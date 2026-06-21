@@ -1,0 +1,225 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1440 500" role="img" aria-labelledby="title description">
+  <title id="title">Coupé sportif japonais rouge</title>
+  <description id="description">Illustration vectorielle professionnelle dessinée à la main, vue arrière trois quarts.</description>
+
+  <defs>
+    <linearGradient id="paintMain" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff5b58"/>
+      <stop offset="0.18" stop-color="#e5161d"/>
+      <stop offset="0.58" stop-color="#bd000b"/>
+      <stop offset="0.83" stop-color="#8e0008"/>
+      <stop offset="1" stop-color="#590006"/>
+    </linearGradient>
+    <linearGradient id="paintSide" x1="0" y1="0" x2="1" y2="0.9">
+      <stop offset="0" stop-color="#b9000b"/>
+      <stop offset="0.38" stop-color="#f02a2d"/>
+      <stop offset="0.68" stop-color="#d00712"/>
+      <stop offset="1" stop-color="#8c0009"/>
+    </linearGradient>
+    <linearGradient id="paintHighlight" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff8580" stop-opacity="0.1"/>
+      <stop offset="0.44" stop-color="#ff9c96" stop-opacity="0.82"/>
+      <stop offset="1" stop-color="#ff726d" stop-opacity="0.05"/>
+    </linearGradient>
+    <linearGradient id="glassRear" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#39454e"/>
+      <stop offset="0.3" stop-color="#172027"/>
+      <stop offset="1" stop-color="#06090c"/>
+    </linearGradient>
+    <linearGradient id="glassSide" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#252e35"/>
+      <stop offset="0.6" stop-color="#090d11"/>
+      <stop offset="1" stop-color="#020304"/>
+    </linearGradient>
+    <linearGradient id="brushedMetal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f0f1ef"/>
+      <stop offset="0.35" stop-color="#a9abad"/>
+      <stop offset="0.62" stop-color="#d9dad8"/>
+      <stop offset="1" stop-color="#707274"/>
+    </linearGradient>
+    <linearGradient id="rimMetal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.26" stop-color="#a6a8a9"/>
+      <stop offset="0.48" stop-color="#f3f3f0"/>
+      <stop offset="0.78" stop-color="#777a7c"/>
+      <stop offset="1" stop-color="#d9dad8"/>
+    </linearGradient>
+    <radialGradient id="tireRubber">
+      <stop offset="0.56" stop-color="#202326"/>
+      <stop offset="0.78" stop-color="#111315"/>
+      <stop offset="1" stop-color="#020303"/>
+    </radialGradient>
+    <radialGradient id="redLens" cx="35%" cy="28%" r="70%">
+      <stop offset="0" stop-color="#ff8278"/>
+      <stop offset="0.34" stop-color="#f31a20"/>
+      <stop offset="0.72" stop-color="#bc000a"/>
+      <stop offset="1" stop-color="#650005"/>
+    </radialGradient>
+    <filter id="groundBlur" x="-10%" y="-100%" width="120%" height="300%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+
+    <!-- Une roue réutilisable garantit des détails et proportions cohérents. -->
+    <g id="wheel">
+      <circle r="92" fill="url(#tireRubber)" stroke="#070809" stroke-width="5"/>
+      <circle r="70" fill="#303336" stroke="#74787b" stroke-width="4"/>
+      <circle r="61" fill="url(#rimMetal)" stroke="#17191a" stroke-width="4"/>
+      <circle r="47" fill="#1c1f21"/>
+      <g fill="url(#rimMetal)" stroke="#252728" stroke-width="2.5" stroke-linejoin="round">
+        <path d="M-8-11-20-55-4-60 9-19 4-6Z"/>
+        <path d="m11-8 39-27 11 13-36 30-12 3Z"/>
+        <path d="m15 10 34 31-9 15-39-27-5-12Z"/>
+        <path d="m-5 17-13 48-17-5 8-49 10-8Z"/>
+        <path d="m-16 1-49-5 1-17 49 1 9 9Z"/>
+      </g>
+      <circle r="19" fill="#c8c9c8" stroke="#191b1c" stroke-width="4"/>
+      <circle r="8" fill="#292b2c"/>
+      <g fill="#222426">
+        <circle cy="-34" r="4"/>
+        <circle cx="32" cy="-11" r="4"/>
+        <circle cx="20" cy="28" r="4"/>
+        <circle cx="-20" cy="28" r="4"/>
+        <circle cx="-32" cy="-11" r="4"/>
+      </g>
+    </g>
+  </defs>
+
+  <ellipse cx="732" cy="448" rx="588" ry="24" fill="#050607" opacity="0.22" filter="url(#groundBlur)"/>
+
+  <!-- Les roues sont posées avant la carrosserie afin que les ailes les recouvrent naturellement. -->
+  <g transform="translate(708 370)"><use href="#wheel" xlink:href="#wheel"/></g>
+  <g transform="translate(1262 345) scale(.86)"><use href="#wheel" xlink:href="#wheel"/></g>
+
+  <!-- Volume principal, construit avec des courbes automobiles continues. -->
+  <path
+    d="M36 352
+       C21 333 20 298 31 273
+       C39 255 55 241 82 231
+       C95 192 118 168 159 151
+       C224 130 301 118 386 109
+       C464 62 548 33 643 21
+       C760 6 887 13 1004 38
+       C1105 59 1184 93 1252 139
+       C1323 187 1362 236 1375 291
+       C1394 297 1405 311 1409 334
+       L1406 370
+       C1391 394 1356 403 1318 409
+       C1312 330 1296 291 1256 276
+       C1207 258 1163 292 1151 361
+       L1143 410
+       L820 437
+       C818 345 786 291 725 280
+       C660 269 611 320 607 405
+       L600 437
+       C452 442 294 439 162 424
+       C95 416 54 391 36 352Z"
+    fill="url(#paintMain)"
+    stroke="#17191b"
+    stroke-width="6"
+    stroke-linejoin="round"
+  />
+
+  <!-- Épaule supérieure et flanc : deux surfaces séparées donnent de la profondeur sans effet cartoon. -->
+  <path
+    d="M88 230
+       C116 188 151 165 210 148
+       C277 130 342 122 405 115
+       C488 63 560 41 650 29
+       C768 14 880 21 993 45
+       C1094 66 1182 104 1247 149
+       C1307 191 1346 235 1365 284
+       C1247 257 1122 235 980 218
+       C758 191 498 181 254 198
+       C190 203 135 213 88 230Z"
+    fill="url(#paintSide)"
+    stroke="#17191b"
+    stroke-width="5"
+  />
+
+  <!-- Vitrages et montants reproduisent une vraie cabine fastback. -->
+  <path
+    d="M382 109
+       C467 64 548 39 646 28
+       L756 24
+       L652 179
+       L294 183
+       C316 151 346 128 382 109Z"
+    fill="url(#glassRear)"
+    stroke="#101214"
+    stroke-width="6"
+  />
+  <path
+    d="M770 25
+       C847 25 921 34 994 50
+       C1069 67 1135 91 1190 123
+       L1243 167
+       L1232 203
+       L671 179
+       Z"
+    fill="url(#glassSide)"
+    stroke="#101214"
+    stroke-width="6"
+  />
+  <path d="M765 24 655 181" fill="none" stroke="#b8babc" stroke-width="7"/>
+  <path d="M1040 61 1026 190" fill="none" stroke="#151719" stroke-width="7"/>
+  <path d="M417 105C503 67 576 48 663 39L617 72C533 96 474 126 424 166L320 177C345 145 375 123 417 105Z" fill="#71808a" opacity="0.2"/>
+  <path d="M792 39C868 43 934 54 997 71L1135 125L839 106Z" fill="#87949c" opacity="0.18"/>
+
+  <!-- Aileron, supports et coffre. -->
+  <path d="M78 161C152 137 270 124 412 121L457 138L423 153C278 153 162 164 91 180Z" fill="#a3000a" stroke="#17191b" stroke-width="6"/>
+  <path d="M109 171 102 211 135 205 149 164Z" fill="#750007" stroke="#17191b" stroke-width="5"/>
+  <path d="M402 145 424 192 451 186 437 140Z" fill="#750007" stroke="#17191b" stroke-width="5"/>
+  <path d="M86 206C211 181 339 174 456 180L500 208 492 287 445 312 56 306 43 264Z" fill="#131619" stroke="#151719" stroke-width="6"/>
+
+  <!-- Bandeau arrière métallique et optiques détaillées. -->
+  <path d="M138 213 329 202 359 273 111 286Z" fill="url(#brushedMetal)" stroke="#111315" stroke-width="5"/>
+  <g>
+    <circle cx="75" cy="259" r="27" fill="#080a0b" stroke="#020303" stroke-width="4"/>
+    <circle cx="75" cy="259" r="18" fill="url(#redLens)" stroke="#a70008" stroke-width="3"/>
+    <circle cx="378" cy="237" r="36" fill="#080a0b" stroke="#020303" stroke-width="4"/>
+    <circle cx="378" cy="237" r="25" fill="url(#redLens)" stroke="#a70008" stroke-width="3"/>
+    <circle cx="301" cy="241" r="35" fill="#080a0b" stroke="#020303" stroke-width="4"/>
+    <circle cx="301" cy="241" r="24" fill="url(#redLens)" stroke="#a70008" stroke-width="3"/>
+  </g>
+  <rect x="159" y="218" width="44" height="22" rx="3" fill="#d9dad8" stroke="#202224" stroke-width="4"/>
+  <rect x="266" y="211" width="45" height="22" rx="3" fill="#d9dad8" stroke="#202224" stroke-width="4"/>
+
+  <!-- Pare-chocs arrière : formes souples et lignes de joint cohérentes. -->
+  <path d="M42 309C157 307 321 302 470 299L502 323 480 357 66 359 34 337Z" fill="#c40c14" stroke="#17191b" stroke-width="6"/>
+  <path d="M49 329 461 325" fill="none" stroke="#ff7872" stroke-width="5" opacity="0.75"/>
+  <path d="M63 365C206 367 391 365 603 357L599 421C439 429 288 425 166 414 110 408 78 390 63 365Z" fill="#840008" opacity="0.76"/>
+
+  <!-- Flanc, portes et bas de caisse. -->
+  <path d="M491 191C693 177 927 187 1234 215L1224 358 1147 410 821 436 609 430 604 360C610 302 650 270 708 268 771 268 811 315 818 392L1138 373C1147 303 1183 264 1248 264" fill="none" stroke="#2a0b0e" stroke-width="5"/>
+  <path d="M858 190 881 413" fill="none" stroke="#360c10" stroke-width="5"/>
+  <path d="M1041 199 1035 388" fill="none" stroke="#360c10" stroke-width="5"/>
+  <path d="M491 346C720 363 934 351 1147 331" fill="none" stroke="#f14143" stroke-width="5" opacity="0.58"/>
+  <path d="M610 421 1143 391 1138 419 817 446 611 442Z" fill="#6e0007" opacity="0.82"/>
+  <path d="M491 195C694 181 910 187 1121 204" fill="none" stroke="url(#paintHighlight)" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- Trappe, poignées et petit répétiteur. -->
+  <rect x="536" y="220" width="57" height="61" rx="13" fill="#c50b14" stroke="#311014" stroke-width="5"/>
+  <rect x="911" y="210" width="58" height="29" rx="13" fill="#bb0710" stroke="#2c0d10" stroke-width="5"/>
+  <path d="M924 220h26" stroke="#ff7770" stroke-width="4" stroke-linecap="round"/>
+  <rect x="1341" y="279" width="25" height="13" rx="4" fill="#ff9b22" stroke="#3a110b" stroke-width="4"/>
+
+  <!-- Rétroviseur modelé avec trois surfaces. -->
+  <path d="M1196 138C1220 115 1253 119 1268 141L1261 174 1218 179 1196 160Z" fill="#ca0c14" stroke="#17191b" stroke-width="6"/>
+  <path d="M1210 141C1225 130 1244 131 1252 143L1248 165 1220 168Z" fill="#aeb4b7" stroke="#26292b" stroke-width="4"/>
+  <path d="M1263 166 1283 184 1256 183Z" fill="#6c0007" stroke="#17191b" stroke-width="4"/>
+
+  <!-- Plaque et échappement. -->
+  <path d="M157 349 255 348 268 410 159 407Z" fill="#c8c9c7" stroke="#181a1b" stroke-width="6"/>
+  <path d="M166 358 247 357 257 400 168 399Z" fill="#ecece8"/>
+  <g transform="translate(73 410)">
+    <path d="M24-12 58-6 57 14 25 15Z" fill="#777a7c" stroke="#17191b" stroke-width="4"/>
+    <ellipse rx="31" ry="24" fill="#1a1d1f" stroke="#090a0b" stroke-width="5"/>
+    <ellipse rx="20" ry="16" fill="#d0d1cf" stroke="#f4f4ef" stroke-width="4"/>
+    <ellipse rx="11" ry="9" fill="#151719"/>
+  </g>
+
+  <!-- Reflets continus peints à la main, jamais blancs purs. -->
+  <path d="M503 204C688 184 938 194 1163 223" fill="none" stroke="#ff8580" stroke-width="6" stroke-linecap="round" opacity="0.62"/>
+  <path d="M511 347C703 367 918 357 1116 338" fill="none" stroke="#ff6964" stroke-width="4" stroke-linecap="round" opacity="0.48"/>
+  <path d="M85 316C204 316 323 312 446 309" fill="none" stroke="#ff6c66" stroke-width="4" stroke-linecap="round" opacity="0.64"/>
+</svg>

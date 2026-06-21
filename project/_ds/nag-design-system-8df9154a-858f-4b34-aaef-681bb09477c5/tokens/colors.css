@@ -1,0 +1,118 @@
+/* ============================================================
+   Nostalgia Auto Gallery — Color tokens
+   JDM crimson · brushed chrome · garage ink · golden-hour sun
+   ============================================================ */
+:root {
+  /* ---- Brand red (matches the cars: Nissan 180SX / Peugeot 205) ---- */
+  --red-50:  #FCEAEB;
+  --red-100: #F7CCCF;
+  --red-200: #EE9AA0;
+  --red-300: #E05E67;
+  --red-400: #D23640;
+  --red-500: #B81E29;   /* primary brand red */
+  --red-600: #A0151F;   /* hover / pressed */
+  --red-700: #7E0F18;   /* deep crimson, car paint in shadow */
+  --red-800: #5C0A11;
+  --red-900: #3A060A;
+
+  /* ---- Ink / garage black ---- */
+  --ink-900: #0D0E10;   /* near-black page on dark */
+  --ink-800: #141518;
+  --ink-700: #1C1E22;
+  --ink-600: #26282D;
+  --ink-500: #34373D;
+
+  /* ---- Steel / brushed chrome neutrals (cool) ---- */
+  --steel-900: #4A4E55;
+  --steel-700: #6B7079;
+  --steel-500: #8E939C;
+  --steel-400: #ABAFB7;
+  --steel-300: #C7CAD0;
+  --steel-200: #DDDFE3;
+  --steel-100: #ECEDF0;
+  --chrome-hi: #F7F8FA;  /* chrome highlight */
+
+  /* ---- Bone / warm paper (light surfaces) ---- */
+  --bone-50:  #FBFAF6;
+  --bone-100: #F5F2EA;   /* primary light surface */
+  --bone-200: #ECE7DB;
+  --bone-300: #DED7C6;
+
+  /* ---- Golden hour sun (warm accent — use sparingly) ---- */
+  --sun-300: #F6C26B;
+  --sun-400: #F0A33D;
+  --sun-500: #E47C24;   /* sunset amber */
+  --sun-600: #C25F16;
+
+  /* ---- JDM rising-sun pure red (logo ray accent) ---- */
+  --hinomaru: #D81F26;
+
+  /* ---- French plate ---- */
+  --plate-blue: #0A3D91;
+  --plate-white: #F2F2EE;
+
+  /* ---- Semantic ---- */
+  --ok-500:   #2E7D4F;
+  --ok-50:    #E6F2EB;
+  --warn-500: #C98A12;
+  --warn-50:  #FBF1DA;
+  --danger-500: #B81E29;
+  --danger-50:  #FCEAEB;
+  --info-500: #2C5C9E;
+  --info-50:  #E7EEF7;
+
+  /* ============================================================
+     SEMANTIC ALIASES — reference these in product code
+     ============================================================ */
+
+  /* Surfaces (light theme = default) */
+  --surface-page:    var(--bone-100);
+  --surface-raised:  #FFFFFF;
+  --surface-card:    #FFFFFF;
+  --surface-sunken:  var(--bone-200);
+  --surface-inverse: var(--ink-900);
+  --surface-rail:    var(--ink-800);
+
+  /* Text */
+  --text-strong:  var(--ink-900);
+  --text-body:    #2C2E33;
+  --text-muted:   var(--steel-700);
+  --text-faint:   var(--steel-500);
+  --text-on-dark: #ECEDF0;
+  --text-on-dark-muted: #9AA0A9;
+  --text-on-red:  #FFFFFF;
+  --text-link:    var(--red-600);
+
+  /* Brand */
+  --brand:        var(--red-500);
+  --brand-hover:  var(--red-600);
+  --brand-press:  var(--red-700);
+  --accent:       var(--sun-500);
+
+  /* Lines / borders */
+  --border-hair:   rgba(13,14,16,.10);
+  --border-soft:   rgba(13,14,16,.16);
+  --border-strong: rgba(13,14,16,.30);
+  --border-on-dark: rgba(255,255,255,.12);
+
+  /* Focus */
+  --focus-ring: var(--red-400);
+}
+
+/* ============================================================
+   Dark scope — apply .nag-dark on a container (rails, heroes)
+   ============================================================ */
+.nag-dark {
+  --surface-page:    var(--ink-900);
+  --surface-raised:  var(--ink-700);
+  --surface-card:    var(--ink-700);
+  --surface-sunken:  var(--ink-800);
+  --text-strong:  #F5F6F8;
+  --text-body:    #D6D9DE;
+  --text-muted:   #9AA0A9;
+  --text-faint:   #6B7079;
+  --border-hair:   rgba(255,255,255,.08);
+  --border-soft:   rgba(255,255,255,.14);
+  --border-strong: rgba(255,255,255,.26);
+  --text-link:    var(--red-300);
+}

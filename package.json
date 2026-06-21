@@ -1,0 +1,26 @@
+{
+    "name": "nostalgia-auto-gallery",
+    "private": true,
+    "version": "1.0.0-beta.1",
+    "type": "module",
+    "scripts": {
+        "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
+        "dev:client": "vite",
+        "dev:server": "node --watch server/index.js",
+        "build": "vite build",
+        "start": "node server/index.js",
+        "test": "node --test"
+    },
+    "dependencies": {
+        "express": "^5.1.0",
+        "lucide-react": "^0.468.0",
+        "react": "^19.1.0",
+        "react-dom": "^19.1.0",
+        "react-router-dom": "^7.6.2"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-react": "^4.5.2",
+        "concurrently": "^9.1.2",
+        "vite": "^6.3.5"
+    }
+}
