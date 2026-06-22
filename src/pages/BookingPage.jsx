@@ -183,6 +183,31 @@ function collectFeatures(categories, formula) {
 }
 
 /**
+ * Panneau d'étape du formulaire de réservation. Classe commune `.panel` ; en-tête avec
+ * le numéro + le titre à gauche et, si fourni, un texte atténué (`aside`) à droite.
+ * @param {object} props Propriétés du panneau.
+ * @param {number} [props.step] Numéro d'étape affiché devant le titre.
+ * @param {string} props.title Titre de l'étape.
+ * @param {React.ReactNode} [props.aside] Texte atténué optionnel, aligné à droite.
+ * @param {string} [props.className] Classes additionnelles.
+ * @param {React.ReactNode} props.children Contenu du panneau.
+ * @returns {JSX.Element} Le panneau d'étape.
+ */
+function BookPanel({ step, title, aside, className = "", children }) {
+    return (
+        <section className={`panel ${className}`.trim()}>
+            <div className="panel__head">
+                <h3>
+                    {step != null && <span>{step}.</span>} {title}
+                </h3>
+                {aside && <span className="panel__aside">{aside}</span>}
+            </div>
+            {children}
+        </section>
+    );
+}
+
+/**
  * Gère le contact, la zone et le parcours complet de réservation.
  *
  * Parcours en quatre étapes : 1. date, 2. formules (grille de prix à bascule +
@@ -519,51 +544,70 @@ export default function BookingPage() {
     }
 
     /*
-     * Bloc « Montant » (rouge) : récap des sous-totaux, remises, prix normal et prix à
-     * payer. Rendu à DEUX emplacements (sous le créneau en desktop, en bas en mobile),
+     * Carte « résumé » (rouge) : date + créneau choisis, puis le détail des prix et le
+     * total. Rendue à DEUX emplacements (sous le créneau en desktop, en bas en mobile),
      * un seul étant visible à la fois via CSS — d'où cette factorisation.
      */
-    const montantBlock = hasFormula ? (
-        <div className="montant-block">
-            <h3 className="montant-block__title">Montant</h3>
-            <ul className="formula-recap__lines">
-                <li>
-                    <span>Lavages</span>
-                    <span>{pricing.washBase} €</span>
-                </li>
-                {pricing.mecaBase > 0 && (
+    const resumePanel =
+        hasFormula || selectedDate ? (
+            <div className="panel-resume">
+                <h3 className="panel-resume__title">Résumé</h3>
+                <ul className="formula-recap__lines">
                     <li>
-                        <span>Mécanique</span>
-                        <span>+{pricing.mecaBase} €</span>
+                        <span>Date</span>
+                        <span>
+                            {selectedDate
+                                ? new Date(`${selectedDate}T12:00:00`).toLocaleDateString("fr-FR")
+                                : "—"}
+                        </span>
                     </li>
-                )}
-                {pricing.optionsBase > 0 && (
                     <li>
-                        <span>Options</span>
-                        <span>+{pricing.optionsBase} €</span>
+                        <span>Créneau</span>
+                        <span>{selectedSlot || "—"}</span>
                     </li>
+                    {hasFormula && (
+                        <>
+                            <li>
+                                <span>Lavages</span>
+                                <span>{pricing.washBase} €</span>
+                            </li>
+                            {pricing.mecaBase > 0 && (
+                                <li>
+                                    <span>Mécanique</span>
+                                    <span>+{pricing.mecaBase} €</span>
+                                </li>
+                            )}
+                            {pricing.optionsBase > 0 && (
+                                <li>
+                                    <span>Options</span>
+                                    <span>+{pricing.optionsBase} €</span>
+                                </li>
+                            )}
+                            {pricing.washEconomy > 0 && (
+                                <li className="is-discount">
+                                    <span>Remise lavage complet</span>
+                                    <span>−{pricing.washEconomy} €</span>
+                                </li>
+                            )}
+                            {/* Remise options toujours affichée (même à 0) : anti-saut. */}
+                            <li className="is-discount">
+                                <span>Remise options −{Math.round(pricing.optionsRate * 100)} %</span>
+                                <span>−{pricing.optionsDiscount} €</span>
+                            </li>
+                        </>
+                    )}
+                </ul>
+                {hasFormula && (
+                    <div className="formula-total">
+                        {pricing.economy > 0 && (
+                            <s className="formula-total__strike">{pricing.base} €</s>
+                        )}
+                        <span className="formula-total__label">À payer</span>
+                        <strong className="formula-total__sale">{pricing.sale} €</strong>
+                    </div>
                 )}
-                {pricing.washEconomy > 0 && (
-                    <li className="is-discount">
-                        <span>Remise lavage complet</span>
-                        <span>−{pricing.washEconomy} €</span>
-                    </li>
-                )}
-                {/* Remise options toujours affichée (même à 0) : anti-saut. */}
-                <li className="is-discount">
-                    <span>Remise options −{Math.round(pricing.optionsRate * 100)} %</span>
-                    <span>−{pricing.optionsDiscount} €</span>
-                </li>
-            </ul>
-            <div className="formula-total">
-                {pricing.economy > 0 && (
-                    <s className="formula-total__strike">{pricing.base} €</s>
-                )}
-                <span className="formula-total__label">À payer</span>
-                <strong className="formula-total__sale">{pricing.sale} €</strong>
             </div>
-        </div>
-    ) : null;
+        ) : null;
 
     return (
         <>
@@ -600,160 +644,173 @@ export default function BookingPage() {
                         </div>
                     ) : (
                         <form className="booking-form" onSubmit={submitAppointment}>
-                            {/* Colonne gauche : 1. date (agenda), 2. créneau dessous. */}
+                            {/* Colonne gauche : 1. date (agenda), 2. créneau, puis le résumé. */}
                             <div className="calendar-panel">
-                                <h3><span>1.</span> Choisissez une date</h3>
-                                <div className="calendar-nav">
-                                    <button
-                                        type="button"
-                                        disabled={!canGoBack}
-                                        onClick={() => setVisibleMonth(
-                                            new Date(
-                                                visibleMonth.getFullYear(),
-                                                visibleMonth.getMonth() - 1,
-                                                1,
-                                            ),
-                                        )}
-                                    >
-                                        <ChevronLeft />
-                                    </button>
-                                    <strong>
-                                        {visibleMonth.toLocaleDateString("fr-FR", {
-                                            month: "long",
-                                            year: "numeric",
-                                        })}
-                                    </strong>
-                                    <button
-                                        type="button"
-                                        onClick={() => setVisibleMonth(
-                                            new Date(
-                                                visibleMonth.getFullYear(),
-                                                visibleMonth.getMonth() + 1,
-                                                1,
-                                            ),
-                                        )}
-                                    >
-                                        <ChevronRight />
-                                    </button>
-                                </div>
-                                <div className="calendar-grid calendar-grid--labels">
-                                    {weekDays.map((day, index) => (
-                                        <span key={`${day}-${index}`}>{day}</span>
-                                    ))}
-                                </div>
-                                <div className="calendar-grid">
-                                    {calendarCells.map((cell, index) => {
-                                        if (!cell) return <span key={`empty-${index}`} />;
-                                        const isDisabled =
-                                            cell.date < today || cell.date.getDay() === 0;
-                                        return (
-                                            <button
-                                                key={cell.iso}
-                                                type="button"
-                                                disabled={isDisabled}
-                                                className={selectedDate === cell.iso ? "is-selected" : ""}
-                                                onClick={() => {
-                                                    setSelectedDate(cell.iso);
-                                                    setSelectedSlot("");
-                                                }}
-                                            >
-                                                {cell.date.getDate()}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-
-                                <h3><span>2.</span> Créneau</h3>
-                                {durationMinutes > 0 && (
-                                    <p className="slot-duration">
-                                        Durée estimée : {formatDuration(durationMinutes)}
-                                    </p>
-                                )}
-                                <div className="slot-grid">
-                                    {selectedDate ? (
-                                        slots.map((slot) => {
-                                            const start = slotToMinutes(slot.time);
-                                            // Occupé par le service en cours (entre le début et la fin).
-                                            const occupied =
-                                                Boolean(selectedSlot) &&
-                                                start > slotToMinutes(selectedSlot) &&
-                                                start < slotToMinutes(selectedSlot) + durationMinutes;
-                                            // Indisponible si un créneau réservé tombe dans la durée.
-                                            const overlapsBooked = slots.some((other) => {
-                                                const time = slotToMinutes(other.time);
-                                                return (
-                                                    time > start &&
-                                                    time < start + durationMinutes &&
-                                                    !other.available
-                                                );
-                                            });
-                                            // Impossible si la prestation dépasse l'horaire de
-                                            // travail du prestataire (fin de la demi-journée).
-                                            const periodEnd = periodEndForSlot(slot.time);
-                                            const exceedsHours =
-                                                periodEnd === null ||
-                                                start + durationMinutes > periodEnd;
+                                <BookPanel
+                                    step={1}
+                                    title="Choisissez une date"
+                                    aside={
+                                        selectedDate
+                                            ? new Date(`${selectedDate}T12:00:00`)
+                                                .toLocaleDateString("fr-FR")
+                                            : null
+                                    }
+                                >
+                                    <div className="calendar-nav">
+                                        <button
+                                            type="button"
+                                            disabled={!canGoBack}
+                                            onClick={() => setVisibleMonth(
+                                                new Date(
+                                                    visibleMonth.getFullYear(),
+                                                    visibleMonth.getMonth() - 1,
+                                                    1,
+                                                ),
+                                            )}
+                                        >
+                                            <ChevronLeft />
+                                        </button>
+                                        <strong>
+                                            {visibleMonth.toLocaleDateString("fr-FR", {
+                                                month: "long",
+                                                year: "numeric",
+                                            })}
+                                        </strong>
+                                        <button
+                                            type="button"
+                                            onClick={() => setVisibleMonth(
+                                                new Date(
+                                                    visibleMonth.getFullYear(),
+                                                    visibleMonth.getMonth() + 1,
+                                                    1,
+                                                ),
+                                            )}
+                                        >
+                                            <ChevronRight />
+                                        </button>
+                                    </div>
+                                    <div className="calendar-grid calendar-grid--labels">
+                                        {weekDays.map((day, index) => (
+                                            <span key={`${day}-${index}`}>{day}</span>
+                                        ))}
+                                    </div>
+                                    <div className="calendar-grid">
+                                        {calendarCells.map((cell, index) => {
+                                            if (!cell) return <span key={`empty-${index}`} />;
+                                            const isDisabled =
+                                                cell.date < today || cell.date.getDay() === 0;
                                             return (
                                                 <button
-                                                    key={slot.time}
+                                                    key={cell.iso}
                                                     type="button"
-                                                    disabled={
-                                                        !slot.available ||
-                                                        occupied ||
-                                                        overlapsBooked ||
-                                                        exceedsHours
-                                                    }
-                                                    className={selectedSlot === slot.time ? "is-selected" : ""}
-                                                    onClick={() => setSelectedSlot(slot.time)}
+                                                    disabled={isDisabled}
+                                                    className={selectedDate === cell.iso ? "is-selected" : ""}
+                                                    onClick={() => {
+                                                        setSelectedDate(cell.iso);
+                                                        setSelectedSlot("");
+                                                    }}
                                                 >
-                                                    {slot.time}
+                                                    {cell.date.getDate()}
                                                 </button>
                                             );
-                                        })
-                                    ) : (
-                                        <p>Sélectionnez d’abord une date.</p>
-                                    )}
-                                </div>
+                                        })}
+                                    </div>
+                                </BookPanel>
 
-                                {/* Montant sous le créneau (desktop uniquement). */}
-                                {montantBlock && (
+                                <BookPanel
+                                    step={2}
+                                    title="Créneau"
+                                    aside={
+                                        durationMinutes > 0
+                                            ? `Durée estimée : ${formatDuration(durationMinutes)}`
+                                            : null
+                                    }
+                                >
+                                    <div className="slot-grid">
+                                        {selectedDate ? (
+                                            slots.map((slot) => {
+                                                const start = slotToMinutes(slot.time);
+                                                // Occupé par le service en cours (entre le début et la fin).
+                                                const occupied =
+                                                    Boolean(selectedSlot) &&
+                                                    start > slotToMinutes(selectedSlot) &&
+                                                    start < slotToMinutes(selectedSlot) + durationMinutes;
+                                                // Indisponible si un créneau réservé tombe dans la durée.
+                                                const overlapsBooked = slots.some((other) => {
+                                                    const time = slotToMinutes(other.time);
+                                                    return (
+                                                        time > start &&
+                                                        time < start + durationMinutes &&
+                                                        !other.available
+                                                    );
+                                                });
+                                                // Impossible si la prestation dépasse l'horaire de
+                                                // travail du prestataire (fin de la demi-journée).
+                                                const periodEnd = periodEndForSlot(slot.time);
+                                                const exceedsHours =
+                                                    periodEnd === null ||
+                                                    start + durationMinutes > periodEnd;
+                                                return (
+                                                    <button
+                                                        key={slot.time}
+                                                        type="button"
+                                                        disabled={
+                                                            !slot.available ||
+                                                            occupied ||
+                                                            overlapsBooked ||
+                                                            exceedsHours
+                                                        }
+                                                        className={selectedSlot === slot.time ? "is-selected" : ""}
+                                                        onClick={() => setSelectedSlot(slot.time)}
+                                                    >
+                                                        {slot.time}
+                                                    </button>
+                                                );
+                                            })
+                                        ) : (
+                                            <p>Sélectionnez d’abord une date.</p>
+                                        )}
+                                    </div>
+                                </BookPanel>
+
+                                {/* Résumé (carte rouge) sous le créneau, sticky (desktop). */}
+                                {resumePanel && (
                                     <div className="montant-slot montant-slot--desktop">
-                                        {montantBlock}
+                                        {resumePanel}
                                     </div>
                                 )}
                             </div>
 
                             {/* Colonne droite : 3. lavages, 4. révision, 5. options, 6. coordonnées. */}
                             <div className="details-panel">
-                                {/* 3. Lavages : sélection Intérieur/Extérieur + prix + incitation. */}
-                                <h3><span>3.</span> Lavages</h3>
-                                <div className="formula-grid">
-                                    {washCategories.map(renderCategory)}
-                                </div>
+                                {/* 3. Lavages : sélection Intérieur/Extérieur + prix. L'incitation
+                                    (statique, atténuée) est posée à droite du titre (aside). */}
+                                <BookPanel
+                                    step={3}
+                                    title="Lavages"
+                                    aside={`----- Économisez jusqu’à ${maxComboDiscount} € pour un lavage complet`}
+                                >
+                                    <div className="formula-grid">
+                                        {washCategories.map(renderCategory)}
+                                    </div>
 
-                                {/* Prix des lavages choisis (Intérieur/Extérieur). */}
-                                {washLines.length > 0 && (
-                                    <ul className="formula-recap__lines">
-                                        {washLines.map((line) => (
-                                            <li key={line.key}>
-                                                <span>{line.label}</span>
-                                                <span>{line.value}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-
-                                {/* Incitation : blanche et grasse dès qu'un lavage est pris,
-                                    sinon grisée (désactivée). */}
-                                <p className={`formula-upsell ${hasWash ? "is-active" : "is-disabled"}`}>
-                                    Économisez jusqu’à {maxComboDiscount} € pour un lavage supplémentaire
-                                </p>
+                                    {/* Prix des lavages choisis (Intérieur/Extérieur). */}
+                                    {washLines.length > 0 && (
+                                        <ul className="formula-recap__lines">
+                                            {washLines.map((line) => (
+                                                <li key={line.key}>
+                                                    <span>{line.label}</span>
+                                                    <span>{line.value}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </BookPanel>
 
                                 {/* 4. Révision de base (méca) : grille toujours visible, mais
                                     grisée/désactivée tant qu'aucun lavage n'est sélectionné. */}
                                 {mecaCategory && (
-                                    <>
-                                        <h3><span>4.</span> Révision de base</h3>
+                                    <BookPanel step={4} title="Révision de base">
                                         <div className={`formula-grid${hasWash ? "" : " is-disabled"}`}>
                                             {renderCategory(mecaCategory)}
                                         </div>
@@ -767,55 +824,56 @@ export default function BookingPage() {
                                                 </li>
                                             </ul>
                                         )}
-                                    </>
+                                    </BookPanel>
                                 )}
 
                                 {/* 5. Options : cases à cocher, actives seulement avec un lavage. */}
-                                <h3><span>5.</span> Options</h3>
-                                <div className="formula-options">
-                                    {!hasWash && (
-                                        <p className="formula-options__hint">
-                                            Sélectionnez un lavage pour ajouter des options.
-                                        </p>
-                                    )}
-                                    {detailingOptions.map((option) => (
-                                        <label
-                                            className={`formula-option${hasWash ? "" : " is-disabled"}`}
-                                            key={option.label}
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                disabled={!hasWash}
-                                                checked={options.includes(option.label)}
-                                                onChange={() => toggleOption(option.label)}
-                                            />
-                                            <span>{option.label}</span>
-                                            <strong>+{option.price} €</strong>
-                                        </label>
-                                    ))}
-                                </div>
+                                <BookPanel step={5} title="Options">
+                                    <div className="formula-options">
+                                        {!hasWash && (
+                                            <p className="formula-options__hint">
+                                                Sélectionnez un lavage pour ajouter des options.
+                                            </p>
+                                        )}
+                                        {detailingOptions.map((option) => (
+                                            <label
+                                                className={`formula-option${hasWash ? "" : " is-disabled"}`}
+                                                key={option.label}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    disabled={!hasWash}
+                                                    checked={options.includes(option.label)}
+                                                    onChange={() => toggleOption(option.label)}
+                                                />
+                                                <span>{option.label}</span>
+                                                <strong>+{option.price} €</strong>
+                                            </label>
+                                        ))}
+                                    </div>
 
-                                {/* Bas du bloc options : montant, remise, puis montant réduit. */}
-                                {pricing.optionsBase > 0 && (
-                                    <ul className="formula-recap__lines">
-                                        <li>
-                                            <span>Montant</span>
-                                            <span>{pricing.optionsBase} €</span>
-                                        </li>
-                                        <li className="is-discount">
-                                            <span>Remise −{Math.round(pricing.optionsRate * 100)} %</span>
-                                            <span>−{pricing.optionsDiscount} €</span>
-                                        </li>
-                                        <li className="formula-recap__net">
-                                            <span>Montant réduit</span>
-                                            <span>{pricing.optionsNet} €</span>
-                                        </li>
-                                    </ul>
-                                )}
+                                    {/* Bas du bloc options : montant, remise, puis montant réduit. */}
+                                    {pricing.optionsBase > 0 && (
+                                        <ul className="formula-recap__lines">
+                                            <li>
+                                                <span>Montant</span>
+                                                <span>{pricing.optionsBase} €</span>
+                                            </li>
+                                            <li className="is-discount">
+                                                <span>Remise −{Math.round(pricing.optionsRate * 100)} %</span>
+                                                <span>−{pricing.optionsDiscount} €</span>
+                                            </li>
+                                            <li className="formula-recap__net">
+                                                <span>Montant réduit</span>
+                                                <span>{pricing.optionsNet} €</span>
+                                            </li>
+                                        </ul>
+                                    )}
+                                </BookPanel>
 
                                 {/* 6. Coordonnées : grille 2 colonnes, téléphone seul sur sa ligne. */}
-                                <h3><span>6.</span> Vos coordonnées</h3>
-                                <div className="coord-grid">
+                                <BookPanel step={6} title="Vos coordonnées">
+                                    <div className="coord-grid">
                                     <input required value={form.name} onChange={(event) => updateField("name", event.target.value)} placeholder="Nom & prénom *" />
                                     <input className="field-full" required value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Téléphone *" inputMode="tel" />
                                     <input value={form.email} onChange={(event) => updateField("email", event.target.value)} placeholder="Email" type="email" />
@@ -838,12 +896,13 @@ export default function BookingPage() {
                                     </button>
                                     <small>Demande sans paiement. Confirmation par téléphone.</small>
                                 </div>
+                                </BookPanel>
                             </div>
 
-                            {/* Montant en bas de tout (mobile uniquement). */}
-                            {montantBlock && (
+                            {/* Résumé (carte rouge) en bas de tout, sticky (mobile uniquement). */}
+                            {resumePanel && (
                                 <div className="montant-slot montant-slot--mobile">
-                                    {montantBlock}
+                                    {resumePanel}
                                 </div>
                             )}
                         </form>

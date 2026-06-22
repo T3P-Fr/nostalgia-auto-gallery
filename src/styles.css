@@ -1236,19 +1236,48 @@ main::after {
     gap: 30px;
 }
 
+/* Colonne agenda en pleine hauteur : permet de pousser la carte Montant tout en bas
+   (margin-top:auto) pour son comportement « sticky bottom ». */
+.calendar-panel {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+}
+
 .booking-form h3 {
-    margin: 0 0 14px;
+    margin: 0;
     font-size: 12px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
 }
 
-.booking-form h3:not(:first-child) {
-    margin-top: 22px;
-}
-
 .booking-form h3 span {
     color: var(--acc);
+}
+
+/* Panneau d'étape commun (1. Date, 2. Créneau, 3. Lavages…). */
+.panel {
+    margin-bottom: 22px;
+}
+
+/* En-tête du panneau : titre à gauche, texte atténué optionnel à droite. */
+.panel__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+/* Texte atténué à droite de l'en-tête (date choisie, durée, incitation…). */
+.panel__aside {
+    flex-shrink: 1;
+    color: var(--subtle);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: normal;
+    text-transform: none;
+    text-align: right;
 }
 
 .calendar-nav {
@@ -1320,14 +1349,6 @@ main::after {
     cursor: not-allowed;
     opacity: 0.25;
     text-decoration: line-through;
-}
-
-/* Durée estimée affichée au-dessus des créneaux (varie selon les formules). */
-.slot-duration {
-    margin: -4px 0 10px;
-    color: var(--acc);
-    font-size: 12px;
-    font-weight: 700;
 }
 
 .slot-grid {
@@ -1639,15 +1660,17 @@ main::after {
     opacity: 1;
 }
 
-/* Bloc Montant (rouge) : sous le créneau en desktop, en bas de page sur mobile. */
-.montant-block {
+/* Carte « résumé » (rouge) : date + créneau + total. Collée en bas (sticky) ; ombre
+   pour la détacher du contenu qui défile dessous. */
+.panel-resume {
     padding: 16px 18px;
     border-radius: 12px;
     background: var(--acc);
     color: #fff;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
 }
 
-.montant-block__title {
+.panel-resume__title {
     margin: 0 0 10px;
     font-size: 12px;
     letter-spacing: 0.1em;
@@ -1655,58 +1678,53 @@ main::after {
 }
 
 /* Sur fond rouge : lignes et séparateurs passent en clair. */
-.montant-block .formula-recap__lines li + li {
+.panel-resume .formula-recap__lines li + li {
     border-top-color: rgba(255, 255, 255, 0.25);
 }
 
-.montant-block .formula-recap__lines li.is-discount {
+.panel-resume .formula-recap__lines li.is-discount {
     color: #ffe2e2;
 }
 
-.montant-block .formula-recap__lines li.is-offered span:last-child {
+.panel-resume .formula-recap__lines li.is-offered span:last-child {
     color: #c9ffdd;
 }
 
-.montant-block .formula-total {
+.panel-resume .formula-total {
     border-top-color: rgba(255, 255, 255, 0.3);
 }
 
-.montant-block .formula-total__strike {
+.panel-resume .formula-total__strike {
     color: rgba(255, 255, 255, 0.7);
 }
 
-.montant-block .formula-total__label {
+.panel-resume .formula-total__label {
     color: rgba(255, 255, 255, 0.85);
 }
 
-.montant-block .formula-total__sale {
+.panel-resume .formula-total__sale {
     color: #fff;
 }
 
-/* Le Montant existe à deux emplacements ; un seul est visible selon la largeur.
-   Par défaut (desktop) : on montre celui sous le créneau, on masque celui du bas. */
+/* La carte résumé existe à deux emplacements ; un seul visible selon la largeur.
+   Desktop : la zone occupe tout l'espace SOUS le créneau jusqu'au bas de la colonne
+   (flex:1). La carte se cale en bas de cette zone et y devient sticky : elle reste
+   donc collée au bas de l'écran de « sous créneau » jusqu'au bas de page. */
 .montant-slot--desktop {
-    margin-top: 20px;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-top: 20px;
+}
+
+.montant-slot--desktop .panel-resume {
+    position: sticky;
+    bottom: 16px;
 }
 
 .montant-slot--mobile {
     display: none;
-}
-
-/* Incitation « Économisez jusqu'à N € » : grasse/blanche si lavage pris, sinon grisée. */
-.formula-upsell {
-    margin: 10px 0 0;
-    font-size: 13px;
-    color: var(--subtle);
-}
-
-.formula-upsell.is-active {
-    color: #fff;
-    font-weight: 700;
-}
-
-.formula-upsell.is-disabled {
-    opacity: 0.45;
 }
 
 .formula-recap {
@@ -2062,7 +2080,7 @@ main::after {
         grid-template-columns: 1fr;
     }
 
-    /* Mobile : on bascule le Montant du dessous-créneau vers le bas de page. */
+    /* Mobile : on bascule le Montant en bas de page, collé (sticky) au bas de l'écran. */
     .montant-slot--desktop {
         display: none;
     }
@@ -2070,6 +2088,8 @@ main::after {
     .montant-slot--mobile {
         display: block;
         margin-top: 20px;
+        position: sticky;
+        bottom: 12px;
     }
 
     .radius-map {
