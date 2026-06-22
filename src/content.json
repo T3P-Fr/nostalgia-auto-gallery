@@ -86,7 +86,7 @@
         "groups": [
             {
                 "key": "interieur",
-                "title": "Lavage intérieur",
+                "title": "Intérieur",
                 "subtitle": "Habitacle",
                 "bonusLabel": "Prenez aussi un extérieur et économisez",
                 "discounts": {
@@ -132,7 +132,7 @@
             },
             {
                 "key": "exterieur",
-                "title": "Lavage extérieur",
+                "title": "Extérieur",
                 "subtitle": "Carrosserie",
                 "bonusLabel": "Prenez aussi un intérieur et économisez",
                 "discounts": {
@@ -181,7 +181,7 @@
             },
             {
                 "key": "meca",
-                "title": "Révision de mécanique de base",
+                "title": "Révision de base",
                 "subtitle": "Intérieur + extérieur",
                 "bonusLabel": "Formule tout-en-un : intérieur + extérieur + méca",
                 "tiers": [

@@ -1448,19 +1448,6 @@ main::after {
     align-items: center;
 }
 
-/* padding-inline 12px : aligne les en-têtes sur le contenu du cadre .formula-wash
-   (qui a la même marge interne) et sur la méca, pour des colonnes alignées. */
-.formula-grid__head {
-    margin-bottom: 6px;
-    padding-inline: 12px;
-    color: var(--subtle);
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    text-align: center;
-}
-
 /* La méca (enfant direct de la grille, hors cadre) reçoit le même retrait. */
 .formula-grid>.formula-cat {
     padding-inline: 12px;
@@ -1496,18 +1483,15 @@ main::after {
     --level-color: var(--acc);
 }
 
-/* En-têtes de colonnes colorés selon le niveau. */
-.formula-grid__head .platine,
-.formula-grid__head .premium,
-.formula-grid__head .deluxe {
-    color: var(--level-color);
-}
-
 /* Prix cliquable (bascule). Survol = bordure du niveau ; sélection = fond du niveau. */
 .formula-price {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
     overflow: hidden;
-    padding: 10px 6px;
+    padding: 9px 6px;
     border: 1px solid var(--line);
     border-radius: 8px;
     background: var(--surface2);
@@ -1516,6 +1500,20 @@ main::after {
     font-size: 14px;
     font-weight: 700;
     transition: 150ms ease;
+}
+
+/* Niveau (qualité) affiché dans le bouton, plus petit et coloré selon le niveau. */
+.formula-price__level {
+    font-size: 0.8em;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--level-color);
+}
+
+/* Sélectionné : tout le texte passe en blanc (cf. .is-selected). */
+.formula-price.is-selected .formula-price__level {
+    color: #fff;
 }
 
 .formula-price:hover:not(:disabled) {
@@ -1537,8 +1535,8 @@ main::after {
     opacity: 0.4;
 }
 
-/* Méca offerte : prix barré + bandeau incliné « Offert » dans le coin. */
-.formula-price.is-offered {
+/* Méca offerte : prix barré (le niveau reste lisible) + bandeau incliné « Offert ». */
+.formula-price.is-offered .formula-price__amount {
     text-decoration: line-through;
 }
 
@@ -1560,60 +1558,12 @@ main::after {
     text-transform: uppercase;
 }
 
-.formula-cat__bonus {
-    margin: 8px 0 0;
-    color: var(--subtle);
-    font-size: 11px;
-    font-style: italic;
-}
-
-/* Remises de combinaison, alignées sous les trois colonnes de prix. */
-.formula-cat__savings {
-    margin-top: 3px;
-    font-size: 11px;
-    font-weight: 700;
-}
-
-/* Chaque réduction est présentée dans un cadre rouge (accent), sous sa colonne. */
-.formula-cat__savings span {
-    padding: 3px 0;
-    border: 1px solid var(--acc);
-    border-radius: 6px;
-    background: color-mix(in srgb, var(--acc) 14%, transparent);
-    color: var(--acc);
-    text-align: center;
-}
-
 /* Prestations incluses, sous forme de pills. */
-/* Intitulé au-dessus des prestations incluses (libellé + compteur). */
-.formula-pills__title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 4px 0 8px;
-    color: var(--subtle);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-/* Pastille du nombre de prestations incluses. */
-.formula-pills__count {
-    min-width: 20px;
-    padding: 1px 7px;
-    border-radius: 999px;
-    background: color-mix(in srgb, var(--acc) 16%, transparent);
-    color: var(--acc);
-    font-size: 11px;
-    text-align: center;
-}
-
 .formula-pills {
     display: flex;
     flex-wrap: wrap;
     gap: 7px;
-    margin-bottom: 16px;
+    margin: 8px 0 14px;
 }
 
 .pill {
@@ -1678,24 +1628,93 @@ main::after {
     font-style: italic;
 }
 
-/* Ligne de remise progressive sur les options (montant à droite). */
-.formula-options__discount {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin: 6px 0 0;
-    color: var(--acc);
+/* Étape « Révision de base » désactivée (aucun lavage) : grille grisée, non cliquable.
+   On annule l'opacité des boutons déjà désactivés pour éviter une double atténuation. */
+.formula-grid.is-disabled {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+.formula-grid.is-disabled .formula-price:disabled {
+    opacity: 1;
+}
+
+/* Bloc Montant (rouge) : sous le créneau en desktop, en bas de page sur mobile. */
+.montant-block {
+    padding: 16px 18px;
+    border-radius: 12px;
+    background: var(--acc);
+    color: #fff;
+}
+
+.montant-block__title {
+    margin: 0 0 10px;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+/* Sur fond rouge : lignes et séparateurs passent en clair. */
+.montant-block .formula-recap__lines li + li {
+    border-top-color: rgba(255, 255, 255, 0.25);
+}
+
+.montant-block .formula-recap__lines li.is-discount {
+    color: #ffe2e2;
+}
+
+.montant-block .formula-recap__lines li.is-offered span:last-child {
+    color: #c9ffdd;
+}
+
+.montant-block .formula-total {
+    border-top-color: rgba(255, 255, 255, 0.3);
+}
+
+.montant-block .formula-total__strike {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.montant-block .formula-total__label {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.montant-block .formula-total__sale {
+    color: #fff;
+}
+
+/* Le Montant existe à deux emplacements ; un seul est visible selon la largeur.
+   Par défaut (desktop) : on montre celui sous le créneau, on masque celui du bas. */
+.montant-slot--desktop {
+    margin-top: 20px;
+}
+
+.montant-slot--mobile {
+    display: none;
+}
+
+/* Incitation « Économisez jusqu'à N € » : grasse/blanche si lavage pris, sinon grisée. */
+.formula-upsell {
+    margin: 10px 0 0;
     font-size: 13px;
+    color: var(--subtle);
+}
+
+.formula-upsell.is-active {
+    color: #fff;
     font-weight: 700;
 }
 
-/* Récapitulatif : détail des prix cumulés au-dessus du total. */
+.formula-upsell.is-disabled {
+    opacity: 0.45;
+}
+
 .formula-recap {
     margin-top: 16px;
 }
 
 .formula-recap__lines {
-    margin: 0 0 4px;
+    margin: 10px 0 4px;
     padding: 0;
     list-style: none;
 }
@@ -1716,6 +1735,17 @@ main::after {
 /* Méca offerte : le montant « Offert » ressort en vert. */
 .formula-recap__lines li.is-offered span:last-child {
     color: #2b9d5f;
+    font-weight: 700;
+}
+
+/* Ligne de remise (remise lavage complet) : en accent. */
+.formula-recap__lines li.is-discount {
+    color: var(--acc);
+    font-weight: 700;
+}
+
+/* Ligne « montant réduit » : mise en avant (gras). */
+.formula-recap__lines li.formula-recap__net {
     font-weight: 700;
 }
 
@@ -1740,8 +1770,17 @@ main::after {
     font-weight: 700;
 }
 
-.formula-total__sale {
+/* « À payer » poussé à droite, juste avant le prix. */
+.formula-total__label {
     margin-left: auto;
+    color: var(--subtle);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.formula-total__sale {
     font-family: "DM Serif Display", serif;
     font-size: 30px;
     font-weight: 400;
@@ -2021,6 +2060,16 @@ main::after {
     .booking-layout,
     .booking-form {
         grid-template-columns: 1fr;
+    }
+
+    /* Mobile : on bascule le Montant du dessous-créneau vers le bas de page. */
+    .montant-slot--desktop {
+        display: none;
+    }
+
+    .montant-slot--mobile {
+        display: block;
+        margin-top: 20px;
     }
 
     .radius-map {

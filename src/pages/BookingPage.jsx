@@ -32,6 +32,23 @@ const initialForm = {
 // Aucune catégorie sélectionnée au départ (chaîne vide = aucun niveau pris).
 const emptyFormula = { interieur: "", exterieur: "", meca: "" };
 
+// Économie maximale en ajoutant le second lavage (remise du plus haut niveau).
+const maxComboDiscount = Math.max(...Object.values(comboDiscounts));
+
+// Lavages (Intérieur/Extérieur) et méca séparés : chacun a désormais son cadre.
+const washCategories = formulaCategories.filter((category) => category.key !== "meca");
+const mecaCategory = formulaCategories.find((category) => category.key === "meca");
+
+/*
+ * Plages de travail du prestataire (matin / après-midi). Sert à invalider un créneau
+ * dont la prestation dépasserait l'heure de fermeture de sa demi-journée.
+ * (Les créneaux 08:00/10:00 et 13:30/15:30/17:00 viennent du backend.)
+ */
+const workingPeriods = [
+    { start: "08:00", end: "12:00" },
+    { start: "13:30", end: "19:00" },
+];
+
 /**
  * Convertit une date locale en chaîne ISO sans décalage de fuseau.
  * @param {Date} date Date locale à convertir.
@@ -98,6 +115,19 @@ function slotToMinutes(time) {
 }
 
 /**
+ * Heure de fin (en minutes) de la plage de travail à laquelle appartient un créneau.
+ * @param {string} time Horaire du créneau « HH:MM ».
+ * @returns {number|null} Fin de la plage en minutes, ou null si hors plages de travail.
+ */
+function periodEndForSlot(time) {
+    const minutes = slotToMinutes(time);
+    const period = workingPeriods.find(
+        (range) => minutes >= slotToMinutes(range.start) && minutes < slotToMinutes(range.end),
+    );
+    return period ? slotToMinutes(period.end) : null;
+}
+
+/**
  * Taux de remise progressif appliqué au SOUS-TOTAL des options : plus le client en
  * cumule, plus la remise grandit (1 → 6 %, 2 → 8 %, 3 → 10 %, toutes → 12 %).
  * @param {number} selectedCount Nombre d'options cochées.
@@ -120,6 +150,36 @@ function optionsDiscountRate(selectedCount, totalCount) {
     }
     // 3 options ou plus (mais pas toutes).
     return 0.1;
+}
+
+/**
+ * Liste cumulée et dédoublonnée des prestations incluses pour des catégories données.
+ * Cumule les prestations du palier le plus bas jusqu'au niveau choisi de chaque catégorie.
+ * @param {Array<object>} categories Catégories à parcourir (ex. lavages, ou méca seule).
+ * @param {object} formula État de sélection { interieur, exterieur, meca }.
+ * @returns {Array<{ key: string, label: string }>} Prestations triées alphabétiquement.
+ */
+function collectFeatures(categories, formula) {
+    const seen = new Set();
+    const list = [];
+    categories.forEach((category) => {
+        const level = formula[category.key];
+        if (!level) {
+            return;
+        }
+        const selectedRank = formulaLevels.indexOf(level);
+        formulaLevels.forEach((currentLevel, rank) => {
+            if (rank <= selectedRank) {
+                category.features[currentLevel].forEach((label) => {
+                    if (!seen.has(label)) {
+                        seen.add(label);
+                        list.push({ key: label, label });
+                    }
+                });
+            }
+        });
+    });
+    return list.sort((a, b) => a.label.localeCompare(b.label, "fr"));
 }
 
 /**
@@ -148,6 +208,14 @@ export default function BookingPage() {
     // Les options ne sont disponibles qu'avec un lavage (intérieur OU extérieur).
     const hasWash = Boolean(formula.interieur || formula.exterieur);
 
+    // Niveau de méca OFFERT (gratuit) en lavage complet = le plus bas des deux lavages.
+    // En dessous de ce niveau, la méca n'est pas sélectionnable (cf. renderCategory).
+    const mecaOfferedLevel = isCompleteWash
+        ? formulaLevels.indexOf(formula.interieur) <= formulaLevels.indexOf(formula.exterieur)
+            ? formula.interieur
+            : formula.exterieur
+        : null;
+
     useEffect(() => {
         if (!selectedDate) {
             setSlots([]);
@@ -168,20 +236,23 @@ export default function BookingPage() {
         }
     }, [hasWash]);
 
-    // Lavage complet (intérieur + extérieur) : la méca est OFFERTE au niveau le PLUS
-    // BAS des deux lavages choisis. Sans aucun lavage, la méca est retirée.
+    // Cohérence de la méca selon les lavages :
+    // - aucun lavage → méca retirée (non disponible seule) ;
+    // - lavage complet → la méca ne peut pas rester sous le niveau offert (on remonte).
     useEffect(() => {
         setFormula((current) => {
-            if (current.interieur && current.exterieur) {
-                const lowest =
+            if (!current.interieur && !current.exterieur) {
+                return current.meca ? { ...current, meca: "" } : current;
+            }
+            if (current.interieur && current.exterieur && current.meca) {
+                const offered =
                     formulaLevels.indexOf(current.interieur) <=
                         formulaLevels.indexOf(current.exterieur)
                         ? current.interieur
                         : current.exterieur;
-                return current.meca === lowest ? current : { ...current, meca: lowest };
-            }
-            if (!current.interieur && !current.exterieur && current.meca) {
-                return { ...current, meca: "" };
+                if (formulaLevels.indexOf(current.meca) < formulaLevels.indexOf(offered)) {
+                    return { ...current, meca: offered };
+                }
             }
             return current;
         });
@@ -189,15 +260,19 @@ export default function BookingPage() {
 
     // Total barré, économie et prix de vente, recalculés à chaque choix.
     const pricing = useMemo(() => {
-        // Prix des lavages/méca (la remise de combinaison s'y applique).
+        // Prix des lavages (Intérieur/Extérieur) et de la méca, comptés séparément.
         let washBase = 0;
+        let mecaBase = 0;
         formulaCategories.forEach((category) => {
             const level = formula[category.key];
             if (!level) {
                 return;
             }
-            // Méca OFFERTE avec un lavage complet : elle ne compte pas dans le total.
-            if (category.key === "meca" && isCompleteWash) {
+            if (category.key === "meca") {
+                // Méca OFFERTE avec un lavage complet : elle ne compte pas dans le total.
+                if (!isCompleteWash) {
+                    mecaBase += category.prices[level];
+                }
                 return;
             }
             washBase += category.prices[level];
@@ -212,85 +287,65 @@ export default function BookingPage() {
             }
         });
 
-        const base = washBase + optionsBase;
+        const base = washBase + mecaBase + optionsBase;
 
-        // Remise de combinaison : montant du niveau le plus bas des deux lavages.
-        let economy = 0;
+        // Remise de combinaison sur les lavages : montant du niveau le plus bas des deux.
+        let washEconomy = 0;
         if (isCompleteWash) {
             const lowerLevel =
                 formulaLevels.indexOf(formula.interieur) <=
                     formulaLevels.indexOf(formula.exterieur)
                     ? formula.interieur
                     : formula.exterieur;
-            economy += comboDiscounts[lowerLevel];
+            washEconomy += comboDiscounts[lowerLevel];
         }
 
         // Remise progressive sur le seul sous-total des options.
         const optionsRate = optionsDiscountRate(options.length, detailingOptions.length);
         const optionsDiscount = Math.round(optionsBase * optionsRate);
-        economy += optionsDiscount;
 
-        return { base, economy, optionsDiscount, optionsRate, sale: base - economy };
+        // Économie totale = remise lavage complet + remise options.
+        const economy = washEconomy + optionsDiscount;
+
+        return {
+            base,
+            economy,
+            washBase,
+            mecaBase,
+            washEconomy,
+            optionsBase,
+            optionsDiscount,
+            optionsRate,
+            optionsNet: optionsBase - optionsDiscount,
+            sale: base - economy,
+        };
     }, [formula, options, isCompleteWash]);
 
-    // Prestations incluses (pills) : cumul des niveaux choisis, du plus bas au choisi.
-    // Dédoublonnées par libellé (une même prestation peut figurer dans plusieurs
-    // catégories ou paliers) pour un décompte juste.
-    const activeFeatures = useMemo(() => {
-        const seen = new Set();
-        const list = [];
-        formulaCategories.forEach((category) => {
-            const level = formula[category.key];
-            if (!level) {
-                return;
-            }
-
-            const selectedRank = formulaLevels.indexOf(level);
-            formulaLevels.forEach((currentLevel, rank) => {
-                if (rank <= selectedRank) {
-                    category.features[currentLevel].forEach((label) => {
-                        if (!seen.has(label)) {
-                            seen.add(label);
-                            list.push({ key: label, label });
-                        }
-                    });
-                }
+    // Détail des prix des lavages (Intérieur/Extérieur), sous la grille LAVAGE.
+    const washLines = useMemo(() => {
+        return washCategories
+            .filter((category) => formula[category.key])
+            .map((category) => {
+                const level = formula[category.key];
+                return {
+                    key: category.key,
+                    label: `${category.label} ${level}`,
+                    value: `${category.prices[level]} €`,
+                };
             });
-        });
-        // Pills classées par ordre alphabétique.
-        return list.sort((a, b) => a.label.localeCompare(b.label, "fr"));
     }, [formula]);
 
-    // Détail des prix sélectionnés (un par ligne) pour le récapitulatif cumulé.
-    const priceLines = useMemo(() => {
-        const lines = [];
-        formulaCategories.forEach((category) => {
-            const level = formula[category.key];
-            if (!level) {
-                return;
-            }
-            // Méca offerte quand le lavage est complet : montrée à 0 € (offerte).
-            const offered = category.key === "meca" && isCompleteWash;
-            lines.push({
-                key: category.key,
-                label: `${category.label} ${level}`,
-                value: offered ? "Offert" : `${category.prices[level]} €`,
-                offered,
-            });
-        });
-        options.forEach((label) => {
-            const option = detailingOptions.find((entry) => entry.label === label);
-            if (option) {
-                lines.push({
-                    key: `option-${label}`,
-                    label,
-                    value: `+${option.price} €`,
-                    offered: false,
-                });
-            }
-        });
-        return lines;
-    }, [formula, options, isCompleteWash]);
+    // Ligne de prix de la méca, sous la grille MÉCANIQUE (« Offert » si lavage complet).
+    const mecaLine = useMemo(() => {
+        if (!mecaCategory || !formula.meca) {
+            return null;
+        }
+        return {
+            label: `${mecaCategory.label} ${formula.meca}`,
+            value: isCompleteWash ? "Offert" : `${mecaCategory.prices[formula.meca]} €`,
+            offered: isCompleteWash,
+        };
+    }, [formula.meca, isCompleteWash]);
 
     // Résumé lisible de la formule, envoyé comme « prestation » au backend.
     const serviceSummary = useMemo(() => {
@@ -404,13 +459,16 @@ export default function BookingPage() {
         visibleMonth.getMonth() > today.getMonth();
 
     /**
-     * Rend une catégorie de la grille (titre, 3 prix cliquables, bonus/remises).
-     * La méca est indisponible sans lavage et verrouillée (offerte) si lavage complet.
+     * Rend une catégorie de la grille : titre, 3 prix cliquables et ses prestations
+     * incluses (pills) juste en dessous. La méca est sélectionnable librement dès qu'un
+     * lavage est pris ; elle est offerte (gratuite) lorsque le lavage est complet.
      * @param {object} category Catégorie issue de formulaCategories.
      * @returns {JSX.Element} Le bloc de la catégorie.
      */
     function renderCategory(category) {
         const isMeca = category.key === "meca";
+        // Prestations incluses propres à CETTE catégorie, sous ses boutons.
+        const features = collectFeatures([category], formula);
 
         return (
             <div className="formula-cat" key={category.key}>
@@ -418,8 +476,17 @@ export default function BookingPage() {
                 <div className="formula-grid__line">
                     {formulaLevels.map((level) => {
                         const selected = formula[category.key] === level;
-                        const offered = isMeca && selected && isCompleteWash;
-                        const disabled = isMeca && (!hasWash || isCompleteWash);
+                        // Le flag « Offert » se place toujours sur la méca la moins chère
+                        // disponible (le niveau offert), quelle que soit la sélection.
+                        const offered = isMeca && isCompleteWash && level === mecaOfferedLevel;
+                        // Méca : indisponible sans lavage ; et sous le niveau offert
+                        // (lavage complet) seuls les niveaux supérieurs sont sélectionnables.
+                        const disabled =
+                            isMeca &&
+                            (!hasWash ||
+                                (mecaOfferedLevel &&
+                                    formulaLevels.indexOf(level) <
+                                        formulaLevels.indexOf(mecaOfferedLevel)));
                         return (
                             <button
                                 type="button"
@@ -429,27 +496,74 @@ export default function BookingPage() {
                                 className={`formula-price ${level.toLowerCase()}${selected ? " is-selected" : ""}${offered ? " is-offered" : ""}`}
                                 onClick={() => toggleFormula(category.key, level)}
                             >
-                                {category.prices[level]} €
+                                {/* Qualité de l'intervention (0.8em) puis prix, dans le bouton. */}
+                                <span className="formula-price__level">{level}</span>
+                                <span className="formula-price__amount">{category.prices[level]} €</span>
                             </button>
                         );
                     })}
                 </div>
-                {/* Incitation + réductions : seulement si CE lavage est sélectionné. */}
-                {formula[category.key] && (
-                    <>
-                        <p className="formula-cat__bonus">{category.bonusLabel}</p>
-                        {category.discounts && (
-                            <div className="formula-grid__line formula-cat__savings">
-                                {formulaLevels.map((level) => (
-                                    <span key={level}>−{category.discounts[level]} €</span>
-                                ))}
-                            </div>
-                        )}
-                    </>
+
+                {/* Prestations incluses de la catégorie, en pleine largeur sous ses prix. */}
+                {features.length > 0 && (
+                    <div className="formula-pills">
+                        {features.map((feature) => (
+                            <span className="pill" key={feature.key}>
+                                {feature.label}
+                            </span>
+                        ))}
+                    </div>
                 )}
             </div>
         );
     }
+
+    /*
+     * Bloc « Montant » (rouge) : récap des sous-totaux, remises, prix normal et prix à
+     * payer. Rendu à DEUX emplacements (sous le créneau en desktop, en bas en mobile),
+     * un seul étant visible à la fois via CSS — d'où cette factorisation.
+     */
+    const montantBlock = hasFormula ? (
+        <div className="montant-block">
+            <h3 className="montant-block__title">Montant</h3>
+            <ul className="formula-recap__lines">
+                <li>
+                    <span>Lavages</span>
+                    <span>{pricing.washBase} €</span>
+                </li>
+                {pricing.mecaBase > 0 && (
+                    <li>
+                        <span>Mécanique</span>
+                        <span>+{pricing.mecaBase} €</span>
+                    </li>
+                )}
+                {pricing.optionsBase > 0 && (
+                    <li>
+                        <span>Options</span>
+                        <span>+{pricing.optionsBase} €</span>
+                    </li>
+                )}
+                {pricing.washEconomy > 0 && (
+                    <li className="is-discount">
+                        <span>Remise lavage complet</span>
+                        <span>−{pricing.washEconomy} €</span>
+                    </li>
+                )}
+                {/* Remise options toujours affichée (même à 0) : anti-saut. */}
+                <li className="is-discount">
+                    <span>Remise options −{Math.round(pricing.optionsRate * 100)} %</span>
+                    <span>−{pricing.optionsDiscount} €</span>
+                </li>
+            </ul>
+            <div className="formula-total">
+                {pricing.economy > 0 && (
+                    <s className="formula-total__strike">{pricing.base} €</s>
+                )}
+                <span className="formula-total__label">À payer</span>
+                <strong className="formula-total__sale">{pricing.sale} €</strong>
+            </div>
+        </div>
+    ) : null;
 
     return (
         <>
@@ -552,7 +666,7 @@ export default function BookingPage() {
                                 <h3><span>2.</span> Créneau</h3>
                                 {durationMinutes > 0 && (
                                     <p className="slot-duration">
-                                        Durée estimée du rendez-vous : {formatDuration(durationMinutes)}
+                                        Durée estimée : {formatDuration(durationMinutes)}
                                     </p>
                                 )}
                                 <div className="slot-grid">
@@ -573,11 +687,22 @@ export default function BookingPage() {
                                                     !other.available
                                                 );
                                             });
+                                            // Impossible si la prestation dépasse l'horaire de
+                                            // travail du prestataire (fin de la demi-journée).
+                                            const periodEnd = periodEndForSlot(slot.time);
+                                            const exceedsHours =
+                                                periodEnd === null ||
+                                                start + durationMinutes > periodEnd;
                                             return (
                                                 <button
                                                     key={slot.time}
                                                     type="button"
-                                                    disabled={!slot.available || occupied || overlapsBooked}
+                                                    disabled={
+                                                        !slot.available ||
+                                                        occupied ||
+                                                        overlapsBooked ||
+                                                        exceedsHours
+                                                    }
                                                     className={selectedSlot === slot.time ? "is-selected" : ""}
                                                     onClick={() => setSelectedSlot(slot.time)}
                                                 >
@@ -589,47 +714,64 @@ export default function BookingPage() {
                                         <p>Sélectionnez d’abord une date.</p>
                                     )}
                                 </div>
+
+                                {/* Montant sous le créneau (desktop uniquement). */}
+                                {montantBlock && (
+                                    <div className="montant-slot montant-slot--desktop">
+                                        {montantBlock}
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Colonne droite : 3. formules, 4. coordonnées. */}
+                            {/* Colonne droite : 3. lavages, 4. révision, 5. options, 6. coordonnées. */}
                             <div className="details-panel">
-                                <h3><span>3.</span> Vos formules</h3>
+                                {/* 3. Lavages : sélection Intérieur/Extérieur + prix + incitation. */}
+                                <h3><span>3.</span> Lavages</h3>
                                 <div className="formula-grid">
-                                    {/* En-têtes de colonnes — mêmes classes de niveau que les
-                                        boutons (.platine/.premium/.deluxe) pour la couleur. */}
-                                    <div className="formula-grid__line formula-grid__head">
-                                        {formulaLevels.map((level) => (
-                                            <span key={level} className={level.toLowerCase()}>
-                                                {level}
-                                            </span>
-                                        ))}
-                                    </div>
-
-                                    {formulaCategories.map(renderCategory)}
+                                    {washCategories.map(renderCategory)}
                                 </div>
 
-                                {/* Prestations incluses : titre + nombre, puis la liste de pills. */}
-                                {activeFeatures.length > 0 && (
+                                {/* Prix des lavages choisis (Intérieur/Extérieur). */}
+                                {washLines.length > 0 && (
+                                    <ul className="formula-recap__lines">
+                                        {washLines.map((line) => (
+                                            <li key={line.key}>
+                                                <span>{line.label}</span>
+                                                <span>{line.value}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+
+                                {/* Incitation : blanche et grasse dès qu'un lavage est pris,
+                                    sinon grisée (désactivée). */}
+                                <p className={`formula-upsell ${hasWash ? "is-active" : "is-disabled"}`}>
+                                    Économisez jusqu’à {maxComboDiscount} € pour un lavage supplémentaire
+                                </p>
+
+                                {/* 4. Révision de base (méca) : grille toujours visible, mais
+                                    grisée/désactivée tant qu'aucun lavage n'est sélectionné. */}
+                                {mecaCategory && (
                                     <>
-                                        <p className="formula-pills__title">
-                                            <span>Prestations incluses</span>
-                                            <span className="formula-pills__count">
-                                                {activeFeatures.length}
-                                            </span>
-                                        </p>
-                                        <div className="formula-pills">
-                                            {activeFeatures.map((feature) => (
-                                                <span className="pill" key={feature.key}>
-                                                    {feature.label}
-                                                </span>
-                                            ))}
+                                        <h3><span>4.</span> Révision de base</h3>
+                                        <div className={`formula-grid${hasWash ? "" : " is-disabled"}`}>
+                                            {renderCategory(mecaCategory)}
                                         </div>
+
+                                        {/* Prix de la méca (« Offert » en vert si lavage complet). */}
+                                        {mecaLine && (
+                                            <ul className="formula-recap__lines">
+                                                <li className={mecaLine.offered ? "is-offered" : ""}>
+                                                    <span>{mecaLine.label}</span>
+                                                    <span>{mecaLine.value}</span>
+                                                </li>
+                                            </ul>
+                                        )}
                                     </>
                                 )}
 
-                                {/* Options : cases à cocher (total). Disponibles seulement
-                                    si un lavage (intérieur ou extérieur) est sélectionné. */}
-                                <p className="formula-pills__title">Prestations en options</p>
+                                {/* 5. Options : cases à cocher, actives seulement avec un lavage. */}
+                                <h3><span>5.</span> Options</h3>
                                 <div className="formula-options">
                                     {!hasWash && (
                                         <p className="formula-options__hint">
@@ -653,43 +795,26 @@ export default function BookingPage() {
                                     ))}
                                 </div>
 
-                                {/* Remise progressive sur les options : TOUJOURS affichée (même à 0)
-                                    pour réserver sa place et éviter les sauts de mise en page. */}
-                                <p className="formula-options__discount">
-                                    Remise options −{Math.round(pricing.optionsRate * 100)} %
-                                    <strong>−{pricing.optionsDiscount} €</strong>
-                                </p>
-
-                                {/* Récapitulatif : détail de chaque prix cumulé, puis total. */}
-                                {hasFormula && (
-                                    <div className="formula-recap">
-                                        <ul className="formula-recap__lines">
-                                            {priceLines.map((line) => (
-                                                <li
-                                                    key={line.key}
-                                                    className={line.offered ? "is-offered" : ""}
-                                                >
-                                                    <span>{line.label}</span>
-                                                    <span>{line.value}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                        <div className="formula-total">
-                                            {pricing.economy > 0 && (
-                                                <>
-                                                    <s className="formula-total__strike">{pricing.base} €</s>
-                                                    <span className="formula-total__save">
-                                                        Économie −{pricing.economy} €
-                                                    </span>
-                                                </>
-                                            )}
-                                            <strong className="formula-total__sale">{pricing.sale} €</strong>
-                                        </div>
-                                    </div>
+                                {/* Bas du bloc options : montant, remise, puis montant réduit. */}
+                                {pricing.optionsBase > 0 && (
+                                    <ul className="formula-recap__lines">
+                                        <li>
+                                            <span>Montant</span>
+                                            <span>{pricing.optionsBase} €</span>
+                                        </li>
+                                        <li className="is-discount">
+                                            <span>Remise −{Math.round(pricing.optionsRate * 100)} %</span>
+                                            <span>−{pricing.optionsDiscount} €</span>
+                                        </li>
+                                        <li className="formula-recap__net">
+                                            <span>Montant réduit</span>
+                                            <span>{pricing.optionsNet} €</span>
+                                        </li>
+                                    </ul>
                                 )}
 
-                                {/* 4. Coordonnées : grille 2 colonnes, téléphone seul sur sa ligne. */}
-                                <h3><span>4.</span> Vos coordonnées</h3>
+                                {/* 6. Coordonnées : grille 2 colonnes, téléphone seul sur sa ligne. */}
+                                <h3><span>6.</span> Vos coordonnées</h3>
                                 <div className="coord-grid">
                                     <input required value={form.name} onChange={(event) => updateField("name", event.target.value)} placeholder="Nom & prénom *" />
                                     <input className="field-full" required value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Téléphone *" inputMode="tel" />
@@ -714,6 +839,13 @@ export default function BookingPage() {
                                     <small>Demande sans paiement. Confirmation par téléphone.</small>
                                 </div>
                             </div>
+
+                            {/* Montant en bas de tout (mobile uniquement). */}
+                            {montantBlock && (
+                                <div className="montant-slot montant-slot--mobile">
+                                    {montantBlock}
+                                </div>
+                            )}
                         </form>
                     )}
                 </div>
