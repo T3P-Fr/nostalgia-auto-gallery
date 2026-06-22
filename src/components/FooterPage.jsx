@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
+import { site } from "../data.js";
 import { Brand } from "./Brand.jsx";
 
 /**
  * Pied de page commun : présentation, navigation secondaire et coordonnées.
  *
- * Posé au-dessus du fond fixe (z-index dédié côté CSS) pour ne pas être masqué en
- * bas de page.
+ * Les textes et coordonnées proviennent de content.json (via `site`) ; seuls les
+ * liens de navigation restent ici, étant structurels.
  * @returns {JSX.Element} Le pied de page du site.
  */
 export function FooterPage() {
@@ -14,14 +15,8 @@ export function FooterPage() {
             <div className="footer-grid container">
                 <div className="footer-about">
                     <Brand footer />
-                    <p>
-                        Le soin, la passion, l’excellence pour chaque voiture.
-                        Detailing, négoce de véhicules d’occasion et pièces
-                        automobiles.
-                    </p>
-                    <small>
-                        SIRET 105 175 756 · Ouverture officielle · 6 juillet 2026
-                    </small>
+                    <p>{site.footerTagline}</p>
+                    <small>{site.siret}</small>
                 </div>
                 <div>
                     <h3>Navigation</h3>
@@ -36,17 +31,13 @@ export function FooterPage() {
                 </div>
                 <div>
                     <h3>Contact</h3>
-                    <a href="tel:+33636372210">06 36 37 22 10</a>
-                    <a href="mailto:jammesmeca.auto@gmail.com">
-                        jammesmeca.auto@gmail.com
-                    </a>
-                    <span>@nostalgia_auto_galery</span>
-                    <span>Parignargues · Gard (30)</span>
+                    <a href={site.phoneHref}>{site.phone}</a>
+                    <a href={site.emailHref}>{site.email}</a>
+                    <span>{site.social}</span>
+                    <span>{site.location}</span>
                 </div>
             </div>
-            <div className="footer-bottom">
-                © 2026 Nostalgia Auto Gallery — Corentin Jammes.
-            </div>
+            <div className="footer-bottom">{site.copyright}</div>
         </footer>
     );
 }

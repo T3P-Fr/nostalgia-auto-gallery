@@ -1161,10 +1161,11 @@ main::after {
    Coordonnées, calendrier, créneaux, formulaire et confirmation.
    ========================================================================== */
 
+/* Une seule colonne : le formulaire (pleine largeur, 2 colonnes en interne) au-dessus,
+   la carte contact en dessous. */
 .booking-layout {
-    display: grid;
-    grid-template-columns: 300px minmax(0, 1fr);
-    align-items: start;
+    display: flex;
+    flex-direction: column;
     gap: 22px;
     padding-block: 48px 64px;
 }
@@ -1174,12 +1175,24 @@ main::after {
     padding: 30px;
 }
 
+/* Sous le formulaire et pleine largeur : les coordonnées passent en ligne. */
+.contact-card {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px 24px;
+    align-items: center;
+}
+
+.contact-card .overline,
+.contact-card p {
+    grid-column: 1 / -1;
+}
+
 .contact-card>a,
 .contact-card>div {
     display: flex;
     align-items: center;
     gap: 14px;
-    margin-top: 20px;
     text-decoration: none;
 }
 
@@ -1207,16 +1220,19 @@ main::after {
 }
 
 .contact-card p {
-    margin-top: 26px;
+    margin: 0;
     padding-top: 18px;
     border-top: 1px solid var(--line);
     color: var(--muted);
     line-height: 1.7;
 }
 
+/* Deux colonnes : gauche = agenda + créneau, droite = formules + coordonnées. */
 .booking-form {
     display: grid;
-    grid-template-columns: minmax(290px, 1fr) minmax(260px, 0.9fr);
+    /* Agenda (Data) sur 1/3, détails (formules + coordonnées) sur 2/3. */
+    grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr);
+    align-items: start;
     gap: 30px;
 }
 
@@ -1306,6 +1322,14 @@ main::after {
     text-decoration: line-through;
 }
 
+/* Durée estimée affichée au-dessus des créneaux (varie selon les formules). */
+.slot-duration {
+    margin: -4px 0 10px;
+    color: var(--acc);
+    font-size: 12px;
+    font-weight: 700;
+}
+
 .slot-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
@@ -1376,15 +1400,351 @@ main::after {
     color: var(--acc);
 }
 
-.details-panel>small {
+.details-panel small {
     color: var(--subtle);
     font-size: 11px;
+}
+
+/* 4. Coordonnées : grille 2 colonnes. Le téléphone, le message et les éléments de
+   pied (récap, erreur, bouton, note) occupent toute la largeur ; le « dense »
+   comble la case laissée libre à côté du nom. */
+.coord-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-flow: dense;
+    gap: 11px;
+}
+
+.coord-grid>.field-full,
+.coord-grid>textarea,
+.coord-grid>.booking-recap,
+.coord-grid>.form-error,
+.coord-grid>button,
+.coord-grid>small {
+    grid-column: 1 / -1;
 }
 
 .form-error {
     color: var(--red-light);
     font-size: 13px;
     font-weight: 600;
+}
+
+/* ----- Étape « 2. Formules » : grille de prix, prestations, options, total ----- */
+
+/* Pile de lignes. Chaque ligne (--line) partage la même grille : une colonne de
+   libellé puis trois colonnes de niveaux, pour que prix et remises s'alignent. */
+.formula-grid {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+
+/* Trois colonnes égales : les boutons (et leurs remises/en-têtes) font chacun 1/3. */
+.formula-grid__line {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    align-items: center;
+}
+
+/* padding-inline 12px : aligne les en-têtes sur le contenu du cadre .formula-wash
+   (qui a la même marge interne) et sur la méca, pour des colonnes alignées. */
+.formula-grid__head {
+    margin-bottom: 6px;
+    padding-inline: 12px;
+    color: var(--subtle);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+/* La méca (enfant direct de la grille, hors cadre) reçoit le même retrait. */
+.formula-grid>.formula-cat {
+    padding-inline: 12px;
+}
+
+.formula-cat {
+    padding: 10px 0;
+    border-top: 1px solid var(--line);
+}
+
+/* Titre de catégorie, posé au-dessus de ses trois boutons. */
+.formula-cat__label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/* Couleur d'identité par niveau (.platine/.premium/.deluxe). Définie sur le
+   formulaire pour être PARTAGÉE par les en-têtes de colonnes, les boutons ET les
+   pills de prestations : changez --level-color pour recolorer un niveau partout. */
+.booking-form .platine {
+    --level-color: #101216;
+}
+
+.booking-form .premium {
+    --level-color: var(--acc);
+}
+
+.booking-form .deluxe {
+    --level-color: var(--acc);
+}
+
+/* En-têtes de colonnes colorés selon le niveau. */
+.formula-grid__head .platine,
+.formula-grid__head .premium,
+.formula-grid__head .deluxe {
+    color: var(--level-color);
+}
+
+/* Prix cliquable (bascule). Survol = bordure du niveau ; sélection = fond du niveau. */
+.formula-price {
+    position: relative;
+    overflow: hidden;
+    padding: 10px 6px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface2);
+    color: var(--txt);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    transition: 150ms ease;
+}
+
+.formula-price:hover:not(:disabled) {
+    border-color: var(--level-color, var(--acc));
+}
+
+.formula-price.is-selected {
+    border-color: var(--level-color, var(--acc));
+    background: var(--level-color, var(--acc));
+    color: #fff;
+}
+
+.formula-price:disabled {
+    cursor: not-allowed;
+}
+
+/* Les boutons verrouillés se grisent, SAUF la méca offerte (sélectionnée). */
+.formula-price:disabled:not(.is-selected) {
+    opacity: 0.4;
+}
+
+/* Méca offerte : prix barré + bandeau incliné « Offert » dans le coin. */
+.formula-price.is-offered {
+    text-decoration: line-through;
+}
+
+.formula-price.is-offered::after {
+    content: "Offert";
+    position: absolute;
+    top: 7px;
+    right: -24px;
+    width: 86px;
+    padding: 2px 0;
+    transform: rotate(45deg);
+    background: #2b9d5f;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.formula-cat__bonus {
+    margin: 8px 0 0;
+    color: var(--subtle);
+    font-size: 11px;
+    font-style: italic;
+}
+
+/* Remises de combinaison, alignées sous les trois colonnes de prix. */
+.formula-cat__savings {
+    margin-top: 3px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* Chaque réduction est présentée dans un cadre rouge (accent), sous sa colonne. */
+.formula-cat__savings span {
+    padding: 3px 0;
+    border: 1px solid var(--acc);
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--acc) 14%, transparent);
+    color: var(--acc);
+    text-align: center;
+}
+
+/* Prestations incluses, sous forme de pills. */
+/* Intitulé au-dessus des prestations incluses (libellé + compteur). */
+.formula-pills__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0 8px;
+    color: var(--subtle);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* Pastille du nombre de prestations incluses. */
+.formula-pills__count {
+    min-width: 20px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--acc) 16%, transparent);
+    color: var(--acc);
+    font-size: 11px;
+    text-align: center;
+}
+
+.formula-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 16px;
+}
+
+.pill {
+    padding: 5px 11px;
+    border: 1px solid color-mix(in srgb, var(--acc) 40%, var(--line));
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--acc) 12%, transparent);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* Options à cocher (ajoutées au total). */
+.formula-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.formula-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface2);
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.formula-option input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--acc);
+}
+
+.formula-option span {
+    flex: 1;
+}
+
+.formula-option strong {
+    color: var(--muted);
+    font-weight: 700;
+}
+
+/* Options indisponibles tant qu'aucun lavage n'est sélectionné. */
+.formula-option.is-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.formula-option.is-disabled input {
+    cursor: not-allowed;
+}
+
+.formula-options__hint {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: var(--subtle);
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* Ligne de remise progressive sur les options (montant à droite). */
+.formula-options__discount {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin: 6px 0 0;
+    color: var(--acc);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* Récapitulatif : détail des prix cumulés au-dessus du total. */
+.formula-recap {
+    margin-top: 16px;
+}
+
+.formula-recap__lines {
+    margin: 0 0 4px;
+    padding: 0;
+    list-style: none;
+}
+
+/* Une ligne « libellé … montant » par prestation sélectionnée. */
+.formula-recap__lines li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0;
+    font-size: 13px;
+}
+
+.formula-recap__lines li + li {
+    border-top: 1px dashed var(--line);
+}
+
+/* Méca offerte : le montant « Offert » ressort en vert. */
+.formula-recap__lines li.is-offered span:last-child {
+    color: #2b9d5f;
+    font-weight: 700;
+}
+
+/* Total : prix barré (sans remise), économie, prix de vente. */
+.formula-total {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+}
+
+.formula-total__strike {
+    color: var(--subtle);
+    font-size: 15px;
+}
+
+.formula-total__save {
+    color: var(--acc);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.formula-total__sale {
+    margin-left: auto;
+    font-family: "DM Serif Display", serif;
+    font-size: 30px;
+    font-weight: 400;
 }
 
 .success-state {

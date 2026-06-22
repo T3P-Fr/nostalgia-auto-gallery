@@ -1,10 +1,12 @@
 import {
     BeforeAfterComparison,
-    ButtonLink,
     PageHero,
     SectionHeading,
 } from "../components/Ui.jsx";
-import { galleryItems } from "../data.js";
+import { galleryItems, pages } from "../data.js";
+
+// Contenu centralisé (cf. content.json → pages.gallery).
+const { hero, actions, heading } = pages.gallery;
 
 /**
  * Regroupe le comparateur et les photos sur une page dédiée.
@@ -13,23 +15,10 @@ import { galleryItems } from "../data.js";
 export default function GalleryPage() {
     return (
         <>
-            <PageHero
-                image="/assets/nissan-dusk2.jpg"
-                eyebrow="Galerie"
-                title={<>la différence<br />se <em>voit</em>.</>}
-                description="Une sélection de véhicules, de détails et de visuels fournis par Nostalgia Auto Gallery."
-            >
-                <div className="hero__actions">
-                    <ButtonLink to="/rendez-vous">Confier mon véhicule →</ButtonLink>
-                </div>
-            </PageHero>
+            <PageHero {...hero} actions={actions} />
 
             <section className="container">
-                <SectionHeading
-                    overline="Avant / Après"
-                    title="retrouver l’éclat"
-                    description="Glissez le curseur pour visualiser le résultat recherché après une préparation esthétique complète."
-                />
+                <SectionHeading {...heading} />
                 <BeforeAfterComparison />
                 <div className="gallery-grid">
                     {galleryItems.map(([image, title, subtitle]) => (

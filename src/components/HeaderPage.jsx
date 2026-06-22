@@ -1,6 +1,7 @@
 import { Menu, X } from "lucide-react";
 import { useLayoutEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { site } from "../data.js";
 import { Brand } from "./Brand.jsx";
 import { ButtonLink } from "./Ui.jsx";
 
@@ -186,8 +187,8 @@ export function HeaderPage() {
                 </NavLink>
             </nav>
             <div className="header-actions">
-                <a className="header-phone" href="tel:+33636372210">
-                    06 36 37 22 10
+                <a className="header-phone" href={site.phoneHref}>
+                    {site.phone}
                 </a>
                 <ButtonLink size="small" to="/rendez-vous">
                     Prendre RDV

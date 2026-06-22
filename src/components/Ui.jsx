@@ -1,8 +1,34 @@
 import { Sparkles } from "lucide-react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 import { interventionTowns } from "../data.js";
 import { usePageBackgroundImage } from "./PageBackground.jsx";
+
+/**
+ * Rend un titre de héros écrit en texte : « \n » devient un retour à la ligne et
+ * « *un mot* » devient ce mot en accent (em). Permet de stocker les titres dans le
+ * JSON de contenu plutôt qu'en JSX.
+ * @param {string} title Titre balisé.
+ * @returns {React.ReactNode} Le titre rendu.
+ */
+function renderHeroTitle(title) {
+    if (typeof title !== "string") {
+        return title;
+    }
+
+    return title.split("\n").map((line, lineIndex) => (
+        <Fragment key={lineIndex}>
+            {lineIndex > 0 && <br />}
+            {line.split(/(\*[^*]+\*)/).map((part, partIndex) =>
+                part.startsWith("*") && part.endsWith("*") ? (
+                    <em key={partIndex}>{part.slice(1, -1)}</em>
+                ) : (
+                    part
+                ),
+            )}
+        </Fragment>
+    ));
+}
 
 /**
  * Uniformise les liens d'action et leurs variantes visuelles.
@@ -38,10 +64,12 @@ export function ButtonLink({
  * Le fond image/voile est porté par les pseudo-éléments de <main> ; ce composant ne
  * fait que déclarer l'image de la page (via `usePageBackgroundImage`) et afficher le
  * texte. L'en-tête est un `.container` (largeur de lecture) centré verticalement.
- * @param {{ image: string, eyebrow: string, title: React.ReactNode, description: string, children?: React.ReactNode }} props Contenu du héros.
+ * Le `title` est une chaîne balisée (cf. renderHeroTitle) ; `actions` génère les
+ * boutons d'appel à l'action ; `children` reste possible (ex. statistiques).
+ * @param {{ image: string, eyebrow: string, title: string, description: string, actions?: Array<{label: string, to: string, variant?: string}>, children?: React.ReactNode }} props Contenu du héros.
  * @returns {JSX.Element} L'en-tête de page.
  */
-export function PageHero({ image, eyebrow, title, description, children }) {
+export function PageHero({ image, eyebrow, title, description, actions, children }) {
     // Déclare l'image affichée par le fond (main::before) tant que la page est montée.
     usePageBackgroundImage(image);
 
@@ -52,8 +80,21 @@ export function PageHero({ image, eyebrow, title, description, children }) {
                     <span />
                     {eyebrow}
                 </div>
-                <h1>{title}</h1>
+                <h1>{renderHeroTitle(title)}</h1>
                 <p>{description}</p>
+                {actions && (
+                    <div className="hero__actions">
+                        {actions.map((action) => (
+                            <ButtonLink
+                                key={`${action.to}-${action.label}`}
+                                to={action.to}
+                                variant={action.variant}
+                            >
+                                {action.label}
+                            </ButtonLink>
+                        ))}
+                    </div>
+                )}
                 {children}
             </div>
         </header>
