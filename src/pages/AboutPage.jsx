@@ -40,17 +40,17 @@ export default function AboutPage() {
                 </div>
             </PageHero>
 
-            <section className="section container">
+            <section className="container">
                 <SectionHeading
                     overline="Nostalgia Auto Gallery"
                     title="bien plus qu’un moyen de transport"
                     description="Une voiture peut être un objet du quotidien, un souvenir ou un projet. Dans chaque cas, elle mérite une attention adaptée, des gestes précis et un regard honnête."
                     split
                 />
-                <div className="page-card-grid">
-                    <article className="page-card">
+                <div className="nav-grid">
+                    <article className="card nav-card">
                         <img src="/assets/peugeot-front.jpg" alt="Peugeot 205 rouge" />
-                        <div>
+                        <div className="content">
                             <h2>Deux expertises</h2>
                             <p>
                                 Le soin et la préparation esthétique, puis l’achat,
@@ -61,9 +61,9 @@ export default function AboutPage() {
                             </ButtonLink>
                         </div>
                     </article>
-                    <article className="page-card">
+                    <article className="card nav-card">
                         <img src="/assets/context.jpg" alt="Véhicules suivis par Nostalgia Auto Gallery" />
-                        <div>
+                        <div className="content">
                             <h2>Un suivi personnel</h2>
                             <p>
                                 Corentin Jammes accompagne chaque demande avec un
@@ -74,9 +74,9 @@ export default function AboutPage() {
                             </ButtonLink>
                         </div>
                     </article>
-                    <article className="page-card">
+                    <article className="card nav-card">
                         <img src="/assets/nissan-dusk2.jpg" alt="Nissan 200SX préparée" />
-                        <div>
+                        <div className="content">
                             <h2>La passion du détail</h2>
                             <p>
                                 Chaque véhicule mérite une approche précise, qu’il
@@ -91,7 +91,7 @@ export default function AboutPage() {
                 </div>
             </section>
 
-            <section className="section section--surface">
+            <section className="section--surface">
                 <div className="container">
                     <SectionHeading
                         overline="Pourquoi me choisir ?"
@@ -103,7 +103,7 @@ export default function AboutPage() {
                         const Icon = commitment.icon;
 
                         return (
-                            <article className="service-card" key={commitment.title}>
+                            <article className="card service-card" key={commitment.title}>
                                 <span className="icon-tile">
                                     <Icon />
                                 </span>
@@ -116,7 +116,7 @@ export default function AboutPage() {
                         );
                     })}
                     </div>
-                    <div className="beyond-card">
+                    <div className="card beyond-card">
                         <strong>Un projet automobile ?</strong>
                         <span>
                             Detailing, vente, achat ou recherche de pièces : échangeons

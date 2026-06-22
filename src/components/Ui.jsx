@@ -2,7 +2,7 @@ import { Sparkles } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { interventionTowns } from "../data.js";
-import { useHeroBackgroundImage } from "./HeroBackground.jsx";
+import { usePageBackgroundImage } from "./PageBackground.jsx";
 
 /**
  * Uniformise les liens d'action et leurs variantes visuelles.
@@ -33,28 +33,21 @@ export function ButtonLink({
 }
 
 /**
- * Affiche l'en-tête éditorial d'une page, posé par-dessus le fond fixe partagé.
+ * Affiche l'en-tête éditorial d'une page (le « héros texte »), centré sur le fond.
  *
- * Le fond image n'appartient plus à la section : il est délégué au composant
- * `HeroBackground` monté dans le Layout. Cette section ne porte que le héros
- * « texte » et le dégradé de lisibilité, qui défilent donc avec la page.
- * @param {{ image: string, eyebrow: string, title: React.ReactNode, description: string, children?: React.ReactNode, large?: boolean }} props Contenu du héros.
+ * Le fond image/voile est porté par les pseudo-éléments de <main> ; ce composant ne
+ * fait que déclarer l'image de la page (via `usePageBackgroundImage`) et afficher le
+ * texte. L'en-tête est un `.container` (largeur de lecture) centré verticalement.
+ * @param {{ image: string, eyebrow: string, title: React.ReactNode, description: string, children?: React.ReactNode }} props Contenu du héros.
  * @returns {JSX.Element} L'en-tête de page.
  */
-export function PageHero({
-    image,
-    eyebrow,
-    title,
-    description,
-    children,
-    large = false,
-}) {
-    // Déclare l'image affichée par le fond fixe tant que cette page est montée.
-    useHeroBackgroundImage(image);
+export function PageHero({ image, eyebrow, title, description, children }) {
+    // Déclare l'image affichée par le fond (main::before) tant que la page est montée.
+    usePageBackgroundImage(image);
 
     return (
-        <header className={`hero ${large ? "hero--large" : ""}`}>
-            <div className="hero__content container">
+        <header className="hero container">
+            <div className="hero__content">
                 <div className="eyebrow">
                     <span />
                     {eyebrow}
@@ -93,7 +86,7 @@ export function ServiceCard({ service }) {
     const Icon = service.icon;
 
     return (
-        <article className="service-card">
+        <article className="card service-card">
             <span className="icon-tile">
                 <Icon />
             </span>
@@ -159,7 +152,7 @@ export function BeforeAfterComparison() {
  */
 export function ZonePanel() {
     return (
-        <section className="zone-panel">
+        <section className="zone-panel container">
             <div>
                 <SectionHeading
                     overline="Zone d’intervention"

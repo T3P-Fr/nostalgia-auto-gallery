@@ -43,7 +43,7 @@ export default function VehiclesPage() {
                 </div>
             </PageHero>
 
-            <section className="section container">
+            <section className="container">
                 <SectionHeading
                     overline="Achat & vente"
                     title="une approche attentive"
@@ -55,7 +55,7 @@ export default function VehiclesPage() {
                         const Icon = step.icon;
 
                         return (
-                            <article className="service-card" key={step.title}>
+                            <article className="card service-card" key={step.title}>
                                 <span className="icon-tile">
                                     <Icon />
                                 </span>
@@ -68,7 +68,7 @@ export default function VehiclesPage() {
                         );
                     })}
                 </div>
-                <div className="beyond-card">
+                <div className="card beyond-card">
                     <strong>Vous avez un véhicule à vendre ?</strong>
                     <span>
                         Indiquez le modèle, l’année, l’état et les informations dont

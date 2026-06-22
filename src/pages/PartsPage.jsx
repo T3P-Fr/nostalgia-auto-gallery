@@ -43,7 +43,7 @@ export default function PartsPage() {
                 </div>
             </PageHero>
 
-            <section className="section container">
+            <section className="container">
                 <SectionHeading
                     overline="Pièces automobiles"
                     title="une recherche sur mesure"
@@ -55,7 +55,7 @@ export default function PartsPage() {
                         const Icon = service.icon;
 
                         return (
-                            <article className="service-card" key={service.title}>
+                            <article className="card service-card" key={service.title}>
                                 <span className="icon-tile">
                                     <Icon />
                                 </span>
@@ -68,7 +68,7 @@ export default function PartsPage() {
                         );
                     })}
                 </div>
-                <div className="beyond-card">
+                <div className="card beyond-card">
                     <strong>Pour lancer une recherche</strong>
                     <span>
                         Précisez la marque, le modèle, l’année, la motorisation et la

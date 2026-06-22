@@ -1,5 +1,5 @@
-import { ShieldCheck } from "lucide-react";
-import { ButtonLink, PageHero, SectionHeading } from "../components/Ui.jsx";
+import {ShieldCheck} from "lucide-react";
+import {ButtonLink, PageHero, SectionHeading} from "../components/Ui.jsx";
 
 const tradingPages = [
     {
@@ -46,18 +46,18 @@ export default function TradingPage() {
                 </div>
             </PageHero>
 
-            <section className="section container">
+            <section className="container">
                 <SectionHeading
                     overline="Négoce automobile"
                     title="une sélection attentive"
                     description="Chaque demande est étudiée individuellement. L’objectif est de proposer une solution cohérente, avec une attention particulière portée à l’état, à l’historique et à la qualité du véhicule ou de la pièce recherchée."
                     split
                 />
-                <div className="page-card-grid">
+                <div className="nav-grid">
                     {tradingPages.map((page) => (
-                        <article className="page-card" key={page.title}>
-                            <img src={page.image} alt="" />
-                            <div>
+                        <article className="card nav-card" key={page.title}>
+                            <img src={page.image} alt={page.title} />
+                            <div className="content">
                                 <h2>{page.title}</h2>
                                 <p>{page.description}</p>
                                 <ButtonLink size="small" to={page.to}>
@@ -67,7 +67,7 @@ export default function TradingPage() {
                         </article>
                     ))}
                 </div>
-                <div className="beyond-card">
+                <div className="card beyond-card">
                     <span className="icon-tile">
                         <ShieldCheck />
                     </span>

@@ -24,7 +24,7 @@ export default function GalleryPage() {
                 </div>
             </PageHero>
 
-            <section className="section container">
+            <section className="container">
                 <SectionHeading
                     overline="Avant / Après"
                     title="retrouver l’éclat"

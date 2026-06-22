@@ -134,7 +134,7 @@ export default function BookingPage() {
             />
 
             <section className="booking-layout container">
-                <aside className="contact-card">
+                <aside className="card contact-card">
                     <span className="overline">Contact direct</span>
                     <a href="tel:+33636372210">
                         <Phone />
@@ -151,7 +151,7 @@ export default function BookingPage() {
                     <p>Sur rendez-vous<br />Service itinérant</p>
                 </aside>
 
-                <div className="booking-card">
+                <div className="card booking-card">
                     {createdAppointment ? (
                         <div className="success-state">
                             <span><Check /></span>
@@ -300,9 +300,7 @@ export default function BookingPage() {
                 </div>
             </section>
 
-            <div className="container">
-                <ZonePanel />
-            </div>
+            <ZonePanel />
         </>
     );
 }

@@ -20,7 +20,7 @@ export default function ServicesPage() {
                 </div>
             </PageHero>
 
-            <section className="section container">
+            <section className="container">
                 <SectionHeading
                     overline="Detailing à domicile"
                     title="le bon soin, au bon niveau"
@@ -32,7 +32,7 @@ export default function ServicesPage() {
                         <ServiceCard key={service.title} service={service} />
                     ))}
                 </div>
-                <div className="beyond-card">
+                <div className="card beyond-card">
                     <strong>Au-delà du detailing</strong>
                     <span>
                         Achat et vente de véhicules · Pièces performance · Optiques et

@@ -48,7 +48,6 @@ export default function HomePage() {
                 eyebrow="Detailing · négoce · solutions automobiles"
                 title={<>le soin que mérite<br />chaque <em>légende</em>.</>}
                 description="Lavage à la main, rénovation esthétique et protection céramique — directement chez vous, autour de Parignargues."
-                large
             >
                 <div className="hero__actions">
                     <ButtonLink to="/rendez-vous">Prendre rendez-vous →</ButtonLink>
@@ -72,18 +71,18 @@ export default function HomePage() {
                 </div>
             </section>
 
-            <section className="section container">
+            <section className="container">
                 <SectionHeading
                     overline="Nostalgia Auto Gallery"
                     title="choisissez votre route"
                     description="Detailing, négoce automobile ou projet particulier : découvrez l’accompagnement adapté à votre véhicule."
                     split
                 />
-                <div className="page-card-grid">
+                <div className="nav-grid">
                     {pageCards.map((page) => (
-                        <article className="page-card" key={page.title}>
-                            <img src={page.image} alt="" />
-                            <div>
+                        <article className="card nav-card" key={page.title}>
+                            <img src={page.image} alt={page.title} />
+                            <div className="content">
                                 <h2>{page.title}</h2>
                                 <p>{page.description}</p>
                                 <ButtonLink size="small" to={page.to}>

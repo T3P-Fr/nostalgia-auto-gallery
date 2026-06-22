@@ -4,9 +4,8 @@
    ========================================================================== */
 
 :root {
-    /* Trois nuances suffisent aux actions, états pressés et messages d'erreur. */
+    /* Deux nuances de rouge : l'accent principal et une variante claire. */
     --red-primary: #b81e29;
-    --red-dark: #8f141d;
     --red-light: #df5660;
     --bg: #080f18;
     --bg2: #0d1722;
@@ -27,7 +26,7 @@
     --scroll-range: max(calc(var(--page-height) - var(--viewport)), 1);
     --scroll-factor: clamp(0, calc(var(--scroll-position) / var(--scroll-range)), 1);
 
-    /* ----- Voile : surcouche sombre posée sur l'image (couche .hero-veil) -------
+    /* ----- Voile : surcouche sombre posée sur l'image (couche main::after) ------
        Une seule teinte, --surface, dont seule l'OPACITÉ varie avec le défilement.
          --veil-min : opacité du voile en haut de l'écran — image bien visible (repos).
          --veil-max : opacité maximale — bas de l'écran, et partout en bas de page.
@@ -47,28 +46,38 @@
     --subtle: #687789;
     --line: rgba(255, 255, 255, 0.09);
     --acc: var(--red-primary);
-    --accd: var(--red-dark);
-    --shadow-red: 0 10px 30px color-mix(in srgb, var(--red-primary) 30%, transparent);
-    --shadow-lg: 0 16px 40px rgba(0, 5, 12, 0.42);
     --ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
-    /* Une valeur partagée garantit la même barre rouge partout dans l'interface. */
+    /* Hauteur partagée : même liseré/barre d'accent partout (nav, cartes). */
     --nav-accent-height: 4px;
     color: var(--txt);
     background: var(--bg);
     font-family: "Archivo", system-ui, sans-serif;
     font-synthesis: none;
 
-    --center: 45%;
-    --rotation: 0deg;
-    --red-gradient: linear-gradient(var(--rotation),
-            var(--red-dark),
-            var(--red-primary) var(--center),
-            var(--red-light) var(--center),
-            var(--red-primary));
+    /* Sous-variables du dégradé « chrome » (réglables, héritées). Le dégradé composé
+       lui-même (--shining-gradient) est défini sur * (voir plus bas), pas ici. */
+    --gradient--center: 55%;
+    --gradient--color: var(--acc);
+    --gradient--shine: 25%;
+    --radius: 8px;
 }
 
 * {
     box-sizing: border-box;
+}
+
+/* --shining-gradient référence d'autres variables (--gradient--color…). Une telle
+   variable est résolue AU SCOPE OÙ ELLE EST DÉCLARÉE : sur :root, son
+   var(--gradient--color) serait figé au rouge et hérité tel quel, donc le redéfinir
+   plus bas (ex. --gradient--color: yellow sur un em) n'aurait aucun effet. En la
+   déclarant sur *, elle est RECOMPOSÉE par élément avec ses propres sous-variables.
+   (color-mix exige un espace de couleur : « in srgb ».) */
+* {
+    --shining-gradient: linear-gradient(to bottom,
+            var(--gradient--color),
+            color-mix(in srgb, var(--gradient--color), white var(--gradient--shine)) var(--gradient--center),
+            color-mix(in srgb, var(--gradient--color), black var(--gradient--shine)) var(--gradient--center),
+            var(--gradient--color));
 }
 
 html {
@@ -79,7 +88,7 @@ body {
     margin: 0;
     min-width: 320px;
     /* Volontairement transparent : le fond opaque est porté par :root (canvas),
-       sinon il masquerait la couche .hero-background placée en z-index: -1. */
+       sinon il masquerait les couches main::before / main::after (z-index négatif). */
     background: transparent;
 }
 
@@ -103,10 +112,15 @@ img {
     max-width: 100%;
 }
 
-/* Le conteneur maintient une largeur de lecture stable sur toutes les pages. */
+/* Conteneur unique : largeur de lecture centrée + rythme vertical des sections
+   (absorbe l'ancienne classe .main). Posé directement sur les sections de contenu ;
+   à l'intérieur des bandes pleine largeur (footer, trust-strip, section--surface) il
+   sert de wrapper centré. */
 .container {
     width: min(1180px, calc(100% - 64px));
     margin-inline: auto;
+    padding-block: 0 24px;
+    scroll-margin-top: 80px;
 }
 
 /* ==========================================================================
@@ -114,6 +128,8 @@ img {
    Logo, navigation animée, téléphone et menu mobile.
    ========================================================================== */
 
+/* En-tête collant. Le voile flouté est porté par ::before (ci-dessous) afin de
+   déborder légèrement et de s'estomper vers le bas via un masque. */
 .site-header {
     position: sticky;
     top: 0;
@@ -123,21 +139,20 @@ img {
     justify-content: space-between;
     gap: 24px;
     padding: 14px 32px;
-    /*border-bottom: 1px solid var(--line);
-    background: color-mix(in srgb, var(--bg) 82%, transparent);
-    backdrop-filter: blur(14px);*/
 }
 
+/* Voile flouté sous l'en-tête : surface semi-transparente + flou d'arrière-plan,
+   estompé vers le bas par un masque dégradé. (color-mix exige « in srgb ».) */
 .site-header::before {
     content: "";
     position: absolute;
-    backdrop-filter: blur(20px);
-    background-color: color-mix(var(--surface) 80%, transparent);
-    mask-image: linear-gradient(0deg, transparent 5%, black 50%);
-    width: 110vw;
-    height: 250%;
     z-index: -1;
     left: 0;
+    width: 110vw;
+    height: 250%;
+    background-color: color-mix(in srgb, var(--surface) 80%, transparent);
+    backdrop-filter: blur(20px);
+    mask-image: linear-gradient(0deg, transparent 5%, black 50%);
 }
 
 .brand {
@@ -244,7 +259,13 @@ img {
    Boutons et variantes partagés entre les héros, cartes et formulaires.
    ========================================================================== */
 
+/* Fond = couleur d'accent unie, surmontée d'un dégradé « chrome » fixe (reflet
+   clair en haut, ombre au centre). Le dégradé est en background-IMAGE et la teinte
+   en background-COLOR : au survol, seule la couleur fonce, le chrome reste intact. */
 .button {
+    --gradient--center: 50%;
+    --gradient--color: transparent;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -252,9 +273,9 @@ img {
     min-height: 48px;
     padding: 14px 24px;
     border: 0;
-    border-radius: 8px;
-    background: var(--red-gradient);
-    box-shadow: var(--shadow-red);
+    border-radius: var(--radius);
+    background-color: var(--acc);
+    background-image: var(--shining-gradient);
     color: #fff;
     cursor: pointer;
     font-size: 13px;
@@ -265,8 +286,10 @@ img {
     transition: 180ms ease;
 }
 
+/* Seule la teinte de fond fonce : le dégradé chrome (background-image) est conservé. */
 .button:hover {
-    background: var(--accd);
+    color: var(--surface);
+    background-color: #DDD;
 }
 
 .button:active {
@@ -300,57 +323,45 @@ img {
 }
 
 /* ==========================================================================
-   4. HÉROS DE PAGE
-   Fond image fixe (Layout) flouté/agrandi au scroll, et héros « texte » qui
-   défile avec la page en portant le dégradé de lisibilité.
+   4. FOND DE PAGE & HÉROS
+   Le fond (image + voile) est porté par les pseudo-éléments de <main> ; le héros
+   est un en-tête de texte centré posé par-dessus.
    ========================================================================== */
 
-/* Couche 1 — image pleine page, immobile pendant le défilement. Flou/zoom NULS en
-   haut de page et MAXIMA en bas (--scroll-factor : 0 → 1). Le zoom masque les bords
-   que le flou laisserait transparaître. */
-.hero-background {
+/* <main> : conteneur de la page et support du fond fixe. Il porte aussi la
+   transition de page EN OPACITÉ SEULE : un transform créerait un bloc englobant et
+   casserait le position:fixed de ::before/::after (le fond ne serait plus collé à
+   l'écran mais à <main>). */
+main {
+    position: relative;
+}
+
+/* Couche image — fond fixe plein écran (--page-image, posée par la page courante).
+   Flou/zoom NULS en haut de page et MAXIMA en bas (--scroll-factor : 0 → 1) ; le
+   zoom masque les bords que le flou laisserait transparaître. */
+main::before {
+    content: "";
     position: fixed;
     inset: 0;
     z-index: -2;
     pointer-events: none;
-
-    filter: blur(calc(var(--scroll-factor) * 14px));
-    transform: scale(calc(1 + var(--scroll-factor) * 0.18));
-    transform-origin: center;
-    will-change: filter, transform;
-}
-
-/* Chaque image occupe toute la couche ; la plus récente apparaît en fondu
-   par-dessus la précédente (transition de page), puis la pile est nettoyée. */
-.hero-background__layer {
-    position: absolute;
-    inset: 0;
+    background-image: var(--page-image, none);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    filter: blur(calc(var(--scroll-factor) * 14px));
+    transform: scale(calc(1 + var(--scroll-factor) * 0.18));
+    transform-origin: center top;
+    will-change: filter, transform;
 }
 
-.hero-background__layer--enter {
-    animation: hero-layer-fade 0.6s var(--ease-out) both;
-}
-
-@keyframes hero-layer-fade {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-/* Couche 2 — voile FIXE (plein écran) posé sur l'image de fond. Les positions des
-   stops ne bougent pas (haut à 0 %, bas à 100 %) : seule la COULEUR du stop du haut
-   s'assombrit avec le scroll (--veil, dont l'opacité monte de --veil-min à --veil-max).
-   Le stop du bas reste à l'opacité maximale (--surface à --veil-max). En haut de page
-   le dégradé va donc de clair (haut) à sombre (bas) ; en bas de page les deux stops
-   se rejoignent à --veil-max → écran uniformément sombre, contenu bien lisible. */
-.hero-veil {
+/* Couche voile — dégradé FIXE posé sur l'image. Positions figées (haut 0 %, bas
+   100 %) : seule la COULEUR du haut s'assombrit avec le scroll (--veil, opacité de
+   --veil-min → --veil-max). Le bas reste à --veil-max. En haut de page : clair →
+   sombre ; en bas de page les deux extrémités se rejoignent → écran uniformément
+   sombre, contenu bien lisible. */
+main::after {
+    content: "";
     position: fixed;
     inset: 0;
     z-index: -1;
@@ -360,26 +371,17 @@ img {
             color-mix(in srgb, var(--surface) var(--veil-max), transparent) 100%);
 }
 
-/* Couche 3 — le héros occupe 85 % de l'écran (la suite de page reste un peu visible
-   en dessous) et défile sans fond propre, la surcouche l'asseyant sur un fond sombre.
-   Il remonte (1 − --hero-rise-rate) aussi vite que la page : il « traîne », et le
-   contenu du dessous le rattrape jusqu'à PRESQUE le rejoindre en haut. Le plafond en
-   px borne le décalage du titre (≈ l'écart naturel titre / section, pour qu'ils ne
-   se chevauchent pas). */
+/* En-tête de page (« héros texte »). Texte aligné à gauche, centré verticalement
+   (align-items: center), sur 65vh, posé sur le fond. Porte aussi .container
+   (largeur de lecture). Défile normalement avec la page. */
 .hero {
-    --hero-rise-rate: 0.25;
-    --hero-rise-max: 140;
-
-    position: relative;
     display: flex;
-    min-height: 85vh;
-    align-items: flex-end;
-    transform: translateY(calc(min(var(--scroll-position) * var(--hero-rise-rate), var(--hero-rise-max)) * 1px));
-    will-change: transform;
+    align-items: center;
+    min-height: 65vh;
 }
 
-/* Transition de page : un fondu + léger glissé remplace l'apparition brusque du
-   contenu à chaque navigation (relancé par la clé de route sur le conteneur). */
+/* Transition de page : fondu en OPACITÉ SEULE (cf. <main> : un transform casserait
+   le fond fixe). Relancée par la clé de route posée sur <main>. */
 .page-transition {
     animation: page-enter 0.5s var(--ease-out) both;
 }
@@ -387,31 +389,27 @@ img {
 @keyframes page-enter {
     from {
         opacity: 0;
-        transform: translateY(14px);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
     }
 }
 
 /* Accessibilité : pas d'animation pour les utilisateurs qui la réduisent. */
 @media (prefers-reduced-motion: reduce) {
-
-    .page-transition,
-    .hero-background__layer--enter {
+    .page-transition {
         animation: none;
     }
 }
 
-.hero--large {
-    min-height: 88vh;
-}
-
+/* Contenu du héros : pile centrée horizontalement, texte centré. */
+/* Contenu du héros : pile alignée à gauche, centrée verticalement (via .hero). */
 .hero__content {
-    position: relative;
-    padding-block: 80px 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
 }
 
 .hero__content h1 {
@@ -426,17 +424,19 @@ img {
 }
 
 .hero__content h1 em {
-    color: transparent;
+    /*color: red;*/
     font-family: "Archivo", sans-serif;
     font-weight: 800;
 
-    background: var(--red-gradient);
+    --gradient--color: var(--acc);
+    background: var(--shining-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 
 }
 
-.hero__content>p {
+/* `.hero` étant aussi `.container`, on prime sur la règle générique `.container p`. */
+.hero .hero__content>p {
     max-width: 580px;
     margin: 26px 0 0;
     color: rgba(255, 255, 255, 0.82);
@@ -523,11 +523,6 @@ img {
     color: var(--acc);
 }
 
-.section {
-    padding-block: 84px 24px;
-    scroll-margin-top: 80px;
-}
-
 .gear-rule {
     display: flex;
     align-items: center;
@@ -572,7 +567,7 @@ img {
     text-transform: uppercase;
 }
 
-.section h2,
+.container h2,
 .pricing-section h2,
 .options-card h2,
 .admin-page h1,
@@ -586,7 +581,7 @@ img {
     text-transform: lowercase;
 }
 
-.section p,
+.container p,
 .options-card p {
     color: var(--muted);
     line-height: 1.65;
@@ -604,15 +599,29 @@ img {
     gap: 20px;
 }
 
-/* Les angles supérieurs restent droits pour prolonger la barre rouge du menu. */
-.service-card,
-.price-card,
-.contact-card,
-.booking-card {
+/* Base commune de TOUTES les cartes : cadre fin, coins hauts droits, coins bas
+   arrondis, fond de surface, et un bandeau d'accent rouge en haut. Le bandeau est
+   un ::before (et non un border-top épais) afin d'éviter le biseau à 45° créé par
+   la rencontre d'une bordure haute épaisse avec les bordures latérales fines. */
+.card {
+    position: relative;
     border: 1px solid var(--line);
-    border-top: var(--nav-accent-height) solid var(--acc);
+    border-top: 0;
     border-radius: 0 0 8px 8px;
-    background: var(--surface);
+    background: color-mix(in srgb, var(--surface), transparent 50%);
+    backdrop-filter: blur(100px);
+}
+
+/* Bandeau d'accent : pleine largeur, coins droits, 1px plus haut que l'ancien
+   border-top pour couvrir proprement le sommet de la carte. */
+.card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: calc(var(--nav-accent-height) + 1px);
+    background: var(--acc);
 }
 
 .service-card {
@@ -675,48 +684,58 @@ img {
    Cartes illustrées utilisées sur l'accueil, le négoce et la page À propos.
    ========================================================================== */
 
-.page-card-grid {
+.nav-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
 }
 
-.page-card {
+/* Carte illustrée : reprend la base .card (cadre, bandeau rouge, coins). overflow
+   masqué pour que l'image épouse les coins bas arrondis. */
+.nav-card {
     overflow: hidden;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: var(--surface);
+    display: flex;
+    flex-direction: column;
 }
 
-.page-card>img {
+.nav-card .content {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    flex: 1 0 auto;
+}
+
+.nav-card .content :last-child {
+    margin-top: auto;
+}
+
+.nav-card>img {
     display: block;
     width: 100%;
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 4 / 3;
     object-fit: cover;
+
 }
 
-.page-card>div {
-    padding: 24px;
-}
-
-.page-card h2 {
+.nav-card h2 {
     margin-top: 0;
     font-size: 32px;
+    min-height: 2.5em;
+    margin: 0;
 }
 
-.page-card p {
+.nav-card p {
+    margin: 0 0 2em 0;
     min-height: 72px;
 }
 
+/* Variante de .card : même cadre, fond plus sombre. */
 .beyond-card {
     display: flex;
     flex-wrap: wrap;
     gap: 14px 28px;
     margin-top: 20px;
     padding: 22px 28px;
-    border: 1px solid var(--line);
-    border-top: var(--nav-accent-height) solid var(--acc);
-    border-radius: 0 0 8px 8px;
     background: var(--surface2);
     color: var(--muted);
 }
@@ -1542,7 +1561,11 @@ img {
    Présentation de l'entreprise, navigation secondaire et coordonnées.
    ========================================================================== */
 
+/* Le footer doit passer AU-DESSUS du fond fixe (main::before/::after) qui couvre
+   tout l'écran ; sans ce z-index il est masqué en bas de page. */
 .site-footer {
+    position: relative;
+    z-index: 1;
     border-top: 1px solid var(--line);
 }
 
@@ -1680,10 +1703,6 @@ img {
         min-height: 620px;
     }
 
-    .hero__content {
-        padding-block: 70px 55px;
-    }
-
     .hero__content h1 {
         font-size: clamp(43px, 14vw, 68px);
     }
@@ -1703,10 +1722,6 @@ img {
     .gallery-grid,
     .page-card-grid {
         grid-template-columns: 1fr;
-    }
-
-    .section {
-        padding-top: 64px;
     }
 
     .option-list {

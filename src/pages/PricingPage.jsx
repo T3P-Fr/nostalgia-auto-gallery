@@ -31,7 +31,7 @@ export default function PricingPage() {
                             const service = `${group.title} — ${tier.tier} · ${tier.price} €`;
                             return (
                                 <article
-                                    className={`price-card ${tier.tier === "Premium" ? "price-card--featured" : ""}`}
+                                    className={`card price-card ${tier.tier === "Premium" ? "price-card--featured" : ""}`}
                                     key={tier.tier}
                                 >
                                     <div className="price-card__top">
