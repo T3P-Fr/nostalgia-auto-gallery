@@ -186,6 +186,7 @@ function collectFeatures(categories, formula) {
  * Panneau d'étape du formulaire de réservation. Classe commune `.panel` ; en-tête avec
  * le numéro + le titre à gauche et, si fourni, un texte atténué (`aside`) à droite.
  * @param {object} props Propriétés du panneau.
+ * @param {string} [props.id] Identifiant unique du panneau (ciblage/ancrage).
  * @param {number} [props.step] Numéro d'étape affiché devant le titre.
  * @param {string} props.title Titre de l'étape.
  * @param {React.ReactNode} [props.aside] Texte atténué optionnel, aligné à droite.
@@ -193,9 +194,9 @@ function collectFeatures(categories, formula) {
  * @param {React.ReactNode} props.children Contenu du panneau.
  * @returns {JSX.Element} Le panneau d'étape.
  */
-function BookPanel({ step, title, aside, className = "", children }) {
+function BookPanel({ id, step, title, aside, className = "", children }) {
     return (
-        <section className={`panel ${className}`.trim()}>
+        <section id={id} className={`panel ${className}`.trim()}>
             <div className="panel__head">
                 <h3>
                     {step != null && <span>{step}.</span>} {title}
@@ -647,6 +648,7 @@ export default function BookingPage() {
                             {/* Colonne gauche : 1. date (agenda), 2. créneau, puis le résumé. */}
                             <div className="calendar-panel">
                                 <BookPanel
+                                    id="panel-date"
                                     step={1}
                                     title="Choisissez une date"
                                     aside={
@@ -718,6 +720,7 @@ export default function BookingPage() {
                                 </BookPanel>
 
                                 <BookPanel
+                                    id="panel-creneau"
                                     step={2}
                                     title="Créneau"
                                     aside={
@@ -786,6 +789,7 @@ export default function BookingPage() {
                                 {/* 3. Lavages : sélection Intérieur/Extérieur + prix. L'incitation
                                     (statique, atténuée) est posée à droite du titre (aside). */}
                                 <BookPanel
+                                    id="panel-lavages"
                                     step={3}
                                     title="Lavages"
                                     aside={`----- Économisez jusqu’à ${maxComboDiscount} € pour un lavage complet`}
@@ -810,7 +814,7 @@ export default function BookingPage() {
                                 {/* 4. Révision de base (méca) : grille toujours visible, mais
                                     grisée/désactivée tant qu'aucun lavage n'est sélectionné. */}
                                 {mecaCategory && (
-                                    <BookPanel step={4} title="Révision de base">
+                                    <BookPanel id="panel-revision" step={4} title="Révision de base">
                                         <div className={`formula-grid${hasWash ? "" : " is-disabled"}`}>
                                             {renderCategory(mecaCategory)}
                                         </div>
@@ -828,7 +832,7 @@ export default function BookingPage() {
                                 )}
 
                                 {/* 5. Options : cases à cocher, actives seulement avec un lavage. */}
-                                <BookPanel step={5} title="Options">
+                                <BookPanel id="panel-options" step={5} title="Options">
                                     <div className="formula-options">
                                         {!hasWash && (
                                             <p className="formula-options__hint">
@@ -872,7 +876,7 @@ export default function BookingPage() {
                                 </BookPanel>
 
                                 {/* 6. Coordonnées : grille 2 colonnes, téléphone seul sur sa ligne. */}
-                                <BookPanel step={6} title="Vos coordonnées">
+                                <BookPanel id="panel-coordonnees" step={6} title="Vos coordonnées">
                                     <div className="coord-grid">
                                     <input required value={form.name} onChange={(event) => updateField("name", event.target.value)} placeholder="Nom & prénom *" />
                                     <input className="field-full" required value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Téléphone *" inputMode="tel" />
