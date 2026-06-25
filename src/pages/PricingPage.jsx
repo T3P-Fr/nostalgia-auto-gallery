@@ -32,7 +32,16 @@ export default function PricingPage() {
                                         <strong>{tier.tier}</strong>
                                         <span>{tier.duration}</span>
                                     </div>
-                                    <div className="price"><strong>{tier.price}</strong> €</div>
+                                    {/* Prix à gauche, bouton « Réserver » compact à droite. */}
+                                    <div className="price-row">
+                                        <div className="price"><strong>{tier.price}</strong> €</div>
+                                        <ButtonLink
+                                            size="small"
+                                            to={`/rendez-vous?service=${encodeURIComponent(service)}`}
+                                        >
+                                            Réserver →
+                                        </ButtonLink>
+                                    </div>
                                     {tier.includes ? (
                                         <div className="includes">
                                             <Plus />Tout le {tier.includes}, et en plus :
@@ -45,12 +54,6 @@ export default function PricingPage() {
                                             <li key={feature}><Check />{feature}</li>
                                         ))}
                                     </ul>
-                                    <ButtonLink
-                                        block
-                                        to={`/rendez-vous?service=${encodeURIComponent(service)}`}
-                                    >
-                                        Réserver →
-                                    </ButtonLink>
                                 </article>
                             );
                         })}

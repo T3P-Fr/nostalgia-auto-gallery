@@ -1,5 +1,6 @@
 import express from "express";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
     createAppointment,
     deleteAppointment,
@@ -176,7 +177,10 @@ app.delete("/api/appointments/:id", requireAdmin, async (request, response, next
 });
 
 // En production, Express sert également le bundle généré par Vite.
-const distDirectory = path.resolve("dist");
+// Chemin résolu à partir de ce fichier (indépendant du dossier de lancement,
+// nécessaire sous Passenger où le cwd n'est pas garanti).
+const serverDirectory = path.dirname(fileURLToPath(import.meta.url));
+const distDirectory = path.resolve(serverDirectory, "..", "dist");
 app.use(express.static(distDirectory));
 app.get("*splat", (request, response, next) => {
     if (request.path.startsWith("/api")) {
@@ -191,6 +195,16 @@ app.use((error, _request, response, _next) => {
     response.status(500).json({ message: "Une erreur interne est survenue." });
 });
 
-app.listen(port, () => {
-    console.log(`Nostalgia Auto Gallery API : http://localhost:${port}`);
-});
+// Phusion Passenger (o2switch) intercepte l'appel à listen(). On lui passe le
+// mot-clé "passenger" pour qu'il gère lui-même le binding (reverse port binding).
+// En local, on garde le port classique.
+if (typeof PhusionPassenger !== "undefined") {
+    PhusionPassenger.configure({ autoInstall: false });
+    app.listen("passenger", () => {
+        console.log("Nostalgia Auto Gallery API démarrée via Passenger.");
+    });
+} else {
+    app.listen(port, () => {
+        console.log(`Nostalgia Auto Gallery API : http://localhost:${port}`);
+    });
+}

@@ -1,8 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const dataDirectory = path.resolve("server", "data");
+// Chemin résolu à partir de ce fichier (et non du cwd) pour rester correct
+// sous Passenger comme en local.
+const dataDirectory = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "data");
 const dataFile = path.join(dataDirectory, "appointments.json");
 
 /**

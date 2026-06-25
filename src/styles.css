@@ -1054,8 +1054,16 @@ main::after {
     font-size: 11px;
 }
 
-.price {
+/* Prix et bouton « Réserver » sur la même ligne : prix à gauche, bouton à droite. */
+.price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
     margin: 12px 0 18px;
+}
+
+.price {
     font-size: 22px;
 }
 
