@@ -1,5 +1,4 @@
 import {
-    CalendarDays,
     Check,
     ChevronLeft,
     ChevronRight,
@@ -42,13 +41,12 @@ const washCategories = formulaCategories.filter((category) => category.key !== "
 const mecaCategory = formulaCategories.find((category) => category.key === "meca");
 
 /*
- * Plages de travail du prestataire (matin / après-midi). Sert à invalider un créneau
- * dont la prestation dépasserait l'heure de fermeture de sa demi-journée.
- * (Les créneaux 08:00/10:00 et 13:30/15:30/17:00 viennent du backend.)
+ * Plage de travail du prestataire. Sert à invalider un créneau dont la prestation
+ * dépasserait l'heure de fermeture. Plage continue 08:00–19:00 : les créneaux
+ * horaires (08:00 → 18:00, fournis par le backend) sont tous valides.
  */
 const workingPeriods = [
-    { start: "08:00", end: "12:00" },
-    { start: "13:30", end: "19:00" },
+    { start: "08:00", end: "19:00" },
 ];
 
 /**
@@ -114,6 +112,17 @@ function formatDuration(minutes) {
 function slotToMinutes(time) {
     const [hours, minutes] = time.split(":").map(Number);
     return hours * 60 + minutes;
+}
+
+/**
+ * Convertit des minutes depuis minuit en horaire « HH:MM ».
+ * @param {number} minutes Minutes depuis minuit.
+ * @returns {string} Horaire au format « HH:MM ».
+ */
+function minutesToTime(minutes) {
+    const hours = Math.floor(minutes / 60);
+    const rest = minutes % 60;
+    return `${String(hours).padStart(2, "0")}:${String(rest).padStart(2, "0")}`;
 }
 
 /**
@@ -227,6 +236,8 @@ export default function BookingPage() {
     const [form, setForm] = useState(initialForm);
     const [feedback, setFeedback] = useState("");
     const [createdAppointment, setCreatedAppointment] = useState(null);
+    // Pop-up affichée quand un changement de formule invalide le créneau déjà choisi.
+    const [slotNotice, setSlotNotice] = useState(false);
     const calendarCells = useMemo(() => buildCalendar(visibleMonth), [visibleMonth]);
 
     // Un « lavage complet » = un intérieur ET un extérieur ; il débloque la remise
@@ -397,6 +408,58 @@ export default function BookingPage() {
         }, 0);
     }, [formula]);
 
+    // Plage horaire affichée dans le résumé : « début — fin », la fin (début + durée)
+    // étant arrondie à l'heure supérieure. Sans durée connue, on n'affiche que le début.
+    const slotRange = useMemo(() => {
+        if (!selectedSlot) {
+            return "—";
+        }
+        if (durationMinutes <= 0) {
+            return selectedSlot;
+        }
+        const endMinutes = slotToMinutes(selectedSlot) + durationMinutes;
+        const endRoundedToHour = Math.ceil(endMinutes / 60) * 60;
+        return `${selectedSlot} — ${minutesToTime(endRoundedToHour)}`;
+    }, [selectedSlot, durationMinutes]);
+
+    /**
+     * Indique si l'on peut DÉMARRER la prestation à l'heure donnée : l'horaire existe
+     * dans la plage de travail, la durée ne dépasse pas la fin de journée et aucun
+     * créneau réservé par un client ne tombe dans la durée. C'est le seul critère qui
+     * rend un créneau « incompatible » (donc non sélectionnable comme point de départ).
+     * @param {string} time Heure de départ candidate « HH:MM ».
+     * @returns {boolean} Vrai si la prestation rentre intégralement à partir de cette heure.
+     */
+    function canStartAt(time) {
+        const start = slotToMinutes(time);
+        const periodEnd = periodEndForSlot(time);
+        // Hors plage de travail, ou la prestation déborderait la fin de journée.
+        if (periodEnd === null || start + durationMinutes > periodEnd) {
+            return false;
+        }
+        // Un créneau réservé par un client tombe dans la durée → impossible de démarrer ici.
+        return !slots.some((other) => {
+            const otherStart = slotToMinutes(other.time);
+            return (
+                !other.available &&
+                otherStart > start &&
+                otherStart < start + durationMinutes
+            );
+        });
+    }
+
+    // Si un changement de formule (durée) rend le créneau déjà choisi impossible
+    // (débordement de journée ou chevauchement), on le remet à zéro et on invite,
+    // via une pop-up, à en choisir un nouveau parmi les créneaux désormais compatibles.
+    useEffect(() => {
+        if (selectedSlot && !canStartAt(selectedSlot)) {
+            setSelectedSlot("");
+            setSlotNotice(true);
+        }
+        // canStartAt dépend de durationMinutes et slots : on surveille ces deux sources.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [durationMinutes, slots]);
+
     /**
      * Met à jour un champ du formulaire sans modifier les autres.
      * @param {string} field Nom du champ.
@@ -563,6 +626,10 @@ export default function BookingPage() {
                                 ? new Date(`${selectedDate}T12:00:00`).toLocaleDateString("fr-FR")
                                 : "—"}
                         </span>
+                    </li>
+                    <li>
+                        <span>Créneau</span>
+                        <span>{slotRange}</span>
                     </li>
                     {hasFormula && (
                         <>
@@ -731,40 +798,61 @@ export default function BookingPage() {
                                         {selectedDate ? (
                                             slots.map((slot) => {
                                                 const start = slotToMinutes(slot.time);
-                                                // Occupé par le service en cours (entre le début et la fin).
-                                                const occupied =
+                                                // Réservé/confirmé par un client : seul cas « dur » de blocage.
+                                                const taken = !slot.available;
+                                                const selected = selectedSlot === slot.time;
+                                                // Heure couverte par la prestation en cours (entre début et fin).
+                                                const covered =
                                                     Boolean(selectedSlot) &&
                                                     start > slotToMinutes(selectedSlot) &&
                                                     start < slotToMinutes(selectedSlot) + durationMinutes;
-                                                // Indisponible si un créneau réservé tombe dans la durée.
-                                                const overlapsBooked = slots.some((other) => {
-                                                    const time = slotToMinutes(other.time);
-                                                    return (
-                                                        time > start &&
-                                                        time < start + durationMinutes &&
-                                                        !other.available
-                                                    );
-                                                });
-                                                // Impossible si la prestation dépasse l'horaire de
-                                                // travail du prestataire (fin de la demi-journée).
-                                                const periodEnd = periodEndForSlot(slot.time);
-                                                const exceedsHours =
-                                                    periodEnd === null ||
-                                                    start + durationMinutes > periodEnd;
+                                                // Dernière heure couverte : l'heure suivante sort de la durée.
+                                                const isLastCovered =
+                                                    covered &&
+                                                    start + 60 >=
+                                                        slotToMinutes(selectedSlot) + durationMinutes;
+                                                // Chevrons d'association : droite au départ (si le service
+                                                // déborde son heure), gauche+droite au milieu, gauche à la fin.
+                                                const chevronLeft = covered;
+                                                const chevronRight =
+                                                    (selected && durationMinutes > 60) ||
+                                                    (covered && !isLastCovered);
+                                                // Peut-on démarrer ici (durée compatible, sans chevauchement) ?
+                                                const compatible = canStartAt(slot.time);
+                                                // Désactivé seulement si réservé, ou incompatible ET hors du
+                                                // service en cours. Une heure couverte (ou le créneau choisi)
+                                                // reste active : cliquer dessus ré-ancre le service.
+                                                const disabled =
+                                                    taken || (!compatible && !selected && !covered);
+                                                // Le créneau choisi (vert) prime ; sinon une heure couverte est
+                                                // entourée en rouge mais reste cliquable pour ré-ancrer le service.
+                                                const className = [
+                                                    selected && "is-selected",
+                                                    !selected && covered && "is-covered",
+                                                    taken && "is-taken",
+                                                ]
+                                                    .filter(Boolean)
+                                                    .join(" ");
                                                 return (
                                                     <button
                                                         key={slot.time}
                                                         type="button"
-                                                        disabled={
-                                                            !slot.available ||
-                                                            occupied ||
-                                                            overlapsBooked ||
-                                                            exceedsHours
-                                                        }
-                                                        className={selectedSlot === slot.time ? "is-selected" : ""}
-                                                        onClick={() => setSelectedSlot(slot.time)}
+                                                        disabled={disabled}
+                                                        className={className}
+                                                        onClick={() => {
+                                                            // Ré-ancrage : valide seulement si la durée rentre
+                                                            // à partir de cette heure, sinon on invite à choisir.
+                                                            if (canStartAt(slot.time)) {
+                                                                setSelectedSlot(slot.time);
+                                                            } else {
+                                                                setSelectedSlot("");
+                                                                setSlotNotice(true);
+                                                            }
+                                                        }}
                                                     >
+                                                        {chevronLeft && <ChevronLeft />}
                                                         {slot.time}
+                                                        {chevronRight && <ChevronRight />}
                                                     </button>
                                                 );
                                             })
@@ -890,12 +978,6 @@ export default function BookingPage() {
                                     {/* Véhicule : pleine largeur. */}
                                     <input className="field-full" value={form.vehicle} onChange={(event) => updateField("vehicle", event.target.value)} placeholder="Véhicule (modèle, année)" />
                                     <textarea value={form.message} onChange={(event) => updateField("message", event.target.value)} placeholder="Vos attentes…" rows="3" />
-                                    <div className="booking-recap">
-                                        <CalendarDays />
-                                        {selectedDate && selectedSlot
-                                            ? `${new Date(`${selectedDate}T12:00:00`).toLocaleDateString("fr-FR")} · ${selectedSlot}${hasFormula ? ` · ${pricing.sale} €` : ""}`
-                                            : "Aucun créneau sélectionné"}
-                                    </div>
                                     {feedback && <p className="form-error">{feedback}</p>}
                                     <button
                                         className="button button--block"
@@ -936,6 +1018,33 @@ export default function BookingPage() {
                     <p>Sur rendez-vous<br />Service itinérant</p>
                 </aside>
             </section>
+
+            {/* Pop-up : la formule a changé et le créneau choisi ne rentre plus.
+                On invite à en choisir un nouveau et on recentre la grille des créneaux. */}
+            {slotNotice && (
+                <div className="slot-modal" role="dialog" aria-modal="true">
+                    <div className="slot-modal__box">
+                        <h3>Nouveau créneau requis</h3>
+                        <p>
+                            La durée de votre formule a changé : le créneau choisi ne rentre
+                            plus dans la journée. Merci d’en sélectionner un nouveau parmi les
+                            créneaux compatibles proposés.
+                        </p>
+                        <button
+                            className="button button--block"
+                            type="button"
+                            onClick={() => {
+                                setSlotNotice(false);
+                                document
+                                    .getElementById("panel-creneau")
+                                    ?.scrollIntoView({ behavior: "smooth", block: "center" });
+                            }}
+                        >
+                            Choisir un créneau
+                        </button>
+                    </div>
+                </div>
+            )}
 
             <ZonePanel />
         </>

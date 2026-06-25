@@ -10,7 +10,20 @@ import {
 const app = express();
 const port = Number(process.env.PORT) || 3001;
 const adminKey = process.env.ADMIN_KEY || "nostalgia-admin";
-const allowedSlots = ["08:00", "10:00", "13:30", "15:30", "17:00"];
+// Un créneau toutes les heures, de 08:00 à 18:00 inclus.
+const allowedSlots = [
+    "08:00",
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+];
 const allowedStatuses = ["pending", "confirmed", "completed", "cancelled"];
 
 app.use(express.json({ limit: "100kb" }));
