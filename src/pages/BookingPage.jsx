@@ -25,6 +25,8 @@ const initialForm = {
     phone: "",
     email: "",
     address: "",
+    postalCode: "",
+    city: "",
     vehicle: "",
     message: "",
 };
@@ -562,10 +564,6 @@ export default function BookingPage() {
                                 : "—"}
                         </span>
                     </li>
-                    <li>
-                        <span>Créneau</span>
-                        <span>{selectedSlot || "—"}</span>
-                    </li>
                     {hasFormula && (
                         <>
                             <li>
@@ -875,14 +873,22 @@ export default function BookingPage() {
                                     )}
                                 </BookPanel>
 
-                                {/* 6. Coordonnées : grille 2 colonnes, téléphone seul sur sa ligne. */}
+                                {/* 6. Coordonnées : grille 3 colonnes (1/3 - 2/3) sur desktop,
+                                    chaque champ sur sa propre ligne en mode téléphone. */}
                                 <BookPanel id="panel-coordonnees" step={6} title="Vos coordonnées">
                                     <div className="coord-grid">
-                                    <input required value={form.name} onChange={(event) => updateField("name", event.target.value)} placeholder="Nom & prénom *" />
-                                    <input className="field-full" required value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Téléphone *" inputMode="tel" />
-                                    <input value={form.email} onChange={(event) => updateField("email", event.target.value)} placeholder="Email" type="email" />
-                                    <input value={form.address} onChange={(event) => updateField("address", event.target.value)} placeholder="Adresse d’intervention" />
-                                    <input value={form.vehicle} onChange={(event) => updateField("vehicle", event.target.value)} placeholder="Véhicule (modèle, année)" />
+                                    {/* Ligne 1 : Nom & prénom (2/3) + Téléphone (1/3). */}
+                                    <input className="field-twothird" required value={form.name} onChange={(event) => updateField("name", event.target.value)} placeholder="Nom & prénom *" />
+                                    <input className="field-third" required value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Téléphone *" inputMode="tel" />
+                                    {/* Email : pleine largeur. */}
+                                    <input className="field-full" value={form.email} onChange={(event) => updateField("email", event.target.value)} placeholder="Email" type="email" />
+                                    {/* Adresse : pleine largeur. */}
+                                    <input className="field-full" value={form.address} onChange={(event) => updateField("address", event.target.value)} placeholder="Adresse d’intervention" />
+                                    {/* Ligne : Code postal (1/3) + Ville (2/3). */}
+                                    <input className="field-third" value={form.postalCode} onChange={(event) => updateField("postalCode", event.target.value)} placeholder="Code postal" inputMode="numeric" />
+                                    <input className="field-twothird" value={form.city} onChange={(event) => updateField("city", event.target.value)} placeholder="Ville" />
+                                    {/* Véhicule : pleine largeur. */}
+                                    <input className="field-full" value={form.vehicle} onChange={(event) => updateField("vehicle", event.target.value)} placeholder="Véhicule (modèle, année)" />
                                     <textarea value={form.message} onChange={(event) => updateField("message", event.target.value)} placeholder="Vos attentes…" rows="3" />
                                     <div className="booking-recap">
                                         <CalendarDays />

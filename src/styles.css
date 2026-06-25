@@ -1431,9 +1431,17 @@ main::after {
    comble la case laissée libre à côté du nom. */
 .coord-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-auto-flow: dense;
+    grid-template-columns: repeat(3, 1fr);
     gap: 11px;
+}
+
+/* Largeurs des champs sur la grille à 3 colonnes : 1/3, 2/3 et pleine largeur. */
+.coord-grid>.field-third {
+    grid-column: span 1;
+}
+
+.coord-grid>.field-twothird {
+    grid-column: span 2;
 }
 
 .coord-grid>.field-full,
@@ -1443,6 +1451,18 @@ main::after {
 .coord-grid>button,
 .coord-grid>small {
     grid-column: 1 / -1;
+}
+
+/* Mode téléphone : un seul champ par ligne (la grille passe à 1 colonne). */
+@media (max-width: 640px) {
+    .coord-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .coord-grid>.field-third,
+    .coord-grid>.field-twothird {
+        grid-column: 1 / -1;
+    }
 }
 
 .form-error {
