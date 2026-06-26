@@ -759,6 +759,16 @@ main::after {
     background: var(--bg2);
 }
 
+/* Condition d'éligibilité du complément méca (page Detailing). */
+.meca-condition {
+    margin: -8px 0 18px;
+    padding: 10px 16px;
+    border-left: 3px solid var(--acc);
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 14px;
+}
+
 /* Liste de questions fréquentes (page Detailing), repliables via <details>. */
 .faq-list {
     display: grid;

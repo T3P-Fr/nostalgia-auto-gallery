@@ -32,8 +32,8 @@
         },
         {
             "title": "Complète",
-            "description": "Intérieur et extérieur réunis dans une seule intervention, avec contrôles visuels complémentaires.",
-            "from": "dès 120 €",
+            "description": "Intérieur et extérieur réunis dans une seule intervention : vous économisez sur le lavage et la révision de base est offerte.",
+            "from": "dès 125 €",
             "icon": "Wrench"
         }
     ],
@@ -221,15 +221,15 @@
             {
                 "key": "meca",
                 "title": "Révision de base",
-                "subtitle": "Intérieur + extérieur",
-                "bonusLabel": "Formule tout-en-un : intérieur + extérieur + méca",
+                "subtitle": "Complément · avec un lavage",
+                "condition": "Disponible uniquement avec un lavage. Offerte avec un lavage complet (intérieur + extérieur).",
+                "bonusLabel": "Complément méca : à ajouter à un lavage",
                 "tiers": [
                     {
                         "tier": "Platine",
                         "price": 15,
                         "duration": "≈ 3h30",
                         "features": [
-                            "Nettoyage intérieur et extérieur",
                             "Contrôle visuel du niveau des liquides",
                             "Contrôle de l’état des pneus",
                             "Contrôle des éclairages"

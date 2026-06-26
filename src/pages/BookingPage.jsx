@@ -268,10 +268,12 @@ export default function BookingPage() {
             .catch(() => setFeedback("Impossible de charger les créneaux."));
     }, [selectedDate]);
 
-    // Sans lavage sélectionné, les options ne sont plus disponibles : on les vide.
+    // Sans lavage sélectionné, options ET révision (méca) ne sont plus disponibles :
+    // la méca est un complément qui exige au moins un lavage. On les vide donc.
     useEffect(() => {
         if (!hasWash) {
             setOptions([]);
+            setFormula((current) => (current.meca ? { ...current, meca: "" } : current));
         }
     }, [hasWash]);
 
@@ -901,6 +903,11 @@ export default function BookingPage() {
                                     grisée/désactivée tant qu'aucun lavage n'est sélectionné. */}
                                 {mecaCategory && (
                                     <BookPanel id="panel-revision" step={4} title="Révision de base">
+                                        {!hasWash && (
+                                            <p className="formula-options__hint">
+                                                Sélectionnez un lavage pour ajouter la révision (offerte avec un lavage complet).
+                                            </p>
+                                        )}
                                         <div className={`formula-grid${hasWash ? "" : " is-disabled"}`}>
                                             {renderCategory(mecaCategory)}
                                         </div>

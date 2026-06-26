@@ -12,6 +12,11 @@ import { pages, pricingGroups, pricingOptions, services } from "../data.js";
 const { hero, actions, typeHeading, pricingHeading, options, faq, final } =
     pages.detailing;
 
+// Les lavages (Intérieur/Extérieur) sont de vraies formules ; la méca est un COMPLÉMENT
+// qui ne peut être pris qu'avec au moins un lavage. On les présente donc séparément.
+const washGroups = pricingGroups.filter((group) => group.key !== "meca");
+const mecaGroup = pricingGroups.find((group) => group.key === "meca");
+
 /**
  * Page Detailing : choix du type de prestation, formules détaillées, options et FAQ.
  * @returns {JSX.Element} La page Detailing.
@@ -31,11 +36,11 @@ export default function DetailingPage() {
                 </div>
             </section>
 
-            {/* Section 2 — Les formules détaillées, source unique pricing.groups. */}
+            {/* Section 2 — Les formules détaillées (lavages uniquement). */}
             <section className="container">
                 <SectionHeading {...pricingHeading} split />
             </section>
-            {pricingGroups.map((group) => (
+            {washGroups.map((group) => (
                 <section className="pricing-section container" key={group.title}>
                     <div className="pricing-title">
                         <h2>{group.title}</h2>
@@ -87,6 +92,50 @@ export default function DetailingPage() {
                     </div>
                 </section>
             ))}
+
+            {/* Complément méca : présenté comme un ajout conditionné à un lavage,
+                et non comme une formule autonome (cf. son prix réservation). */}
+            {mecaGroup && (
+                <section className="pricing-section container">
+                    <div className="pricing-title">
+                        <h2>{mecaGroup.title}</h2>
+                        <span>{mecaGroup.subtitle}</span>
+                    </div>
+                    <p className="meca-condition">{mecaGroup.condition}</p>
+                    <div className="pricing-grid">
+                        {mecaGroup.tiers.map((tier) => (
+                            <article className="card price-card" key={tier.tier}>
+                                <div className="price-card__top">
+                                    <strong>{tier.tier}</strong>
+                                    <span>{tier.duration}</span>
+                                </div>
+                                <div className="price-row">
+                                    {/* « + » : c'est un complément qui s'ajoute à un lavage. */}
+                                    <div className="price">
+                                        + <strong>{tier.price}</strong> €
+                                    </div>
+                                </div>
+                                {tier.includes ? (
+                                    <div className="includes">
+                                        <Plus />
+                                        Tout le {tier.includes}, et en plus :
+                                    </div>
+                                ) : (
+                                    <div className="base-label">Le complément de base</div>
+                                )}
+                                <ul>
+                                    {tier.features.map((feature) => (
+                                        <li key={feature}>
+                                            <Check />
+                                            {feature}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </article>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             {/* Section 3 — Options et suppléments à la carte. */}
             <section className="options-card container">
