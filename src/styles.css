@@ -63,6 +63,10 @@
     --gradient--color: var(--acc);
     --gradient--shine: 25%;
     --radius: 8px;
+    /* Rayons centralisés : changer ici se répercute sur toutes les cartes/sections
+       (--radius-card) et tous les boutons (--radius-button). */
+    --radius-card: var(--radius);
+    --radius-button: var(--radius);
 }
 
 * {
@@ -290,7 +294,7 @@ img {
     min-height: 48px;
     padding: 14px 24px;
     border: 0;
-    border-radius: var(--radius);
+    border-radius: var(--radius-button);
     background-color: var(--acc);
     background-image: var(--shining-gradient);
     color: #fff;
@@ -637,7 +641,7 @@ main::after {
     position: relative;
     border: 1px solid var(--line);
     border-top: 0;
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 var(--radius-card) var(--radius-card);
     background: color-mix(in srgb, var(--surface), transparent 50%);
     backdrop-filter: blur(100px);
 }
@@ -667,7 +671,7 @@ main::after {
     height: 50px;
     place-items: center;
     margin-bottom: 18px;
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     background: var(--surface2);
     color: var(--acc);
 }
@@ -972,7 +976,7 @@ main::after {
     aspect-ratio: 4 / 3;
     padding: 0;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     background: none;
     cursor: pointer;
     transition: transform 180ms ease, box-shadow 180ms ease;
@@ -1070,7 +1074,7 @@ main::after {
     max-width: 92vw;
     max-height: 80vh;
     object-fit: contain;
-    border-radius: var(--radius);
+    border-radius: var(--radius-card);
 }
 
 .image-modal__content figcaption {
@@ -1090,7 +1094,7 @@ main::after {
     gap: 8px;
     padding: 10px 16px;
     border: 1px solid rgba(255, 255, 255, 0.42);
-    border-radius: var(--radius);
+    border-radius: var(--radius-card);
     color: #fff;
     cursor: pointer;
     font-weight: 700;
@@ -1153,7 +1157,7 @@ main::after {
     overflow: hidden;
     aspect-ratio: 16 / 9;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
 }
 
 .comparison img {
@@ -1180,7 +1184,7 @@ main::after {
     top: 16px;
     z-index: 2;
     padding: 6px 12px;
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     background: rgba(0, 0, 0, 0.55);
     font-size: 11px;
     font-weight: 800;
@@ -1243,7 +1247,7 @@ main::after {
     overflow: hidden;
     aspect-ratio: 4 / 3;
     margin: 0;
-    border-radius: 8px;
+    border-radius: var(--radius-card);
 }
 
 .gallery-grid img {
@@ -1290,7 +1294,7 @@ main::after {
 .town-list span {
     padding: 7px 13px;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     background: var(--surface);
     font-size: 13px;
 }
@@ -1374,7 +1378,7 @@ main::after {
     padding: 42px;
     border: 1px solid var(--line);
     border-top: var(--nav-accent-height) solid var(--acc);
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 var(--radius-card) var(--radius-card);
     background: var(--surface);
 }
 
@@ -1463,7 +1467,7 @@ main::after {
     gap: 8px;
     padding: 11px;
     border: 1px solid color-mix(in srgb, var(--red-primary) 40%, transparent);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     background: color-mix(in srgb, var(--red-primary) 12%, transparent);
     font-size: 12px;
     font-weight: 800;
@@ -1509,7 +1513,7 @@ main::after {
     margin-block: 48px 64px;
     padding: 32px;
     border: 2px solid var(--acc);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     background: linear-gradient(color-mix(in srgb, var(--red-primary) 32%, transparent),
             var(--surface));
 }
@@ -1532,7 +1536,7 @@ main::after {
     gap: 18px;
     padding: 15px;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     background: var(--bg2);
     color: var(--muted);
     font-size: 12px;
@@ -1596,7 +1600,7 @@ main::after {
     width: 42px;
     height: 42px;
     padding: 11px;
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     background: var(--surface2);
     color: var(--acc);
 }
@@ -1759,7 +1763,7 @@ main::after {
     justify-content: center;
     gap: 1px;
     padding: 11px 5px;
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     font-size: 13px;
     font-weight: 700;
 }
@@ -1793,7 +1797,7 @@ main::after {
     margin: 0;
     padding: 14px;
     border: 1px dashed var(--line);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     color: var(--subtle);
     font-size: 13px;
 }
@@ -1844,7 +1848,7 @@ main::after {
     width: 100%;
     padding: 13px 14px;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     outline: none;
     background: var(--surface2);
     color: var(--txt);
@@ -1864,7 +1868,7 @@ main::after {
     gap: 10px;
     padding: 12px;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     background: var(--surface2);
     color: var(--muted);
     font-size: 13px;
@@ -1988,7 +1992,7 @@ main::after {
     overflow: hidden;
     padding: 9px 6px;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     background: var(--surface2);
     color: var(--txt);
     cursor: pointer;
@@ -2084,7 +2088,7 @@ main::after {
     gap: 10px;
     padding: 10px 12px;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     background: var(--surface2);
     cursor: pointer;
     font-size: 13px;
@@ -2302,7 +2306,7 @@ main::after {
     margin: 24px auto;
     padding: 20px;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     background: var(--surface2);
     text-align: left;
 }
@@ -2376,7 +2380,7 @@ main::after {
     padding: 20px;
     border: 1px solid var(--line);
     border-left: 4px solid var(--acc);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     background: var(--surface);
 }
 
@@ -2432,7 +2436,7 @@ main::after {
     width: 42px;
     height: 42px;
     flex: none;
-    border-radius: 8px;
+    border-radius: var(--radius-card);
 }
 
 .icon-button:hover {
@@ -2442,7 +2446,7 @@ main::after {
 .empty-state {
     padding: 40px;
     border: 1px dashed var(--line);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     color: var(--muted);
     text-align: center;
 }
