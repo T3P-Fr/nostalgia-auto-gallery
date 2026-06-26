@@ -91,24 +91,27 @@ export default function GalleryPage() {
                     />
                 </div>
 
-                {/* Vignettes d'exemples : un clic défile vers le grand comparateur. */}
-                <div className="ba-thumbs">
+                {/* Cartes d'exemples (même style que la galerie) : une seule image,
+                    surmontée des pills « Avant / Après ». Un clic défile vers le
+                    grand comparateur et y charge l'exemple choisi. */}
+                <div className="gallery-grid ba-grid">
                     {beforeAfter.map((set, index) => (
                         <button
                             type="button"
                             key={set.label}
-                            className={`ba-thumb${index === activeSet ? " is-active" : ""}`}
+                            className={`ba-card${index === activeSet ? " is-active" : ""}`}
                             onClick={() => showBeforeAfter(index)}
+                            aria-label={`Voir l’avant / après — ${set.label}`}
                         >
-                            <span className="ba-thumb__images">
-                                <img src={set.before} alt={`Avant — ${set.label}`} loading="lazy" />
-                                <img src={set.after} alt={`Après — ${set.label}`} loading="lazy" />
-                            </span>
-                            <span className="ba-thumb__pills">
+                            <img src={set.after} alt={`Avant / après — ${set.label}`} loading="lazy" />
+                            <span className="ba-card__pills">
                                 <span className="pill">Avant</span>
                                 <span className="pill">Après</span>
                             </span>
-                            <strong>{set.label}</strong>
+                            <span className="ba-card__caption">
+                                <strong>{set.label}</strong>
+                                <span>avant / après</span>
+                            </span>
                         </button>
                     ))}
                 </div>
