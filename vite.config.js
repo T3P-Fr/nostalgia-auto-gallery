@@ -10,4 +10,15 @@ export default defineConfig({
             "/api": "http://localhost:3001",
         },
     },
+    build: {
+        rollupOptions: {
+            output: {
+                // Vendor React isolé : il change rarement → meilleur cache navigateur
+                // entre déploiements (le code applicatif peut évoluer sans réinvalider).
+                manualChunks: {
+                    "react-vendor": ["react", "react-dom", "react-router-dom"],
+                },
+            },
+        },
+    },
 });
