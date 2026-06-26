@@ -1016,16 +1016,30 @@ main::after {
     width: 18px;
 }
 
-/* Pages légales : colonne de lecture aérée. */
+/* Page Informations : colonne de lecture aérée, une section par document légal. */
 .legal-page {
     display: grid;
-    gap: 28px;
+    gap: 56px;
     max-width: 760px;
 }
 
-.legal-block h2 {
-    margin-bottom: 8px;
-    font-size: 20px;
+.legal-section {
+    /* Décale l'ancre sous l'en-tête collant lors d'un défilement vers #section. */
+    scroll-margin-top: 96px;
+}
+
+.legal-section__intro {
+    margin: 0 0 20px;
+    color: var(--muted);
+}
+
+.legal-block {
+    margin-top: 18px;
+}
+
+.legal-block h3 {
+    margin-bottom: 6px;
+    font-size: 17px;
 }
 
 .legal-block p {

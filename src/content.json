@@ -11,9 +11,9 @@
         "footerTagline": "Le detailing automobile à domicile dans le Gard. Nettoyage, rénovation esthétique et protection, autour de Parignargues et Nîmes.",
         "copyright": "© 2026 Nostalgia Auto Gallery — Corentin Jammes. Tous droits réservés.",
         "legalLinks": [
-            { "label": "Mentions légales", "to": "/mentions-legales" },
-            { "label": "Politique de confidentialité", "to": "/confidentialite" },
-            { "label": "Conditions de réservation", "to": "/conditions" }
+            { "label": "Mentions légales", "to": "/informations#mentions-legales" },
+            { "label": "Politique de confidentialité", "to": "/informations#confidentialite" },
+            { "label": "Conditions de réservation", "to": "/informations#conditions" }
         ],
         "secondaryActivity": "Achat & vente de véhicules"
     },
@@ -585,8 +585,17 @@
                 "description": "Choisissez une prestation ou décrivez votre besoin. Après réception de votre demande, je vous contacte pour vérifier les informations et confirmer le rendez-vous."
             }
         },
+        "informations": {
+            "hero": {
+                "image": "/assets/hero-night.jpg",
+                "eyebrow": "Informations",
+                "title": "informations &\nmentions *légales*.",
+                "description": "Éditeur, données personnelles et conditions de réservation du site Nostalgia Auto Gallery, réunis sur une seule page."
+            }
+        },
         "legal": {
             "mentions-legales": {
+                "label": "Mentions légales",
                 "eyebrow": "Informations légales",
                 "title": "mentions *légales*.",
                 "intro": "Conformément aux dispositions légales applicables, cette page présente les informations relatives à l’éditeur et à l’hébergement du site Nostalgia Auto Gallery.",
@@ -606,6 +615,7 @@
                 ]
             },
             "confidentialite": {
+                "label": "Politique de confidentialité",
                 "eyebrow": "Vos données",
                 "title": "politique de *confidentialité*.",
                 "intro": "Les informations transmises par le formulaire sont utilisées uniquement pour répondre à votre demande, préparer un devis ou organiser un rendez-vous.",
@@ -625,6 +635,7 @@
                 ]
             },
             "conditions": {
+                "label": "Conditions de réservation",
                 "eyebrow": "Réservation",
                 "title": "conditions de *réservation*.",
                 "intro": "La réservation en ligne constitue une demande de rendez-vous. Elle devient définitive après validation des informations et confirmation par Nostalgia Auto Gallery.",
