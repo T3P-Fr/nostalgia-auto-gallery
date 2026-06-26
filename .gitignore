@@ -7,5 +7,6 @@ dist.zip
 server/data/appointments.json
 *.log
 tmp/
+cms/
 Thumbs.db
 **/Thumbs.db
