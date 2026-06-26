@@ -20,14 +20,13 @@ export function FooterPage() {
                 </div>
                 <div>
                     <h3>Navigation</h3>
-                    <Link to="/prestations">Prestations</Link>
-                    <Link to="/negoce-auto">Négoce auto</Link>
-                    <Link to="/vehicules">Véhicules</Link>
-                    <Link to="/pieces-automobiles">Pièces automobiles</Link>
-                    <Link to="/galerie">Galerie</Link>
-                    <Link to="/tarifs">Tarifs</Link>
+                    <Link to="/">Accueil</Link>
+                    <Link to="/detailing">Detailing</Link>
+                    <Link to="/realisations">Réalisations</Link>
                     <Link to="/a-propos">À propos</Link>
-                    <Link to="/rendez-vous">Contact & rendez-vous</Link>
+                    <Link to="/contact">Contact et rendez-vous</Link>
+                    {/* Activité secondaire : renvoyée vers la section dédiée d'À propos. */}
+                    <Link to="/a-propos">{site.secondaryActivity}</Link>
                 </div>
                 <div>
                     <h3>Contact</h3>
@@ -35,6 +34,14 @@ export function FooterPage() {
                     <a href={site.emailHref}>{site.email}</a>
                     <span>{site.social}</span>
                     <span>{site.location}</span>
+                </div>
+                <div>
+                    <h3>Informations</h3>
+                    {site.legalLinks.map((label) => (
+                        <Link key={label} to="/contact">
+                            {label}
+                        </Link>
+                    ))}
                 </div>
             </div>
             <div className="footer-bottom">{site.copyright}</div>

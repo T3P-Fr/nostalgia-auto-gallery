@@ -1,5 +1,5 @@
 {
-    "_comment": "Contenu éditorial centralisé du site. Modifiez ici les textes, images et tarifs sans toucher au code. SOURCE UNIQUE des prix : pricing.groups (utilisé à la fois par la page Tarifs ET par la grille de réservation de la page Contact). Dans les titres de héros, un saut de ligne (\\n) devient un retour à la ligne et *un mot* devient le mot en accent. Les icônes sont désignées par leur nom lucide (cf. registre dans data.js).",
+    "_comment": "Contenu éditorial centralisé — architecture v3 recentrée SEO (cf. Site_Structure.md). 5 pages : Accueil, Detailing, Réalisations, À propos, Contact. Le detailing est l'activité principale ; l'achat/vente n'apparaît que dans une section discrète d'À propos. SOURCE UNIQUE des prix : pricing.groups (page Detailing + grille de réservation de Contact). Dans les titres de héros, \\n = retour à la ligne et *un mot* = mot en accent. Les images de galerie commençant par http sont des PLACEHOLDERS distants (à remplacer par de vraies photos). Icônes = noms lucide (cf. data.js).",
     "site": {
         "phone": "06 36 37 22 10",
         "phoneHref": "tel:+33636372210",
@@ -8,25 +8,31 @@
         "social": "@nostalgia_auto_galery",
         "location": "Parignargues · Gard (30)",
         "siret": "SIRET 105 175 756 · Ouverture officielle · 6 juillet 2026",
-        "footerTagline": "Le soin, la passion, l’excellence pour chaque voiture. Detailing, négoce de véhicules d’occasion et pièces automobiles.",
-        "copyright": "© 2026 Nostalgia Auto Gallery — Corentin Jammes."
+        "footerTagline": "Le detailing automobile à domicile dans le Gard. Nettoyage, rénovation esthétique et protection, autour de Parignargues et Nîmes.",
+        "copyright": "© 2026 Nostalgia Auto Gallery — Corentin Jammes. Tous droits réservés.",
+        "legalLinks": [
+            "Mentions légales",
+            "Politique de confidentialité",
+            "Conditions de réservation"
+        ],
+        "secondaryActivity": "Achat & vente de véhicules"
     },
     "services": [
         {
             "title": "Intérieur",
-            "description": "Aspiration, vapeur, shampoing des sièges, soin des cuirs et plastiques. Un habitacle comme au premier jour.",
+            "description": "Un habitacle propre, sain et agréable : aspiration, surfaces, vitres, sièges et vapeur selon le niveau choisi.",
             "from": "dès 65 €",
             "icon": "Armchair"
         },
         {
             "title": "Extérieur",
-            "description": "Prélavage mousse, lavage manuel, décontamination, cire et protection longue durée.",
+            "description": "Une carrosserie qui retrouve son éclat : lavage manuel, jantes, décontamination et protection longue durée.",
             "from": "dès 65 €",
             "icon": "CarFront"
         },
         {
-            "title": "Complet + méca",
-            "description": "Intérieur et extérieur réunis, avec contrôle des niveaux, des pneus et de l’éclairage.",
+            "title": "Complète",
+            "description": "Intérieur et extérieur réunis dans une seule intervention, avec contrôles visuels complémentaires.",
             "from": "dès 120 €",
             "icon": "Wrench"
         }
@@ -40,7 +46,7 @@
         [
             "nissan-lights.jpg",
             "200SX",
-            "face avant"
+            "rénovation des phares"
         ],
         [
             "engine.jpg",
@@ -54,21 +60,54 @@
         ],
         [
             "peugeot-front.jpg",
+            "205 GTI",
+            "carrosserie lustrée"
+        ],
+        [
+            "peugeot-rear.jpg",
             "205",
-            "profil avant"
+            "profil arrière"
         ],
         [
             "context.jpg",
             "À domicile",
             "intervention"
+        ],
+        [
+            "nissan-dusk2.jpg",
+            "200SX",
+            "finition extérieure"
+        ],
+        [
+            "https://picsum.photos/seed/nag-interior/800/600",
+            "Habitacle",
+            "shampoing des sièges · placeholder"
+        ],
+        [
+            "https://picsum.photos/seed/nag-wheel/800/600",
+            "Jantes",
+            "nettoyage & céramique · placeholder"
+        ],
+        [
+            "https://picsum.photos/seed/nag-foam/800/600",
+            "Prélavage mousse",
+            "lavage à la main · placeholder"
+        ],
+        [
+            "https://picsum.photos/seed/nag-detail/800/600",
+            "Finitions",
+            "détails & protection · placeholder"
         ]
     ],
     "interventionTowns": [
         "Parignargues",
-        "Gard (30)",
-        "Départements voisins",
-        "À domicile",
-        "Lieu convenu",
+        "Nîmes",
+        "Caveirac",
+        "Calvisson",
+        "Sommières",
+        "Uzès",
+        "Vauvert",
+        "Saint-Gilles",
         "15 km offerts",
         "Au-delà avec supplément"
     ],
@@ -246,29 +285,29 @@
         "home": {
             "hero": {
                 "image": "/assets/bckgHome.png",
-                "eyebrow": "Detailing · négoce · solutions automobiles",
-                "title": "le soin que mérite\nchaque *légende*.",
-                "description": "Lavage à la main, rénovation esthétique et protection céramique — directement chez vous, autour de Parignargues."
+                "eyebrow": "Detailing automobile à domicile · Gard",
+                "title": "le detailing automobile,\nà domicile dans le *Gard*.",
+                "description": "Nettoyage, rénovation esthétique et protection de votre voiture, directement chez vous, autour de Parignargues et Nîmes. Lavage à la main, produits professionnels, formules dès 65 €."
             },
             "actions": [
                 {
                     "label": "Prendre rendez-vous →",
-                    "to": "/rendez-vous"
+                    "to": "/contact"
                 },
                 {
                     "label": "Voir les formules",
-                    "to": "/tarifs",
+                    "to": "/detailing",
                     "variant": "secondary"
                 }
             ],
             "stats": [
                 {
-                    "value": "15 km",
-                    "label": "déplacement offert"
-                },
-                {
                     "value": "dès 65 €",
                     "label": "la formule"
+                },
+                {
+                    "value": "15 km",
+                    "label": "déplacement offert"
                 },
                 {
                     "value": "à domicile",
@@ -282,7 +321,7 @@
                 },
                 {
                     "icon": "Droplets",
-                    "label": "Vapeur & produits pro"
+                    "label": "Produits & équipements pro"
                 },
                 {
                     "icon": "MapPin",
@@ -294,340 +333,244 @@
                 }
             ],
             "heading": {
-                "overline": "Nostalgia Auto Gallery",
-                "title": "choisissez votre route",
-                "description": "Detailing, négoce automobile ou projet particulier : découvrez l’accompagnement adapté à votre véhicule."
+                "overline": "Plus qu’un simple lavage",
+                "title": "choisissez le soin adapté",
+                "description": "Intérieur, extérieur ou complet : sélectionnez la prestation correspondant à l’état de votre véhicule et au résultat recherché."
             },
-            "cards": [
-                {
-                    "title": "Prestations",
-                    "description": "Découvrez les trois pôles de soin et les niveaux de finition.",
-                    "image": "/assets/nissan-front.jpg",
-                    "to": "/prestations"
-                },
-                {
-                    "title": "Négoce auto",
-                    "description": "Accédez aux pages dédiées aux véhicules et aux pièces automobiles.",
-                    "image": "/assets/peugeot-side.jpg",
-                    "to": "/negoce-auto"
-                },
-                {
-                    "title": "Galerie",
-                    "description": "Avant, après et détails de véhicules qui méritent toute notre attention.",
-                    "image": "/assets/nissan-dusk2.jpg",
-                    "to": "/galerie"
-                },
-                {
-                    "title": "Tarifs",
-                    "description": "Des formules lisibles, de l’entretien essentiel à la rénovation complète.",
-                    "image": "/assets/engine.jpg",
-                    "to": "/tarifs"
-                },
-                {
-                    "title": "À propos",
-                    "description": "Découvrez l’histoire, les engagements et les deux piliers de l’entreprise.",
-                    "image": "/assets/context.jpg",
-                    "to": "/a-propos"
-                }
-            ]
+            "comparison": {
+                "overline": "Le résultat en images",
+                "title": "la différence se voit",
+                "description": "Glissez le curseur pour comparer l’avant et l’après d’une préparation esthétique complète.",
+                "cta": "Voir les réalisations →",
+                "to": "/realisations"
+            },
+            "process": {
+                "overline": "Simple et transparent",
+                "title": "comment se déroule votre rendez-vous ?",
+                "steps": [
+                    {
+                        "title": "Choisissez votre formule",
+                        "description": "Sélectionnez le niveau de soin adapté à votre véhicule, ou décrivez son état et le résultat souhaité.",
+                        "icon": "Sparkles"
+                    },
+                    {
+                        "title": "Indiquez le véhicule et le lieu",
+                        "description": "Précisez le modèle, l’année et l’adresse d’intervention pour préparer le matériel.",
+                        "icon": "CarFront"
+                    },
+                    {
+                        "title": "Sélectionnez un créneau",
+                        "description": "Choisissez une date et un horaire parmi les disponibilités proposées.",
+                        "icon": "ClipboardCheck"
+                    },
+                    {
+                        "title": "Recevez votre confirmation",
+                        "description": "La demande est vérifiée, puis le rendez-vous est confirmé par téléphone.",
+                        "icon": "BadgeCheck"
+                    }
+                ]
+            },
+            "final": {
+                "title": "Votre véhicule mérite une attention particulière",
+                "text": "Choisissez votre formule ou décrivez votre besoin. Je vous accompagne pour sélectionner la prestation la plus adaptée, autour de Parignargues et Nîmes.",
+                "cta": "Prendre rendez-vous →",
+                "to": "/contact"
+            }
         },
-        "services": {
+        "detailing": {
             "hero": {
                 "image": "/assets/nissan-front.jpg",
-                "eyebrow": "Prestations",
-                "title": "trois pôles,\nune même *exigence*",
-                "description": "Du soin de l’habitacle à la rénovation complète, chaque intervention est réalisée à la main avec des produits professionnels."
+                "eyebrow": "Formules de detailing à domicile",
+                "title": "le bon soin,\nau bon *niveau*.",
+                "description": "De l’entretien régulier à la remise en état approfondie, chaque formule répond à un besoin précis. Tout est réalisé à la main, avec des produits adaptés à chaque surface du véhicule."
             },
             "actions": [
                 {
-                    "label": "Choisir un créneau →",
-                    "to": "/rendez-vous"
+                    "label": "Prendre rendez-vous →",
+                    "to": "/contact"
                 },
                 {
-                    "label": "Voir les tarifs",
-                    "to": "/tarifs",
+                    "label": "Demander conseil",
+                    "to": "/contact",
                     "variant": "secondary"
                 }
             ],
-            "heading": {
+            "typeHeading": {
+                "overline": "Par où commencer ?",
+                "title": "intérieur, extérieur ou complet",
+                "description": "Choisissez votre type de prestation, puis le niveau de finition. Chaque niveau comprend les prestations du niveau précédent."
+            },
+            "pricingHeading": {
                 "overline": "Detailing à domicile",
-                "title": "le bon soin, au bon niveau",
+                "title": "les formules en détail",
                 "description": "Platine, Premium ou Deluxe : la formule s’adapte à l’état du véhicule, à son usage et au résultat recherché."
             },
-            "beyond": {
-                "title": "Au-delà du detailing",
-                "text": "Achat et vente de véhicules · Pièces performance · Optiques et sellerie · Protection céramique."
-            }
-        },
-        "trading": {
-            "hero": {
-                "image": "/assets/peugeot-side.jpg",
-                "eyebrow": "Achat · Vente · Pièces",
-                "title": "votre projet auto,\nsuivi avec *rigueur*.",
-                "description": "Nostalgia Auto Gallery accompagne les particuliers et les passionnés dans l’achat, la vente et la recherche de solutions automobiles."
+            "options": {
+                "overline": "À la carte",
+                "title": "options & suppléments",
+                "text": "Certaines zones nécessitent un traitement particulier. Ces options s’ajoutent à une formule selon l’état du véhicule et le résultat recherché.",
+                "note": "Les véhicules utilitaires d’entreprise sont proposés uniquement sur devis.",
+                "cta": "Demander un devis →"
             },
-            "actions": [
-                {
-                    "label": "Parler de mon projet →",
-                    "to": "/rendez-vous"
-                },
-                {
-                    "label": "Voir les véhicules",
-                    "to": "/galerie",
-                    "variant": "secondary"
-                }
-            ],
-            "heading": {
-                "overline": "Négoce automobile",
-                "title": "une sélection attentive",
-                "description": "Chaque demande est étudiée individuellement. L’objectif est de proposer une solution cohérente, avec une attention particulière portée à l’état, à l’historique et à la qualité du véhicule ou de la pièce recherchée."
+            "faq": {
+                "overline": "Bon à savoir",
+                "title": "questions fréquentes",
+                "items": [
+                    {
+                        "question": "Quelle formule choisir ?",
+                        "answer": "La formule Platine convient à un entretien régulier. La Premium permet un nettoyage plus approfondi. La Deluxe est destinée aux véhicules nécessitant une remise en état complète ou une attention particulière portée aux détails."
+                    },
+                    {
+                        "question": "Puis-je réserver uniquement l’intérieur ou l’extérieur ?",
+                        "answer": "Oui. Les prestations intérieures et extérieures peuvent être réservées séparément. Les formules complètes réunissent les deux lors d’une seule intervention."
+                    },
+                    {
+                        "question": "Intervenez-vous sur tous les véhicules ?",
+                        "answer": "Les prestations sont proposées pour les véhicules particuliers. Les utilitaires d’entreprise, grands véhicules ou véhicules en état particulier sont étudiés sur devis."
+                    },
+                    {
+                        "question": "Les tarifs peuvent-ils évoluer ?",
+                        "answer": "Le tarif affiché correspond à une intervention dans des conditions normales. Si l’état ou les besoins du véhicule demandent un travail supplémentaire, la situation est expliquée avant toute modification du prix."
+                    },
+                    {
+                        "question": "Le rendez-vous est-il confirmé immédiatement ?",
+                        "answer": "La réservation en ligne correspond à une demande. Le rendez-vous devient définitif après confirmation par téléphone."
+                    }
+                ]
             },
-            "cards": [
-                {
-                    "title": "Véhicules",
-                    "description": "Achat, vente et accompagnement autour de véhicules d’occasion sélectionnés avec attention.",
-                    "image": "/assets/peugeot-front.jpg",
-                    "to": "/vehicules"
-                },
-                {
-                    "title": "Pièces & solutions",
-                    "description": "Recherche de pièces détachées, de performance, d’optiques et de solutions de sellerie.",
-                    "image": "/assets/engine.jpg",
-                    "to": "/pieces-automobiles"
-                },
-                {
-                    "title": "Préparation avant vente",
-                    "description": "Une présentation esthétique soignée du véhicule pour le valoriser et permettre aux futurs acheteurs de l’examiner dans de bonnes conditions.",
-                    "image": "/assets/nissan-dusk2.jpg",
-                    "to": "/prestations"
-                }
-            ],
-            "beyond": {
-                "icon": "ShieldCheck",
-                "title": "Une recherche particulière ?",
-                "text": "Véhicule d’occasion, pièce spécifique ou préparation avant vente : chaque demande fait l’objet d’une réponse personnalisée.",
-                "cta": "Me contacter →",
-                "to": "/rendez-vous"
-            }
-        },
-        "vehicles": {
-            "hero": {
-                "image": "/assets/peugeot-front.jpg",
-                "eyebrow": "Véhicules d’occasion",
-                "title": "acheter ou vendre,\navec un regard *passionné*.",
-                "description": "Nostalgia Auto Gallery étudie les projets d’achat et de vente avec une attention particulière portée à l’état, à l’historique et à la qualité de chaque automobile."
-            },
-            "actions": [
-                {
-                    "label": "Présenter mon véhicule →",
-                    "to": "/rendez-vous"
-                },
-                {
-                    "label": "Voir la galerie",
-                    "to": "/galerie",
-                    "variant": "secondary"
-                }
-            ],
-            "heading": {
-                "overline": "Achat & vente",
-                "title": "une approche attentive",
-                "description": "Il ne s’agit pas d’afficher un stock fictif : les véhicules disponibles et les recherches en cours sont communiqués directement selon les projets."
-            },
-            "footerLabel": "Sur demande",
-            "steps": [
-                {
-                    "title": "Sélection",
-                    "description": "Chaque véhicule est considéré selon son état général, son historique et la cohérence du projet.",
-                    "icon": "Search"
-                },
-                {
-                    "title": "Présentation",
-                    "description": "Une préparation esthétique permet de présenter le véhicule proprement et de valoriser ses qualités réelles.",
-                    "icon": "Sparkles"
-                },
-                {
-                    "title": "Accompagnement",
-                    "description": "La demande est étudiée individuellement afin de proposer une réponse adaptée à l’achat ou à la vente.",
-                    "icon": "ClipboardCheck"
-                }
-            ],
-            "beyond": {
-                "title": "Vous avez un véhicule à vendre ?",
-                "text": "Indiquez le modèle, l’année, l’état et les informations dont vous disposez pour permettre une première étude.",
-                "cta": "Présenter le véhicule →",
-                "to": "/rendez-vous"
-            }
-        },
-        "parts": {
-            "hero": {
-                "image": "/assets/engine.jpg",
-                "eyebrow": "Pièces & solutions automobiles",
-                "title": "la bonne solution,\npour votre *projet*.",
-                "description": "Pièces détachées, éléments de performance, optiques ou sellerie : chaque recherche commence par l’identification précise du véhicule et du besoin."
-            },
-            "actions": [
-                {
-                    "label": "Rechercher une pièce →",
-                    "to": "/rendez-vous"
-                },
-                {
-                    "label": "Retour au négoce",
-                    "to": "/negoce-auto",
-                    "variant": "secondary"
-                }
-            ],
-            "heading": {
-                "overline": "Pièces automobiles",
-                "title": "une recherche sur mesure",
-                "description": "Aucun catalogue générique n’est inventé : la disponibilité, la compatibilité et le tarif sont étudiés à partir des références du véhicule."
-            },
-            "footerLabel": "Sur devis",
-            "steps": [
-                {
-                    "title": "Pièces détachées",
-                    "description": "Recherche de pièces automobiles adaptées à l’entretien, à la remise en état ou à un projet spécifique.",
-                    "icon": "PackageSearch"
-                },
-                {
-                    "title": "Pièces performance",
-                    "description": "Étude de solutions et d’éléments de performance cohérents avec le véhicule et l’usage recherché.",
-                    "icon": "Cog"
-                },
-                {
-                    "title": "Optiques & sellerie",
-                    "description": "Solutions de rénovation ou de remplacement pour les optiques, la sellerie et certains éléments de finition.",
-                    "icon": "Wrench"
-                }
-            ],
-            "beyond": {
-                "title": "Pour lancer une recherche",
-                "text": "Précisez la marque, le modèle, l’année, la motorisation et la pièce souhaitée, idéalement avec sa référence ou une photo.",
-                "cta": "Décrire mon besoin →",
-                "to": "/rendez-vous"
+            "final": {
+                "title": "Un doute entre deux formules ?",
+                "text": "Décrivez votre véhicule, son état et le résultat souhaité. Je vous conseillerai la formule la plus cohérente, sans vous orienter vers une prestation inutile.",
+                "cta": "Demander conseil →",
+                "to": "/contact"
             }
         },
         "gallery": {
             "hero": {
                 "image": "/assets/nissan-dusk2.jpg",
-                "eyebrow": "Galerie",
-                "title": "la différence\nse *voit*.",
-                "description": "Une sélection de véhicules, de détails et de visuels fournis par Nostalgia Auto Gallery."
+                "eyebrow": "Réalisations · avant / après",
+                "title": "le résultat parle\nde *lui-même*.",
+                "description": "Une sélection de véhicules confiés à Nostalgia Auto Gallery dans le Gard. Chaque réalisation montre l’état de départ, le travail effectué et le résultat obtenu."
             },
             "actions": [
                 {
                     "label": "Confier mon véhicule →",
-                    "to": "/rendez-vous"
+                    "to": "/contact"
                 }
             ],
             "heading": {
                 "overline": "Avant / Après",
-                "title": "retrouver l’éclat",
-                "description": "Glissez le curseur pour visualiser le résultat recherché après une préparation esthétique complète."
-            }
-        },
-        "pricing": {
-            "hero": {
-                "image": "/assets/nissan-dusk.jpg",
-                "eyebrow": "Tarifs & formules",
-                "title": "des prix clairs,\nsans *surprise*.",
-                "description": "Trois formules par prestation. Chaque palier reprend tout le précédent et y ajoute son lot de soins."
+                "title": "observer les détails",
+                "description": "Glissez le curseur pour comparer l’état du véhicule avant et après l’intervention. Les résultats varient selon l’état initial, les matériaux et l’âge du véhicule."
             },
-            "actions": [
+            "reviewsHeading": {
+                "overline": "Ils partagent leur expérience",
+                "title": "la confiance se construit",
+                "description": "Les retours de clients ayant confié leur véhicule à Nostalgia Auto Gallery. Seuls des avis authentiques sont publiés."
+            },
+            "reviews": [
                 {
-                    "label": "Prendre rendez-vous →",
-                    "to": "/rendez-vous"
+                    "quote": "Habitacle méconnaissable après le passage de Corentin. Travail soigné et ponctuel, je recommande.",
+                    "author": "Julien",
+                    "context": "Intérieur Premium · Nîmes"
+                },
+                {
+                    "quote": "Ma 205 a retrouvé tout son éclat. Le déplacement à domicile, c’est un vrai confort.",
+                    "author": "Sophie",
+                    "context": "Extérieur Deluxe · Calvisson"
+                },
+                {
+                    "quote": "Phares rénovés et carrosserie lustrée avant la vente : la voiture est partie en une semaine.",
+                    "author": "Marc",
+                    "context": "Préparation avant vente · Sommières"
                 }
             ],
-            "options": {
-                "overline": "À la carte",
-                "title": "options & suppléments",
-                "text": "Complétez votre formule selon l’état du véhicule et le résultat recherché.",
-                "note": "Les véhicules utilitaires d’entreprise sont proposés uniquement sur devis.",
-                "cta": "Demander un devis →"
+            "transparency": {
+                "title": "Chaque véhicule a sa propre histoire",
+                "text": "Une intervention esthétique améliore la propreté, l’aspect et la protection du véhicule. Elle ne remplace pas une réparation de carrosserie, de sellerie ou de mécanique. L’état du véhicule et les résultats raisonnablement possibles sont examinés avant chaque prestation."
+            },
+            "final": {
+                "title": "Le prochain avant-après peut être le vôtre",
+                "text": "Envoyez quelques photographies de votre véhicule et décrivez le résultat souhaité. Vous recevrez une première orientation vers la formule la plus adaptée.",
+                "cta": "Envoyer ma demande →",
+                "to": "/contact"
             }
         },
         "about": {
             "hero": {
                 "image": "/assets/bckgBooking.png",
-                "eyebrow": "À propos",
+                "eyebrow": "À propos · Corentin Jammes",
                 "title": "la passion,\nmise à votre *service*.",
                 "description": "Nostalgia Auto Gallery est né à Parignargues d’une passion profonde pour l’automobile et du goût du travail réalisé avec soin."
             },
             "actions": [
                 {
                     "label": "Échanger sur mon véhicule →",
-                    "to": "/rendez-vous"
+                    "to": "/contact"
                 }
             ],
             "heading": {
-                "overline": "Nostalgia Auto Gallery",
-                "title": "bien plus qu’un moyen de transport",
-                "description": "Une voiture peut être un objet du quotidien, un souvenir ou un projet. Dans chaque cas, elle mérite une attention adaptée, des gestes précis et un regard honnête."
+                "overline": "Un interlocuteur unique",
+                "title": "vous échangez directement avec Corentin",
+                "description": "Je m’appelle Corentin Jammes et j’accompagne personnellement chaque demande, de la prise de contact jusqu’à la réalisation de la prestation. Cette proximité permet de mieux comprendre vos attentes et d’y répondre sans prestation inutile."
             },
             "cards": [
                 {
-                    "image": "/assets/peugeot-front.jpg",
-                    "alt": "Peugeot 205 rouge",
-                    "title": "Deux expertises",
-                    "text": "Le soin et la préparation esthétique, puis l’achat, la vente et la recherche de solutions automobiles.",
-                    "cta": "Voir les prestations →",
-                    "to": "/prestations"
-                },
-                {
                     "image": "/assets/context.jpg",
-                    "alt": "Véhicules suivis par Nostalgia Auto Gallery",
-                    "title": "Un suivi personnel",
-                    "text": "Corentin Jammes accompagne chaque demande avec un regard attentif et une réponse adaptée au projet.",
-                    "cta": "Découvrir le négoce →",
-                    "to": "/negoce-auto"
+                    "alt": "Intervention à domicile",
+                    "title": "Le soin, d’abord",
+                    "text": "Nettoyage intérieur, lavage extérieur, finitions et protections : chaque intervention vise un véhicule propre, agréable et mieux préservé.",
+                    "cta": "Voir le detailing →",
+                    "to": "/detailing"
                 },
                 {
-                    "image": "/assets/nissan-dusk2.jpg",
-                    "alt": "Nissan 200SX préparée",
+                    "image": "/assets/peugeot-front.jpg",
+                    "alt": "Peugeot 205 rouge préparée",
                     "title": "La passion du détail",
-                    "text": "Chaque véhicule mérite une approche précise, qu’il s’agisse d’un entretien, d’une rénovation ou d’une vente.",
-                    "cta": "Voir la galerie →",
-                    "to": "/galerie"
+                    "text": "Chaque véhicule reçoit la même attention, qu’il s’agisse d’une voiture du quotidien, d’une ancienne ou d’un projet de passionné.",
+                    "cta": "Voir les réalisations →",
+                    "to": "/realisations"
                 }
             ],
             "surface": {
                 "heading": {
-                    "overline": "Pourquoi me choisir ?",
-                    "title": "trois engagements",
-                    "description": "Une même exigence guide chaque intervention et chaque projet automobile."
+                    "overline": "Pourquoi me faire confiance ?",
+                    "title": "trois engagements simples",
+                    "description": "Une même exigence guide chaque intervention."
                 },
                 "footerLabel": "Nostalgia",
                 "commitments": [
                     {
                         "title": "Expertise & rigueur",
-                        "description": "Une approche professionnelle et minutieuse pour proposer des prestations adaptées à l’état du véhicule et au résultat recherché.",
+                        "description": "Une méthode de travail organisée, des prestations clairement expliquées et une attention constante portée aux détails.",
                         "icon": "BadgeCheck"
                     },
                     {
                         "title": "Passion automobile",
-                        "description": "Chaque véhicule reçoit la même attention, qu’il s’agisse d’un entretien esthétique, d’une vente ou d’un projet de passionné.",
+                        "description": "Chaque véhicule reçoit la même considération, quels que soient son âge, sa valeur ou son usage.",
                         "icon": "Heart"
                     },
                     {
                         "title": "Proximité & mobilité",
-                        "description": "Basé à Parignargues, le service se déplace à domicile ou sur le lieu convenu dans le Gard et, selon le projet, dans les départements voisins.",
+                        "description": "Basé à Parignargues, je me déplace à domicile dans le Gard et, selon le projet, dans les départements voisins.",
                         "icon": "MapPin"
                     }
                 ],
                 "beyond": {
-                    "title": "Un projet automobile ?",
-                    "text": "Detailing, vente, achat ou recherche de pièces : échangeons directement sur votre besoin.",
+                    "icon": "Search",
+                    "title": "Au-delà du detailing",
+                    "text": "J’accompagne aussi, plus ponctuellement, des projets d’achat, de vente et de recherche de pièces automobiles. Chaque demande est étudiée individuellement — parlons-en directement.",
                     "cta": "Me contacter →",
-                    "to": "/rendez-vous"
+                    "to": "/contact"
                 }
             }
         },
         "booking": {
             "hero": {
                 "image": "/assets/hero-night.jpg",
-                "eyebrow": "Contact · Zone · Réservation",
-                "title": "choisissez votre\n*créneau*.",
-                "description": "Contactez-moi, vérifiez votre zone puis sélectionnez une date et un horaire. Je confirme ensuite le rendez-vous par téléphone."
+                "eyebrow": "Contact et réservation · Gard",
+                "title": "parlons de votre\n*véhicule*.",
+                "description": "Choisissez une prestation ou décrivez votre besoin. Après réception de votre demande, je vous contacte pour vérifier les informations et confirmer le rendez-vous."
             }
         }
     }

@@ -759,6 +759,72 @@ main::after {
     background: var(--bg2);
 }
 
+/* Liste de questions fréquentes (page Detailing), repliables via <details>. */
+.faq-list {
+    display: grid;
+    gap: 14px;
+    margin-top: 24px;
+}
+
+.faq-item {
+    padding: 18px 24px;
+}
+
+.faq-item summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--acc);
+    list-style: none;
+}
+
+.faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.faq-item summary::after {
+    content: "+";
+    float: right;
+    color: var(--muted);
+}
+
+.faq-item[open] summary::after {
+    content: "−";
+}
+
+.faq-item p {
+    margin: 14px 0 0;
+    color: var(--muted);
+}
+
+/* Cartes d'avis clients (page Réalisations). */
+.review-card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    justify-content: space-between;
+}
+
+.review-card__quote {
+    margin: 0;
+    color: var(--txt);
+    font-style: italic;
+}
+
+.review-card__author {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.review-card__author strong {
+    color: var(--acc);
+}
+
+.review-card__author span {
+    color: var(--muted);
+    font-size: 13px;
+}
+
 /* ==========================================================================
    8. PAGE GALERIE
    Comparateur avant/après et grille des véhicules.

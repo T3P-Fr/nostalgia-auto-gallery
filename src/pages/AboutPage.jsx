@@ -4,6 +4,9 @@ import { icons, pages } from "../data.js";
 // Contenu centralisé (cf. content.json → pages.about).
 const { hero, actions, heading, cards, surface } = pages.about;
 
+// Icône de la section secondaire « Au-delà du detailing » (achat/vente discret).
+const BeyondIcon = icons[surface.beyond.icon];
+
 /**
  * Raconte l'origine de l'entreprise et présente ses engagements.
  * @returns {JSX.Element} La page de présentation de Nostalgia Auto Gallery.
@@ -53,6 +56,11 @@ export default function AboutPage() {
                         })}
                     </div>
                     <div className="card beyond-card">
+                        {surface.beyond.icon && (
+                            <span className="icon-tile">
+                                <BeyondIcon />
+                            </span>
+                        )}
                         <strong>{surface.beyond.title}</strong>
                         <span>{surface.beyond.text}</span>
                         <ButtonLink size="small" to={surface.beyond.to}>

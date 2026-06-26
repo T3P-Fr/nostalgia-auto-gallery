@@ -167,22 +167,19 @@ export function HeaderPage() {
                     }}
                     aria-hidden="true"
                 />
-                <NavLink to="/prestations" onClick={closeMenu}>
-                    Prestations
+                <NavLink to="/" end onClick={closeMenu}>
+                    Accueil
                 </NavLink>
-                <NavLink to="/negoce-auto" onClick={closeMenu}>
-                    Négoce auto
+                <NavLink to="/detailing" onClick={closeMenu}>
+                    Detailing
                 </NavLink>
-                <NavLink to="/galerie" onClick={closeMenu}>
-                    Galerie
-                </NavLink>
-                <NavLink to="/tarifs" onClick={closeMenu}>
-                    Tarifs
+                <NavLink to="/realisations" onClick={closeMenu}>
+                    Réalisations
                 </NavLink>
                 <NavLink to="/a-propos" onClick={closeMenu}>
                     À propos
                 </NavLink>
-                <NavLink to="/rendez-vous" onClick={closeMenu}>
+                <NavLink to="/contact" onClick={closeMenu}>
                     Contact
                 </NavLink>
             </nav>
@@ -190,7 +187,7 @@ export function HeaderPage() {
                 <a className="header-phone" href={site.phoneHref}>
                     {site.phone}
                 </a>
-                <ButtonLink size="small" to="/rendez-vous">
+                <ButtonLink size="small" to="/contact">
                     Prendre RDV
                 </ButtonLink>
             </div>

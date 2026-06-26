@@ -1,11 +1,20 @@
-import { ButtonLink, PageHero, SectionHeading } from "../components/Ui.jsx";
-import { icons, pages } from "../data.js";
+import {
+    BeforeAfterComparison,
+    ButtonLink,
+    PageHero,
+    SectionHeading,
+    ServiceCard,
+    ZonePanel,
+} from "../components/Ui.jsx";
+import { icons, pages, services } from "../data.js";
 
 // Contenu éditorial centralisé (cf. content.json → pages.home).
-const { hero, actions, stats, trust, heading, cards } = pages.home;
+const { hero, actions, stats, trust, heading, comparison, process, final } =
+    pages.home;
 
 /**
- * Sert de porte d'entrée vers les différentes pages de l'application.
+ * Page d'accueil v3 : promesse, aperçu des formules, preuve avant/après,
+ * déroulement, zone d'intervention et appel à réserver. Recentrée sur la conversion.
  * @returns {JSX.Element} La page d'accueil.
  */
 export default function HomePage() {
@@ -22,6 +31,7 @@ export default function HomePage() {
                 </div>
             </PageHero>
 
+            {/* Bandeau de réassurance. */}
             <section className="trust-strip">
                 <div className="container trust-grid">
                     {trust.map((item) => {
@@ -35,21 +45,73 @@ export default function HomePage() {
                 </div>
             </section>
 
+            {/* Aperçu des trois formules (le détail vit sur la page Detailing). */}
             <section className="container">
                 <SectionHeading {...heading} split />
-                <div className="nav-grid">
-                    {cards.map((card) => (
-                        <article className="card nav-card" key={card.title}>
-                            <img src={card.image} alt={card.title} />
-                            <div className="content">
-                                <h2>{card.title}</h2>
-                                <p>{card.description}</p>
-                                <ButtonLink size="small" to={card.to}>
-                                    Découvrir →
-                                </ButtonLink>
-                            </div>
-                        </article>
+                <div className="service-grid">
+                    {services.map((service) => (
+                        <ServiceCard key={service.title} service={service} />
                     ))}
+                </div>
+                <div className="card beyond-card">
+                    <span>Découvrez le détail des prestations, des niveaux et des options.</span>
+                    <ButtonLink size="small" to="/detailing">
+                        Voir toutes les formules →
+                    </ButtonLink>
+                </div>
+            </section>
+
+            {/* Preuve visuelle : comparateur avant / après. */}
+            <section className="container">
+                <SectionHeading
+                    overline={comparison.overline}
+                    title={comparison.title}
+                    description={comparison.description}
+                    split
+                />
+                <BeforeAfterComparison />
+                <div className="card beyond-card">
+                    <ButtonLink size="small" to={comparison.to}>
+                        {comparison.cta}
+                    </ButtonLink>
+                </div>
+            </section>
+
+            {/* Déroulement d'une intervention en quatre étapes. */}
+            <section className="section--surface">
+                <div className="container">
+                    <SectionHeading
+                        overline={process.overline}
+                        title={process.title}
+                    />
+                    <div className="service-grid">
+                        {process.steps.map((step) => {
+                            const Icon = icons[step.icon];
+                            return (
+                                <article className="card service-card" key={step.title}>
+                                    <span className="icon-tile">
+                                        <Icon />
+                                    </span>
+                                    <h3>{step.title}</h3>
+                                    <p>{step.description}</p>
+                                </article>
+                            );
+                        })}
+                    </div>
+                </div>
+            </section>
+
+            {/* Zone d'intervention (SEO local). */}
+            <ZonePanel />
+
+            {/* Appel à l'action final. */}
+            <section className="container">
+                <div className="card beyond-card">
+                    <strong>{final.title}</strong>
+                    <span>{final.text}</span>
+                    <ButtonLink size="small" to={final.to}>
+                        {final.cta}
+                    </ButtonLink>
                 </div>
             </section>
         </>

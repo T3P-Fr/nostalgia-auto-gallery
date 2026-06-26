@@ -138,7 +138,7 @@ export function ServiceCard({ service }) {
                 <ButtonLink
                     size="small"
                     variant="secondary"
-                    to={`/rendez-vous?service=${encodeURIComponent(service.title)}`}
+                    to={`/contact?service=${encodeURIComponent(service.title)}`}
                 >
                     Réserver
                 </ButtonLink>
