@@ -1,39 +1,4 @@
-import { useEffect, useSyncExternalStore } from "react";
-
-// Petit store d'abonnement à l'image de fond de la page COURANTE. usePageBackgroundImage
-// le met à jour ; le Layout s'y abonne pour alimenter le fond animé (LiquidShineImage)
-// sans avoir à faire remonter l'image depuis chaque page.
-let currentImage = "";
-const listeners = new Set();
-
-/**
- * Notifie les abonnés du changement d'image de fond courante.
- * @param {string} image Nouveau chemin d'image.
- * @returns {void} Aucune valeur de retour.
- */
-function setCurrentImage(image) {
-    if (image === currentImage) {
-        return;
-    }
-
-    currentImage = image;
-    listeners.forEach((listener) => listener());
-}
-
-/**
- * Hook React : renvoie le chemin de l'image de fond de la page courante et se
- * re-rend quand elle change.
- * @returns {string} Chemin de l'image courante (chaîne vide si aucune).
- */
-export function useCurrentPageImage() {
-    return useSyncExternalStore(
-        (listener) => {
-            listeners.add(listener);
-            return () => listeners.delete(listener);
-        },
-        () => currentImage,
-    );
-}
+import { useEffect } from "react";
 
 /**
  * Déclare l'image de fond de la page courante via une variable CSS sur la racine.
@@ -53,7 +18,5 @@ export function usePageBackgroundImage(image) {
             "--page-image",
             image ? `url("${image}")` : "none",
         );
-        // Publie aussi le chemin brut pour le fond animé (cf. useCurrentPageImage).
-        setCurrentImage(image || "");
     }, [image]);
 }

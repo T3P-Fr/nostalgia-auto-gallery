@@ -1,12 +1,8 @@
-import { lazy, Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { FooterPage } from "./FooterPage.jsx";
 import { HeaderPage } from "./HeaderPage.jsx";
 import { MainPage } from "./MainPage.jsx";
-import { useCurrentPageImage } from "./PageBackground.jsx";
-
-// Fond animé WebGL : décoratif et lourd → chargé paresseusement, hors bundle initial.
-const LiquidShineImage = lazy(() => import("./LiquidShineImage.jsx"));
 
 /**
  * Squelette commun à toutes les pages : en-tête, contenu, pied de page.
@@ -20,8 +16,6 @@ const LiquidShineImage = lazy(() => import("./LiquidShineImage.jsx"));
  */
 export default function Layout() {
     const location = useLocation();
-    // Image de fond de la page courante, alimentée par usePageBackgroundImage.
-    const backgroundImage = useCurrentPageImage();
 
     // Chaque changement de page repart du haut : React Router ne réinitialise pas
     // le défilement seul, et l'état du fond fixe (flou/zoom) en dépend.
@@ -95,24 +89,6 @@ export default function Layout() {
 
     return (
         <>
-            {/* Fond animé plein écran : l'image de la page courante traitée par le
-                shader « comète lumineuse ». Posé derrière le contenu (cf. CSS), il
-                laisse passer les clics et suit la souris au niveau fenêtre. La clé
-                force un remontage propre du contexte WebGL à chaque changement d'image. */}
-            {backgroundImage && (
-                <div className="site-background" aria-hidden="true">
-                    {/* Suspense sans fallback : l'image fixe (main::before) sert de
-                        repli tant que le shader n'est pas chargé. */}
-                    <Suspense fallback={null}>
-                        <LiquidShineImage
-                            key={backgroundImage}
-                            src={backgroundImage}
-                            pointerSource="window"
-                            dim={0.12}
-                        />
-                    </Suspense>
-                </div>
-            )}
             <HeaderPage />
             <MainPage />
             <FooterPage />

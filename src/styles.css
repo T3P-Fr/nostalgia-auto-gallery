@@ -34,8 +34,8 @@
                       interpolée de --veil-min → --veil-max selon --scroll-factor.
        À --scroll-factor 1, --veil atteint --veil-max : le haut devient aussi sombre
        que le bas, donc l'écran s'uniformise en sombre en bas de page. */
-    --veil-min: 8%;
-    --veil-max: 70%;
+    --veil-min: 15%;
+    --veil-max: 92%;
     --veil: color-mix(in srgb,
             var(--surface) calc(var(--veil-min) + (var(--veil-max) - var(--veil-min)) * var(--scroll-factor)),
             transparent);
@@ -357,10 +357,7 @@ main::before {
     content: "";
     position: fixed;
     inset: 0;
-    /* Passe en -3 : sert désormais de FALLBACK sous le fond animé (.site-background,
-       z-index -2). Si WebGL fonctionne, le canvas opaque le recouvre ; sinon cette
-       image fixe reste visible avec son flou/zoom au scroll. */
-    z-index: -3;
+    z-index: -2;
     pointer-events: none;
     background-image: var(--page-image, none);
     background-position: center;
@@ -370,21 +367,6 @@ main::before {
     transform: scale(calc(1 + var(--scroll-factor) * 0.18));
     transform-origin: center top;
     will-change: filter, transform;
-}
-
-/* Fond animé plein écran — porte le canvas WebGL (LiquidShineImage). Fixe, derrière
-   le contenu, AU-DESSUS de l'image fallback (-3) mais SOUS le voile (-1) pour que le
-   texte reste lisible. pointer-events: none : les clics passent au travers. */
-.site-background {
-    position: fixed;
-    inset: 0;
-    z-index: -2;
-    pointer-events: none;
-}
-
-.site-background canvas {
-    width: 100%;
-    height: 100%;
 }
 
 /* Réserve de hauteur pendant le chargement paresseux d'une page (évite un saut). */
