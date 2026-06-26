@@ -375,6 +375,14 @@
                 "text": "Choisissez votre formule ou décrivez votre besoin. Je vous accompagne pour sélectionner la prestation la plus adaptée, autour de Parignargues et Nîmes.",
                 "cta": "Prendre rendez-vous →",
                 "to": "/contact"
+            },
+            "about": {
+                "overline": "À propos",
+                "title": "un interlocuteur unique, passionné",
+                "text": "Nostalgia Auto Gallery, c’est Corentin Jammes : un seul interlocuteur, de la prise de contact jusqu’à la prestation, animé par la passion de l’automobile et le goût du travail soigné.",
+                "image": "/assets/context.jpg",
+                "cta": "Découvrir Corentin →",
+                "to": "/a-propos"
             }
         },
         "detailing": {

@@ -9,7 +9,7 @@ import {
 import { icons, pages, services } from "../data.js";
 
 // Contenu éditorial centralisé (cf. content.json → pages.home).
-const { hero, actions, stats, trust, heading, comparison, process, final } =
+const { hero, actions, stats, trust, heading, comparison, process, about, final } =
     pages.home;
 
 /**
@@ -103,6 +103,21 @@ export default function HomePage() {
 
             {/* Zone d'intervention (SEO local). */}
             <ZonePanel />
+
+            {/* Présentation « À propos » en bas de page → renvoie vers la page dédiée. */}
+            <section className="container">
+                <article className="card nav-card nav-card--wide">
+                    <img src={about.image} alt="Corentin Jammes — Nostalgia Auto Gallery" />
+                    <div className="content">
+                        <span className="overline">{about.overline}</span>
+                        <h2>{about.title}</h2>
+                        <p>{about.text}</p>
+                        <ButtonLink size="small" to={about.to}>
+                            {about.cta}
+                        </ButtonLink>
+                    </div>
+                </article>
+            </section>
 
             {/* Appel à l'action final. */}
             <section className="container">

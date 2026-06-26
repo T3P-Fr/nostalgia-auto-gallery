@@ -759,6 +759,46 @@ main::after {
     min-height: 72px;
 }
 
+/* Variante large (À propos en bas d'accueil) : image à gauche, texte à droite. */
+.nav-card--wide {
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.nav-card--wide > img {
+    width: 42%;
+    height: auto;
+    aspect-ratio: auto;
+}
+
+.nav-card--wide .content {
+    justify-content: center;
+    gap: 12px;
+    padding: 32px;
+}
+
+.nav-card--wide h2 {
+    min-height: 0;
+    font-size: 28px;
+}
+
+.nav-card--wide p {
+    min-height: 0;
+    margin: 0;
+    color: var(--muted);
+}
+
+@media (max-width: 720px) {
+    .nav-card--wide {
+        flex-direction: column;
+    }
+
+    .nav-card--wide > img {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+    }
+}
+
 /* Variante de .card : même cadre, fond plus sombre. */
 .beyond-card {
     display: flex;
