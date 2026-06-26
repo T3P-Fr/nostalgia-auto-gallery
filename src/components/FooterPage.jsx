@@ -24,8 +24,7 @@ export function FooterPage() {
                     <Link to="/negoce">Négoce</Link>
                     <Link to="/detailing">Detailing</Link>
                     <Link to="/realisations">Réalisations</Link>
-                    <Link to="/a-propos">À propos</Link>
-                    <Link to="/contact">Contact et rendez-vous</Link>
+                    <Link to="/contact">Contact</Link>
                     <Link to="/informations">Informations</Link>
                 </div>
                 <div>
