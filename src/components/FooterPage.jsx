@@ -26,6 +26,7 @@ export function FooterPage() {
                     <Link to="/realisations">Réalisations</Link>
                     <Link to="/a-propos">À propos</Link>
                     <Link to="/contact">Contact et rendez-vous</Link>
+                    <Link to="/informations">Informations</Link>
                 </div>
                 <div>
                     <h3>Contact</h3>
@@ -33,14 +34,6 @@ export function FooterPage() {
                     <a href={site.emailHref}>{site.email}</a>
                     <span>{site.social}</span>
                     <span>{site.location}</span>
-                </div>
-                <div>
-                    <h3>Informations</h3>
-                    {site.legalLinks.map((link) => (
-                        <Link key={link.to} to={link.to}>
-                            {link.label}
-                        </Link>
-                    ))}
                 </div>
             </div>
             <div className="footer-bottom">{site.copyright}</div>

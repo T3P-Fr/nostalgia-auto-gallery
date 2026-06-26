@@ -1030,16 +1030,27 @@ main::after {
     width: 18px;
 }
 
-/* Page Informations : colonne de lecture aérée, une section par document légal. */
+/* Page Informations : pleine largeur du site (le .container fixe déjà la largeur),
+   une section par document légal. */
 .legal-page {
     display: grid;
     gap: 56px;
-    max-width: 760px;
 }
 
 .legal-section {
     /* Décale l'ancre sous l'en-tête collant lors d'un défilement vers #section. */
     scroll-margin-top: 96px;
+}
+
+/* Petit trait de séparation au-dessus de chaque document (sauf le premier). */
+.legal-section:not(:first-child)::before {
+    content: "";
+    display: block;
+    width: 56px;
+    height: 3px;
+    margin-bottom: 32px;
+    border-radius: 2px;
+    background: var(--acc);
 }
 
 .legal-section__intro {
@@ -2380,8 +2391,8 @@ main::after {
 
 .footer-grid {
     display: grid;
-    grid-template-columns: 1.6fr 1fr 1fr 1fr;
-    gap: 48px;
+    grid-template-columns: 1.6fr 1fr 1fr;
+    gap: 56px;
     padding-block: 60px 30px;
 }
 
