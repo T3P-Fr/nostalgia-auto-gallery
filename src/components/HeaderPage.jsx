@@ -156,7 +156,7 @@ export function HeaderPage() {
             </button>
             <nav
                 ref={navRef}
-                className={`site-nav bluredBckg ${isMenuOpen ? "site-nav--open" : ""}`}
+                className={`site-nav ${isMenuOpen ? "site-nav--open" : ""}`}
             >
                 <span
                     className="site-nav__indicator"

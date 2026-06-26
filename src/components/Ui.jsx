@@ -45,8 +45,6 @@ export function ButtonLink({
     const classNames = [
         "button",
         `button--${variant}`,
-        // Le bouton secondaire repose sur le fond flouté réutilisable.
-        variant === "secondary" ? "bluredBckg" : "",
         size === "small" ? "button--small" : "",
         block ? "button--block" : "",
     ]

@@ -41,9 +41,6 @@
             transparent);
     --surface: #121e2a;
     --surface2: #0e1924;
-    /* Teinte par défaut des fonds floutés (.bluredBckg) : bleu sombre de surface.
-       Redéfinir --bckgColor sur un élément pour un voile rouge, p. ex. */
-    --bckgColor: var(--surface);
     --txt: #f5f7fa;
     --muted: #9ba8b7;
     --subtle: #687789;
@@ -62,32 +59,15 @@
     --gradient--center: 55%;
     --gradient--color: var(--acc);
     --gradient--shine: 25%;
+    --radius: 8px;
     /* Rayons centralisés : changer ici se répercute sur toutes les cartes/sections
        (--radius-card) et tous les boutons (--radius-button). */
-    --radius-card: 12px;
-    --radius-button: 6px;
+    --radius-card: var(--radius);
+    --radius-button: var(--radius);
 }
 
 * {
     box-sizing: border-box;
-}
-
-/* Fond flouté réutilisable, appliqué partout où un « verre dépoli » est requis. */
-.bluredBckg {
-    position: relative;
-    isolation: isolate;
-}
-
-.bluredBckg::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    backdrop-filter: blur(75px);
-    -webkit-backdrop-filter: blur(75px);
-    background-color: color-mix(in oklch, var(--bckgColor), transparent 50%);
-    pointer-events: none;
 }
 
 /* --shining-gradient référence d'autres variables (--gradient--color…). Une telle
@@ -175,10 +155,8 @@ img {
     left: 0;
     width: 110vw;
     height: 250%;
-    /* Même formule que .bluredBckg (pseudo-élément : on ne peut pas y poser la classe). */
-    background-color: color-mix(in oklch, var(--bckgColor), transparent 50%);
-    backdrop-filter: blur(75px);
-    -webkit-backdrop-filter: blur(75px);
+    background-color: color-mix(in srgb, var(--surface) 80%, transparent);
+    backdrop-filter: blur(20px);
     mask-image: linear-gradient(0deg, transparent 5%, black 50%);
 }
 
@@ -338,24 +316,20 @@ img {
     font-size: 12px;
 }
 
-/* Secondaire : texte gris, contour clair ; le fond flouté vient de .bluredBckg.
-   Au survol, texte ET contour passent au blanc, le voile se densifie légèrement. */
+/* Secondaire : texte gris, fond flouté translucide, contour clair. Au survol, le
+   texte ET le contour passent au blanc (le fond reste un voile flou). */
 .button--secondary {
     border: 1px solid rgba(255, 255, 255, 0.42);
-    /* Fond propre transparent : seul le voile du ::after (.bluredBckg) est visible. */
-    background: none;
+    background: color-mix(in srgb, var(--surface) 28%, transparent);
+    backdrop-filter: blur(10px);
     color: var(--muted);
     box-shadow: none;
 }
 
 .button--secondary:hover {
     border-color: #fff;
+    background: color-mix(in srgb, var(--surface) 38%, transparent);
     color: #fff;
-}
-
-/* Voile un peu plus dense au survol (porté par le ::after de .bluredBckg). */
-.button--secondary:hover::after {
-    background-color: color-mix(in oklch, var(--bckgColor), transparent 35%);
 }
 
 .button--block {
@@ -782,7 +756,7 @@ main::after {
     align-items: stretch;
 }
 
-.nav-card--wide>img {
+.nav-card--wide > img {
     width: 42%;
     height: auto;
     aspect-ratio: auto;
@@ -810,7 +784,7 @@ main::after {
         flex-direction: column;
     }
 
-    .nav-card--wide>img {
+    .nav-card--wide > img {
         width: 100%;
         aspect-ratio: 16 / 9;
     }
@@ -937,13 +911,13 @@ main::after {
     grid-template-rows: 1fr;
 }
 
-.faq-item__answer>p {
+.faq-item__answer > p {
     overflow: hidden;
     margin: 0;
     color: var(--muted);
 }
 
-.faq-item[open] .faq-item__answer>p {
+.faq-item[open] .faq-item__answer > p {
     padding-bottom: 22px;
 }
 
@@ -1097,7 +1071,6 @@ main::after {
     font-size: 14px;
 }
 
-/* Fond flouté fourni par .bluredBckg ; ici seulement la mise en forme. */
 .image-modal__close {
     position: absolute;
     top: -52px;
@@ -1108,6 +1081,8 @@ main::after {
     padding: 10px 16px;
     border: 1px solid rgba(255, 255, 255, 0.42);
     border-radius: var(--radius-card);
+    background: color-mix(in srgb, var(--surface) 38%, transparent);
+    backdrop-filter: blur(10px);
     color: #fff;
     cursor: pointer;
     font-weight: 700;
@@ -2169,7 +2144,7 @@ main::after {
 }
 
 /* Sur fond rouge : lignes et séparateurs passent en clair. */
-.panel-resume .formula-recap__lines li+li {
+.panel-resume .formula-recap__lines li + li {
     border-top-color: rgba(255, 255, 255, 0.25);
 }
 
@@ -2237,7 +2212,7 @@ main::after {
     font-size: 13px;
 }
 
-.formula-recap__lines li+li {
+.formula-recap__lines li + li {
     border-top: 1px dashed var(--line);
 }
 
@@ -2526,14 +2501,6 @@ main::after {
    Réduction des colonnes et transformation de la navigation en menu dépliable.
    ========================================================================== */
 
-/* Desktop : la barre de navigation reste transparente — le voile flouté .bluredBckg
-   (::after) n'a de sens que pour le tiroir du menu téléphone. */
-@media (min-width: 901px) {
-    .site-nav.bluredBckg::after {
-        display: none;
-    }
-}
-
 @media (max-width: 900px) {
     .container {
         width: min(100% - 32px, 1180px);
@@ -2571,13 +2538,11 @@ main::after {
         height: 100vh;
         flex-direction: column;
         justify-content: center;
-        /* Éléments alignés à gauche. Beaucoup d'air entre les liens : la barre rouge
-           appartient clairement au lien qu'elle surmonte. */
-        align-items: flex-start;
+        /* Beaucoup d'air entre les liens : la barre rouge appartient clairement
+           au lien qu'elle surmonte. */
         gap: 26px;
-        padding: 24px 28px;
-        /* Le fond flouté translucide vient de la classe .bluredBckg (::after). */
-        --bckgColor: var(--surface);
+        padding: 24px;
+        background: var(--surface);
         box-shadow: -12px 0 32px rgba(0, 0, 0, 0.35);
         /* Hors écran par défaut, glisse vers le centre à l'ouverture. */
         transform: translateX(100%);
@@ -2588,14 +2553,13 @@ main::after {
         transform: translateX(0);
     }
 
-    /* Liens calés à gauche, à la largeur de leur texte : le trait rouge de l'actif
-       (box-shadow en haut) épouse ainsi exactement la largeur du libellé. */
+    /* Liens pleine largeur en colonne, plus gros que sur desktop. */
     .site-nav a {
-        width: auto;
-        text-align: left;
+        width: 100%;
+        text-align: center;
         font-size: 18px;
-        padding: 12px 0;
-        border-radius: 0;
+        padding: 14px 16px;
+        border-radius: var(--radius-card);
     }
 
     /* Page en cours : barre rouge AU-DESSUS du lien, exactement comme l'indicateur
