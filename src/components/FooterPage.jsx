@@ -21,12 +21,11 @@ export function FooterPage() {
                 <div>
                     <h3>Navigation</h3>
                     <Link to="/">Accueil</Link>
+                    <Link to="/negoce">Négoce</Link>
                     <Link to="/detailing">Detailing</Link>
                     <Link to="/realisations">Réalisations</Link>
                     <Link to="/a-propos">À propos</Link>
                     <Link to="/contact">Contact et rendez-vous</Link>
-                    {/* Activité secondaire : renvoyée vers la section dédiée d'À propos. */}
-                    <Link to="/a-propos">{site.secondaryActivity}</Link>
                 </div>
                 <div>
                     <h3>Contact</h3>

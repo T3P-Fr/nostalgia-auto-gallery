@@ -445,6 +445,90 @@
                 "to": "/contact"
             }
         },
+        "negoce": {
+            "hero": {
+                "image": "/assets/peugeot-side.jpg",
+                "eyebrow": "Achat, vente et solutions automobiles",
+                "title": "votre projet auto,\nsuivi avec *attention*.",
+                "description": "Nostalgia Auto Gallery accompagne les particuliers et les passionnés dans leurs projets d’achat, de vente et de recherche de pièces. Chaque demande est étudiée individuellement, avec une attention portée à l’état, à l’historique et à la cohérence du projet."
+            },
+            "actions": [
+                {
+                    "label": "Présenter mon projet →",
+                    "to": "/contact"
+                },
+                {
+                    "label": "Voir les réalisations",
+                    "to": "/realisations",
+                    "variant": "secondary"
+                }
+            ],
+            "sections": [
+                {
+                    "overline": "Recherche et sélection",
+                    "title": "acheter un véhicule",
+                    "text": "Vous recherchez un modèle précis, une ancienne, une youngtimer ou un véhicule destiné à un usage particulier ? La recherche commence par un échange sur vos critères, votre budget et vos priorités. Les véhicules étudiés sont considérés selon leur état général, leur historique connu et la cohérence de leur prix.",
+                    "cta": "Décrire le véhicule recherché →",
+                    "to": "/contact"
+                },
+                {
+                    "overline": "Étude de votre automobile",
+                    "title": "vendre un véhicule",
+                    "text": "Vous souhaitez vendre un véhicule ? Présentez son modèle, son année, son kilométrage, son état et les documents dont vous disposez. Une première étude permet de comprendre le véhicule et votre objectif, et d’envisager une préparation esthétique avant la présentation aux acheteurs.",
+                    "cta": "Présenter mon véhicule →",
+                    "to": "/contact"
+                },
+                {
+                    "overline": "Valorisation esthétique",
+                    "title": "préparation avant vente",
+                    "text": "Un véhicule propre et correctement présenté est plus agréable à découvrir et plus simple à examiner. La préparation avant vente valorise ses qualités réelles, améliore les photographies de l’annonce et facilite la première impression — sans masquer la réalité.",
+                    "cta": "Préparer mon véhicule →",
+                    "to": "/contact"
+                },
+                {
+                    "overline": "Pièces et solutions automobiles",
+                    "title": "recherche de pièces",
+                    "text": "Pièce détachée, élément de finition, optique, sellerie ou solution destinée à un projet particulier : chaque recherche commence par l’identification précise du véhicule et du besoin. La disponibilité, la compatibilité, l’état et le prix sont étudiés à partir des références communiquées.",
+                    "cta": "Rechercher une pièce →",
+                    "to": "/contact"
+                }
+            ],
+            "methodHeading": {
+                "overline": "Méthode d’accompagnement",
+                "title": "une démarche simple et personnalisée",
+                "description": "Achat, vente, préparation ou recherche de pièce : chaque projet suit les mêmes étapes claires."
+            },
+            "steps": [
+                {
+                    "title": "Comprendre le besoin",
+                    "description": "Le projet, les contraintes et le budget sont définis lors d’un premier échange.",
+                    "icon": "Search"
+                },
+                {
+                    "title": "Étudier les possibilités",
+                    "description": "Les informations disponibles sont vérifiées et les solutions cohérentes sont recherchées.",
+                    "icon": "ClipboardCheck"
+                },
+                {
+                    "title": "Présenter une proposition",
+                    "description": "Les possibilités, limites, délais et coûts connus sont expliqués clairement.",
+                    "icon": "BadgeCheck"
+                },
+                {
+                    "title": "Vous laisser décider",
+                    "description": "Vous conservez la décision finale. Aucun engagement n’est pris sans votre accord.",
+                    "icon": "Heart"
+                }
+            ],
+            "footerLabel": "Sur demande",
+            "beyond": {
+                "icon": "ShieldCheck",
+                "title": "Véhicules actuellement proposés",
+                "text": "Les disponibilités évoluent selon les projets et les opportunités. Aucun stock fictif n’est affiché : contactez-moi pour présenter votre recherche ou être informé d’un véhicule correspondant à vos critères.",
+                "cta": "Me confier une recherche →",
+                "to": "/contact"
+            }
+        },
         "gallery": {
             "hero": {
                 "image": "/assets/nissan-dusk2.jpg",
@@ -571,9 +655,9 @@
                 "beyond": {
                     "icon": "Search",
                     "title": "Au-delà du detailing",
-                    "text": "J’accompagne aussi, plus ponctuellement, des projets d’achat, de vente et de recherche de pièces automobiles. Chaque demande est étudiée individuellement — parlons-en directement.",
-                    "cta": "Me contacter →",
-                    "to": "/contact"
+                    "text": "J’accompagne aussi des projets d’achat, de vente et de recherche de pièces automobiles. Chaque demande est étudiée individuellement.",
+                    "cta": "Découvrir le négoce →",
+                    "to": "/negoce"
                 }
             }
         },

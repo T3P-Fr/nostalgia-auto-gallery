@@ -169,14 +169,14 @@ export function HeaderPage() {
                 <NavLink to="/" end onClick={closeMenu}>
                     Accueil
                 </NavLink>
+                <NavLink to="/negoce" onClick={closeMenu}>
+                    Négoce
+                </NavLink>
                 <NavLink to="/detailing" onClick={closeMenu}>
                     Detailing
                 </NavLink>
                 <NavLink to="/realisations" onClick={closeMenu}>
                     Réalisations
-                </NavLink>
-                <NavLink to="/a-propos" onClick={closeMenu}>
-                    À propos
                 </NavLink>
             </nav>
             <div className="header-actions">

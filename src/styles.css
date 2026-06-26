@@ -788,6 +788,20 @@ main::after {
     color: #fff;
 }
 
+/* Sections éditoriales de la page Négoce : titre + texte + lien d'action. */
+.lead-section {
+    padding: 30px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.lead-section:last-child {
+    border-bottom: 0;
+}
+
+.lead-section .button {
+    margin-top: 6px;
+}
+
 /* Condition d'éligibilité du complément méca (page Detailing). */
 .meca-condition {
     margin: -8px 0 18px;
@@ -2423,9 +2437,16 @@ main::after {
         padding: 10px 16px;
     }
 
+    /* Ordre mobile imposé : Logo … bouton ROUGE (RDV) puis bouton MENU (à droite). */
+    .header-actions {
+        order: 2;
+        margin-left: auto;
+    }
+
     .menu-button {
         display: block;
-        margin-left: auto;
+        order: 3;
+        margin-left: 12px;
         /* Au-dessus du panneau (z-index 50) pour rester cliquable et fermer le menu. */
         position: relative;
         z-index: 60;
@@ -2443,7 +2464,9 @@ main::after {
         height: 100vh;
         flex-direction: column;
         justify-content: center;
-        gap: 8px;
+        /* Beaucoup d'air entre les liens : la barre rouge appartient clairement
+           au lien qu'elle surmonte. */
+        gap: 26px;
         padding: 24px;
         background: var(--surface);
         box-shadow: -12px 0 32px rgba(0, 0, 0, 0.35);
@@ -2465,12 +2488,16 @@ main::after {
         border-radius: 8px;
     }
 
-    /* Page en cours : même rendu que le menu normal — texte blanc + liseré rouge
-       (réplique de l'indicateur), au lieu d'un pavé rouge plein. */
+    /* Page en cours : barre rouge AU-DESSUS du lien, exactement comme l'indicateur
+       du menu normal (qui est posé en haut). Texte blanc, pas de pavé plein. */
+    .site-nav a {
+        border-radius: 0;
+    }
+
     .site-nav a.active {
         color: var(--txt);
         background: transparent;
-        box-shadow: inset 0 calc(-1 * var(--nav-accent-height)) 0 var(--acc);
+        box-shadow: inset 0 var(--nav-accent-height) 0 0 var(--acc);
     }
 
     .site-nav__indicator {

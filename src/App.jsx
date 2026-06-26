@@ -7,6 +7,7 @@ import DetailingPage from "./pages/DetailingPage.jsx";
 import GalleryPage from "./pages/GalleryPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import InformationsPage from "./pages/InformationsPage.jsx";
+import NegocePage from "./pages/NegocePage.jsx";
 
 /**
  * Déclare une route distincte pour chaque page de l'architecture v3 (5 pages).
@@ -20,6 +21,7 @@ export default function App() {
         <Routes>
             <Route element={<Layout />}>
                 <Route index element={<HomePage />} />
+                <Route path="negoce" element={<NegocePage />} />
                 <Route path="detailing" element={<DetailingPage />} />
                 <Route path="realisations" element={<GalleryPage />} />
                 <Route path="a-propos" element={<AboutPage />} />
