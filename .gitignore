@@ -1,6 +1,11 @@
 node_modules/
 dist/
+dist.zip
+.next/
 .env
+.env.local
 server/data/appointments.json
 *.log
 tmp/
+Thumbs.db
+**/Thumbs.db
