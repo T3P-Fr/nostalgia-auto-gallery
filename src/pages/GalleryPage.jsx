@@ -1,3 +1,5 @@
+import { X } from "lucide-react";
+import { useRef, useState } from "react";
 import {
     BeforeAfterComparison,
     ButtonLink,
@@ -7,8 +9,16 @@ import {
 import { galleryItems, pages } from "../data.js";
 
 // Contenu centralisé (cf. content.json → pages.gallery).
-const { hero, actions, heading, reviewsHeading, reviews, transparency, final } =
-    pages.gallery;
+const {
+    hero,
+    actions,
+    heading,
+    beforeAfter,
+    reviewsHeading,
+    reviews,
+    transparency,
+    final,
+} = pages.gallery;
 
 /**
  * Résout la source d'une image de galerie : URL distante (placeholder) telle quelle,
@@ -21,27 +31,109 @@ function resolveImageSource(image) {
 }
 
 /**
- * Page Réalisations : avant/après, galerie de photos, avis clients et transparence.
+ * Page Réalisations : avant/après sélectionnable, galerie zoomable (modal natif),
+ * avis clients et note de transparence.
  * @returns {JSX.Element} La page des réalisations.
  */
 export default function GalleryPage() {
+    // Exemple avant/après actuellement affiché dans le grand comparateur.
+    const [activeSet, setActiveSet] = useState(0);
+    // Photo affichée en plein écran dans le <dialog> (null = fermé).
+    const [zoomed, setZoomed] = useState(null);
+
+    const comparisonRef = useRef(null);
+    const dialogRef = useRef(null);
+
+    /**
+     * Sélectionne un exemple avant/après et fait défiler vers le grand comparateur.
+     * @param {number} index Indice de l'exemple choisi.
+     * @returns {void} Aucune valeur de retour.
+     */
+    function showBeforeAfter(index) {
+        setActiveSet(index);
+        comparisonRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    /**
+     * Ouvre une photo en plein écran via le modal natif <dialog>.
+     * @param {string} source URL de l'image à agrandir.
+     * @param {string} title Légende de l'image.
+     * @returns {void} Aucune valeur de retour.
+     */
+    function openZoom(source, title) {
+        setZoomed({ source, title });
+        dialogRef.current?.showModal();
+    }
+
+    /**
+     * Ferme le modal plein écran.
+     * @returns {void} Aucune valeur de retour.
+     */
+    function closeZoom() {
+        dialogRef.current?.close();
+    }
+
+    const current = beforeAfter[activeSet];
+
     return (
         <>
             <PageHero {...hero} actions={actions} />
 
             <section className="container">
                 <SectionHeading {...heading} />
-                <BeforeAfterComparison />
-                <div className="gallery-grid">
-                    {galleryItems.map(([image, title, subtitle]) => (
-                        <figure key={image}>
-                            <img src={resolveImageSource(image)} alt={title} loading="lazy" />
-                            <figcaption>
-                                <strong>{title}</strong>
-                                <span>{subtitle}</span>
-                            </figcaption>
-                        </figure>
+
+                {/* Grand comparateur avant/après, piloté par l'exemple sélectionné. */}
+                <div ref={comparisonRef}>
+                    <BeforeAfterComparison
+                        before={current.before}
+                        after={current.after}
+                        label={current.label}
+                    />
+                </div>
+
+                {/* Vignettes d'exemples : un clic défile vers le grand comparateur. */}
+                <div className="ba-thumbs">
+                    {beforeAfter.map((set, index) => (
+                        <button
+                            type="button"
+                            key={set.label}
+                            className={`ba-thumb${index === activeSet ? " is-active" : ""}`}
+                            onClick={() => showBeforeAfter(index)}
+                        >
+                            <span className="ba-thumb__images">
+                                <img src={set.before} alt={`Avant — ${set.label}`} loading="lazy" />
+                                <img src={set.after} alt={`Après — ${set.label}`} loading="lazy" />
+                            </span>
+                            <span className="ba-thumb__pills">
+                                <span className="pill">Avant</span>
+                                <span className="pill">Après</span>
+                            </span>
+                            <strong>{set.label}</strong>
+                        </button>
                     ))}
+                </div>
+
+                {/* Galerie : chaque photo s'ouvre en plein écran au clic. */}
+                <div className="gallery-grid">
+                    {galleryItems.map(([image, title, subtitle]) => {
+                        const source = resolveImageSource(image);
+                        return (
+                            <figure key={image}>
+                                <button
+                                    type="button"
+                                    className="gallery-zoom"
+                                    onClick={() => openZoom(source, title)}
+                                    aria-label={`Agrandir : ${title}`}
+                                >
+                                    <img src={source} alt={title} loading="lazy" />
+                                </button>
+                                <figcaption>
+                                    <strong>{title}</strong>
+                                    <span>{subtitle}</span>
+                                </figcaption>
+                            </figure>
+                        );
+                    })}
                 </div>
             </section>
 
@@ -81,6 +173,19 @@ export default function GalleryPage() {
                     </ButtonLink>
                 </div>
             </section>
+
+            {/* Modal plein écran natif : visualisation d'une photo + bouton Fermer. */}
+            <dialog ref={dialogRef} className="image-modal" onClose={() => setZoomed(null)}>
+                {zoomed && (
+                    <figure className="image-modal__content">
+                        <img src={zoomed.source} alt={zoomed.title} />
+                        <figcaption>{zoomed.title}</figcaption>
+                    </figure>
+                )}
+                <button type="button" className="image-modal__close" onClick={closeZoom}>
+                    <X /> Fermer
+                </button>
+            </dialog>
         </>
     );
 }

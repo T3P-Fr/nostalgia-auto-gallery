@@ -11,9 +11,9 @@
         "footerTagline": "Le detailing automobile à domicile dans le Gard. Nettoyage, rénovation esthétique et protection, autour de Parignargues et Nîmes.",
         "copyright": "© 2026 Nostalgia Auto Gallery — Corentin Jammes. Tous droits réservés.",
         "legalLinks": [
-            "Mentions légales",
-            "Politique de confidentialité",
-            "Conditions de réservation"
+            { "label": "Mentions légales", "to": "/mentions-legales" },
+            { "label": "Politique de confidentialité", "to": "/confidentialite" },
+            { "label": "Conditions de réservation", "to": "/conditions" }
         ],
         "secondaryActivity": "Achat & vente de véhicules"
     },
@@ -228,7 +228,7 @@
                     {
                         "tier": "Platine",
                         "price": 15,
-                        "duration": "≈ 3h30",
+                        "duration": "≈ 5 min",
                         "features": [
                             "Contrôle visuel du niveau des liquides",
                             "Contrôle de l’état des pneus",
@@ -238,7 +238,7 @@
                     {
                         "tier": "Premium",
                         "price": 25,
-                        "duration": "≈ 4h30",
+                        "duration": "≈ 15 min",
                         "includes": "Platine",
                         "features": [
                             "Nettoyage de la baie de pare-brise",
@@ -250,7 +250,7 @@
                     {
                         "tier": "Deluxe",
                         "price": 35,
-                        "duration": "≈ 8h",
+                        "duration": "≈ 30 min",
                         "includes": "Premium",
                         "features": [
                             "Remise à niveau des liquides",
@@ -461,8 +461,20 @@
             "heading": {
                 "overline": "Avant / Après",
                 "title": "observer les détails",
-                "description": "Glissez le curseur pour comparer l’état du véhicule avant et après l’intervention. Les résultats varient selon l’état initial, les matériaux et l’âge du véhicule."
+                "description": "Glissez le curseur pour comparer l’état du véhicule avant et après l’intervention, ou choisissez un exemple ci-dessous. Les résultats varient selon l’état initial, les matériaux et l’âge du véhicule."
             },
+            "beforeAfter": [
+                {
+                    "label": "Carrosserie",
+                    "before": "/assets/comparison--before.webp",
+                    "after": "/assets/comparison--after.webp"
+                },
+                {
+                    "label": "Scène complète",
+                    "before": "/assets/AVANT_MEME_SCENE_MATIN_TRES_SALE_PHARES_FERMES.png",
+                    "after": "/assets/AVANT_APRES_JOUR_APRES_ULTRA_CLEAN.png"
+                }
+            ],
             "reviewsHeading": {
                 "overline": "Ils partagent leur expérience",
                 "title": "la confiance se construit",
@@ -571,6 +583,65 @@
                 "eyebrow": "Contact et réservation · Gard",
                 "title": "parlons de votre\n*véhicule*.",
                 "description": "Choisissez une prestation ou décrivez votre besoin. Après réception de votre demande, je vous contacte pour vérifier les informations et confirmer le rendez-vous."
+            }
+        },
+        "legal": {
+            "mentions-legales": {
+                "eyebrow": "Informations légales",
+                "title": "mentions *légales*.",
+                "intro": "Conformément aux dispositions légales applicables, cette page présente les informations relatives à l’éditeur et à l’hébergement du site Nostalgia Auto Gallery.",
+                "blocks": [
+                    {
+                        "title": "Éditeur du site",
+                        "text": "Nostalgia Auto Gallery — Corentin Jammes. Parignargues (30730), Gard. SIRET à compléter (14 chiffres). Responsable de la publication : Corentin Jammes."
+                    },
+                    {
+                        "title": "Contact",
+                        "text": "Téléphone : 06 36 37 22 10. Email : jammesmeca.auto@gmail.com."
+                    },
+                    {
+                        "title": "Hébergement",
+                        "text": "Coordonnées de l’hébergeur à compléter (nom, adresse, téléphone) avant publication."
+                    }
+                ]
+            },
+            "confidentialite": {
+                "eyebrow": "Vos données",
+                "title": "politique de *confidentialité*.",
+                "intro": "Les informations transmises par le formulaire sont utilisées uniquement pour répondre à votre demande, préparer un devis ou organiser un rendez-vous.",
+                "blocks": [
+                    {
+                        "title": "Données collectées",
+                        "text": "Nom, téléphone, email, adresse d’intervention, ainsi que les informations relatives au véhicule et à la demande."
+                    },
+                    {
+                        "title": "Utilisation",
+                        "text": "Elles ne sont pas vendues et ne servent qu’au traitement de votre demande. Aucune utilisation à des fins étrangères n’est faite."
+                    },
+                    {
+                        "title": "Vos droits",
+                        "text": "Vous pouvez demander l’accès, la rectification ou la suppression de vos informations en écrivant à jammesmeca.auto@gmail.com."
+                    }
+                ]
+            },
+            "conditions": {
+                "eyebrow": "Réservation",
+                "title": "conditions de *réservation*.",
+                "intro": "La réservation en ligne constitue une demande de rendez-vous. Elle devient définitive après validation des informations et confirmation par Nostalgia Auto Gallery.",
+                "blocks": [
+                    {
+                        "title": "Confirmation",
+                        "text": "Aucun paiement n’est demandé en ligne. Le rendez-vous est confirmé par téléphone."
+                    },
+                    {
+                        "title": "Conditions d’intervention",
+                        "text": "Un accès adapté au véhicule, et selon la prestation à l’eau et à l’électricité, doit être disponible le jour du rendez-vous. Les besoins particuliers doivent être signalés à l’avance."
+                    },
+                    {
+                        "title": "Annulation & report",
+                        "text": "Conditions d’annulation, de report et modalités de paiement à préciser avant publication définitive."
+                    }
+                ]
             }
         }
     }

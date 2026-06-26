@@ -161,9 +161,11 @@ export default function DetailingPage() {
                 <SectionHeading overline={faq.overline} title={faq.title} split />
                 <div className="faq-list">
                     {faq.items.map((item) => (
-                        <details className="card faq-item" key={item.question}>
+                        <details className="faq-item" key={item.question}>
                             <summary>{item.question}</summary>
-                            <p>{item.answer}</p>
+                            <div className="faq-item__answer">
+                                <p>{item.answer}</p>
+                            </div>
                         </details>
                     ))}
                 </div>

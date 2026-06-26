@@ -37,9 +37,9 @@ export function FooterPage() {
                 </div>
                 <div>
                     <h3>Informations</h3>
-                    {site.legalLinks.map((label) => (
-                        <Link key={label} to="/contact">
-                            {label}
+                    {site.legalLinks.map((link) => (
+                        <Link key={link.to} to={link.to}>
+                            {link.label}
                         </Link>
                     ))}
                 </div>

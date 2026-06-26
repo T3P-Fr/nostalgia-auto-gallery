@@ -6,6 +6,7 @@ import BookingPage from "./pages/BookingPage.jsx";
 import DetailingPage from "./pages/DetailingPage.jsx";
 import GalleryPage from "./pages/GalleryPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
+import LegalPage from "./pages/LegalPage.jsx";
 
 /**
  * Déclare une route distincte pour chaque page de l'architecture v3 (5 pages).
@@ -23,6 +24,15 @@ export default function App() {
                 <Route path="realisations" element={<GalleryPage />} />
                 <Route path="a-propos" element={<AboutPage />} />
                 <Route path="contact" element={<BookingPage />} />
+                <Route
+                    path="mentions-legales"
+                    element={<LegalPage slug="mentions-legales" />}
+                />
+                <Route
+                    path="confidentialite"
+                    element={<LegalPage slug="confidentialite" />}
+                />
+                <Route path="conditions" element={<LegalPage slug="conditions" />} />
                 <Route path="admin" element={<AdminPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Route>

@@ -148,26 +148,33 @@ export function ServiceCard({ service }) {
 }
 
 /**
- * Compare les deux photos avant et après fournies dans les assets.
+ * Compare deux photos avant/après avec un curseur. Les sources sont paramétrables
+ * pour afficher différents exemples (cf. page Réalisations) ; valeurs par défaut =
+ * le couple de démonstration livré dans les assets.
+ * @param {{ before?: string, after?: string, label?: string }} props Sources avant/après.
  * @returns {JSX.Element} Le comparateur interactif.
  */
-export function BeforeAfterComparison() {
+export function BeforeAfterComparison({
+    before = "/assets/comparison--before.webp",
+    after = "/assets/comparison--after.webp",
+    label = "",
+}) {
     const [comparison, setComparison] = useState(50);
 
     return (
         <div className="comparison">
             <img
                 className="comparison__before"
-                src="/assets/comparison--before.webp"
-                alt="Carrosserie avant rénovation"
+                src={before}
+                alt={`Avant rénovation${label ? ` — ${label}` : ""}`}
             />
             <div
                 className="comparison__after"
                 style={{ clipPath: `inset(0 0 0 ${comparison}%)` }}
             >
                 <img
-                    src="/assets/comparison--after.webp"
-                    alt="Carrosserie après rénovation"
+                    src={after}
+                    alt={`Après rénovation${label ? ` — ${label}` : ""}`}
                 />
             </div>
             <span className="comparison__label comparison__label--before">Avant</span>

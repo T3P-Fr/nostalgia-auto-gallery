@@ -86,11 +86,18 @@ function buildCalendar(monthDate) {
  * @returns {number} Durée en minutes (0 si non reconnue).
  */
 function parseDurationMinutes(text) {
-    const match = /(\d+)\s*h\s*(\d*)/.exec(text || "");
-    if (!match) {
-        return 0;
+    const value = text || "";
+    // Format heures « 1h45 » / « 4h » : on additionne heures et minutes.
+    const hourMatch = /(\d+)\s*h\s*(\d*)/.exec(value);
+    if (hourMatch) {
+        return Number(hourMatch[1]) * 60 + (hourMatch[2] ? Number(hourMatch[2]) : 0);
     }
-    return Number(match[1]) * 60 + (match[2] ? Number(match[2]) : 0);
+    // Format minutes seules « 5 min » / « 30 min » (ex. complément méca).
+    const minuteMatch = /(\d+)\s*min/.exec(value);
+    if (minuteMatch) {
+        return Number(minuteMatch[1]);
+    }
+    return 0;
 }
 
 /**
