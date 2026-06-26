@@ -185,7 +185,7 @@ export default function GalleryPage() {
                         <figcaption>{zoomed.title}</figcaption>
                     </figure>
                 )}
-                <button type="button" className="image-modal__close" onClick={closeZoom}>
+                <button type="button" className="image-modal__close bluredBckg" onClick={closeZoom}>
                     <X /> Fermer
                 </button>
             </dialog>

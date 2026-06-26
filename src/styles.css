@@ -41,6 +41,9 @@
             transparent);
     --surface: #121e2a;
     --surface2: #0e1924;
+    /* Teinte par défaut des fonds floutés (.bluredBckg) : bleu sombre de surface.
+       Redéfinir --backdrop-color sur un élément pour un voile rouge, p. ex. */
+    --backdrop-color: var(--surface);
     --txt: #f5f7fa;
     --muted: #9ba8b7;
     --subtle: #687789;
@@ -64,6 +67,15 @@
 
 * {
     box-sizing: border-box;
+}
+
+/* Fond flouté réutilisable : voile translucide (50 %) + flou d'arrière-plan.
+   La teinte vient de --backdrop-color (bleu de surface par défaut, rouge si
+   redéfini sur l'élément). Appliqué partout où un fond « verre dépoli » est requis. */
+.bluredBckg {
+    backdrop-filter: blur(75px);
+    -webkit-backdrop-filter: blur(75px);
+    background-color: color-mix(in oklch, var(--backdrop-color), transparent 50%);
 }
 
 /* --shining-gradient référence d'autres variables (--gradient--color…). Une telle
@@ -151,8 +163,10 @@ img {
     left: 0;
     width: 110vw;
     height: 250%;
-    background-color: color-mix(in srgb, var(--surface) 80%, transparent);
-    backdrop-filter: blur(20px);
+    /* Même formule que .bluredBckg (pseudo-élément : on ne peut pas y poser la classe). */
+    background-color: color-mix(in oklch, var(--backdrop-color), transparent 50%);
+    backdrop-filter: blur(75px);
+    -webkit-backdrop-filter: blur(75px);
     mask-image: linear-gradient(0deg, transparent 5%, black 50%);
 }
 
@@ -312,20 +326,19 @@ img {
     font-size: 12px;
 }
 
-/* Secondaire : texte gris, fond flouté translucide, contour clair. Au survol, le
-   texte ET le contour passent au blanc (le fond reste un voile flou). */
+/* Secondaire : texte gris, contour clair ; le fond flouté vient de .bluredBckg.
+   Au survol, texte ET contour passent au blanc, le voile se densifie légèrement. */
 .button--secondary {
     border: 1px solid rgba(255, 255, 255, 0.42);
-    background: color-mix(in srgb, var(--surface) 28%, transparent);
-    backdrop-filter: blur(10px);
+    background-image: none;
     color: var(--muted);
     box-shadow: none;
 }
 
 .button--secondary:hover {
     border-color: #fff;
-    background: color-mix(in srgb, var(--surface) 38%, transparent);
     color: #fff;
+    background-color: color-mix(in oklch, var(--backdrop-color), transparent 35%);
 }
 
 .button--block {
@@ -1027,6 +1040,7 @@ main::after {
     font-size: 14px;
 }
 
+/* Fond flouté fourni par .bluredBckg ; ici seulement la mise en forme. */
 .image-modal__close {
     position: absolute;
     top: -52px;
@@ -1037,8 +1051,6 @@ main::after {
     padding: 10px 16px;
     border: 1px solid rgba(255, 255, 255, 0.42);
     border-radius: var(--radius);
-    background: color-mix(in srgb, var(--surface) 38%, transparent);
-    backdrop-filter: blur(10px);
     color: #fff;
     cursor: pointer;
     font-weight: 700;
@@ -2457,6 +2469,16 @@ main::after {
    Réduction des colonnes et transformation de la navigation en menu dépliable.
    ========================================================================== */
 
+/* Desktop : la barre de navigation reste transparente — le fond flouté .bluredBckg
+   n'a de sens que pour le tiroir du menu téléphone. */
+@media (min-width: 901px) {
+    .site-nav.bluredBckg {
+        background-color: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+}
+
 @media (max-width: 900px) {
     .container {
         width: min(100% - 32px, 1180px);
@@ -2494,11 +2516,14 @@ main::after {
         height: 100vh;
         flex-direction: column;
         justify-content: center;
-        /* Beaucoup d'air entre les liens : la barre rouge appartient clairement
-           au lien qu'elle surmonte. */
+        /* Éléments alignés à gauche. Beaucoup d'air entre les liens : la barre rouge
+           appartient clairement au lien qu'elle surmonte. */
+        align-items: flex-start;
         gap: 26px;
-        padding: 24px;
-        background: var(--surface);
+        padding: 24px 28px;
+        /* Le fond flouté translucide vient de la classe .bluredBckg ; on densifie
+           juste un peu le voile pour la lisibilité du tiroir plein écran. */
+        --backdrop-color: var(--surface);
         box-shadow: -12px 0 32px rgba(0, 0, 0, 0.35);
         /* Hors écran par défaut, glisse vers le centre à l'ouverture. */
         transform: translateX(100%);
@@ -2509,13 +2534,14 @@ main::after {
         transform: translateX(0);
     }
 
-    /* Liens pleine largeur en colonne, plus gros que sur desktop. */
+    /* Liens calés à gauche, à la largeur de leur texte : le trait rouge de l'actif
+       (box-shadow en haut) épouse ainsi exactement la largeur du libellé. */
     .site-nav a {
-        width: 100%;
-        text-align: center;
+        width: auto;
+        text-align: left;
         font-size: 18px;
-        padding: 14px 16px;
-        border-radius: 8px;
+        padding: 12px 0;
+        border-radius: 0;
     }
 
     /* Page en cours : barre rouge AU-DESSUS du lien, exactement comme l'indicateur
