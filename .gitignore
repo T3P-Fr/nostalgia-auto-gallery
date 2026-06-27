@@ -5,6 +5,7 @@ dist.zip
 .env
 .env.local
 server/data/appointments.json
+server/data/requests.json
 *.log
 tmp/
 cms/

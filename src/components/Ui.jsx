@@ -32,7 +32,7 @@ function renderHeroTitle(title) {
 
 /**
  * Uniformise les liens d'action et leurs variantes visuelles.
- * @param {{ to: string, children: React.ReactNode, variant?: string, size?: string, block?: boolean }} props Propriétés du bouton.
+ * @param {{ to: string, children: React.ReactNode, variant?: string, size?: string, block?: boolean, className?: string, onClick?: () => void }} props Propriétés du bouton.
  * @returns {JSX.Element} Un lien stylé comme un bouton.
  */
 export function ButtonLink({
@@ -41,18 +41,21 @@ export function ButtonLink({
     variant = "primary",
     size = "normal",
     block = false,
+    className = "",
+    onClick,
 }) {
     const classNames = [
         "button",
         `button--${variant}`,
         size === "small" ? "button--small" : "",
         block ? "button--block" : "",
+        className,
     ]
         .filter(Boolean)
         .join(" ");
 
     return (
-        <Link className={classNames} to={to}>
+        <Link className={classNames} to={to} onClick={onClick}>
             {children}
         </Link>
     );

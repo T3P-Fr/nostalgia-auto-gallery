@@ -54,10 +54,20 @@ export default function HomePage() {
                     ))}
                 </div>
                 <div className="card beyond-card">
-                    <span>Découvrez le détail des prestations, des niveaux et des options.</span>
-                    <ButtonLink size="small" to="/detailing">
-                        Voir toutes les formules →
-                    </ButtonLink>
+                    <span>{heading.beyond.text}</span>
+                    {/* Les deux piliers restent accessibles sans alourdir la section. */}
+                    <div className="beyond-card__actions">
+                        <ButtonLink size="small" to={heading.beyond.primaryTo}>
+                            {heading.beyond.primaryCta}
+                        </ButtonLink>
+                        <ButtonLink
+                            size="small"
+                            variant="secondary"
+                            to={heading.beyond.secondaryTo}
+                        >
+                            {heading.beyond.secondaryCta}
+                        </ButtonLink>
+                    </div>
                 </div>
             </section>
 

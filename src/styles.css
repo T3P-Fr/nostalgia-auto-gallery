@@ -261,6 +261,12 @@ img {
     color: var(--txt);
 }
 
+/* CTA du tiroir mobile : masqué par défaut, affiché en bas du menu uniquement
+   quand le bouton « Prendre RDV » de l'en-tête disparaît (≤620px). */
+.site-nav__cta {
+    display: none;
+}
+
 /* ==========================================================================
    3. COMPOSANTS D'ACTION
    Boutons et variantes partagés entre les héros, cartes et formulaires.
@@ -761,7 +767,7 @@ main::after {
     align-items: stretch;
 }
 
-.nav-card--wide > img {
+.nav-card--wide>img {
     width: 42%;
     height: auto;
     aspect-ratio: auto;
@@ -789,7 +795,7 @@ main::after {
         flex-direction: column;
     }
 
-    .nav-card--wide > img {
+    .nav-card--wide>img {
         width: 100%;
         aspect-ratio: 16 / 9;
     }
@@ -815,6 +821,18 @@ main::after {
 
 .beyond-card .button {
     margin-left: auto;
+}
+
+/* Regroupe les actions secondaires sans casser l'alignement historique de la carte. */
+.beyond-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.beyond-card__actions .button {
+    margin-left: 0;
 }
 
 /* Bandeau de section pleine largeur : base bien rouge, contenu blanc, beaucoup
@@ -916,13 +934,13 @@ main::after {
     grid-template-rows: 1fr;
 }
 
-.faq-item__answer > p {
+.faq-item__answer>p {
     overflow: hidden;
     margin: 0;
     color: var(--muted);
 }
 
-.faq-item[open] .faq-item__answer > p {
+.faq-item[open] .faq-item__answer>p {
     padding-bottom: 22px;
 }
 
@@ -1559,13 +1577,23 @@ main::after {
 .booking-layout {
     display: flex;
     flex-direction: column;
-    gap: 22px;
     padding-block: 48px 64px;
+}
+
+.booking-card::before {
+    content: none;
 }
 
 .contact-card,
 .booking-card {
     padding: 30px;
+}
+
+/* La carte de réservation ne porte plus son propre givrage : il est mutualisé
+   sur .booking-frost (parent) avec les onglets pour un rendu continu. */
+.booking-card {
+    background: transparent;
+    backdrop-filter: none;
 }
 
 /* Sous le formulaire et pleine largeur : les coordonnées passent en ligne. */
@@ -1623,8 +1651,8 @@ main::after {
 /* Deux colonnes : gauche = agenda + créneau, droite = formules + coordonnées. */
 .booking-form {
     display: grid;
-    /* Agenda (Data) sur 1/3, détails (formules + coordonnées) sur 2/3. */
-    grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr);
+    /* Deux colonnes égales 50/50 : contact (gauche), champs du besoin (droite). */
+    grid-template-columns: 1fr 1fr;
     align-items: start;
     gap: 30px;
 }
@@ -1825,16 +1853,81 @@ main::after {
     font-size: 14px;
 }
 
+/* Variante « agenda » : plus large pour accueillir calendrier + créneaux. */
+.slot-modal__box--agenda {
+    width: min(460px, 100%);
+}
+
+/* Bloc des créneaux sous le calendrier, dans le popup. */
+.agenda-slots {
+    margin: 18px 0;
+    text-align: left;
+}
+
+.agenda-slots h4 {
+    margin: 0 0 10px;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--subtle);
+}
+
+/* En-tête du popup : titre à gauche, croix de fermeture à droite. */
+.slot-modal__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.slot-modal__head h3 {
+    margin: 0;
+}
+
+/* Croix de fermeture : blanche, rouge au survol. */
+.slot-modal__close {
+    display: inline-flex;
+    padding: 4px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.slot-modal__close:hover {
+    color: var(--acc);
+}
+
+.slot-modal__close svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* Bas du popup : Annuler + Valider, largeurs égales. */
+.slot-modal__actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.slot-modal__actions .button {
+    flex: 1;
+}
+
 .details-panel {
     display: flex;
     flex-direction: column;
     gap: 11px;
 }
 
-/* Les champs partagent les mêmes dimensions entre la réservation et l'administration. */
-.details-panel input,
-.details-panel select,
-.details-panel textarea,
+/* Les champs partagent les mêmes dimensions entre la réservation et l'administration.
+   On cible tout le formulaire (.booking-form) : contact à gauche ET besoins à droite. */
+.booking-form input,
+.booking-form select,
+.booking-form textarea,
 .admin-auth input,
 .admin-toolbar select,
 .appointment-card select {
@@ -1847,9 +1940,9 @@ main::after {
     color: var(--txt);
 }
 
-.details-panel input:focus,
-.details-panel select:focus,
-.details-panel textarea:focus,
+.booking-form input:focus,
+.booking-form select:focus,
+.booking-form textarea:focus,
 .admin-auth input:focus {
     border-color: var(--acc);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--red-primary) 15%, transparent);
@@ -1872,9 +1965,203 @@ main::after {
     color: var(--acc);
 }
 
-.details-panel small {
+.details-panel small,
+.booking-form--lead small {
     color: var(--subtle);
     font-size: 11px;
+}
+
+/* ----- Étape 1 : bloc TABS des besoins (bloc séparé, sans radius) ----- */
+
+/* Calque givré UNIQUE (tabs + carte) : un seul backdrop-filter continu, sinon
+   chaque bloc floute sa propre portion d'arrière-plan → jointure visible. */
+.booking-frost {
+    background: color-mix(in srgb, var(--surface), transparent 50%);
+    backdrop-filter: blur(100px);
+    border-radius: 0 0 var(--radius-card) var(--radius-card);
+}
+
+/* Bloc à part, au-dessus de la carte : 3 onglets de largeur identique, jointifs. */
+.need-tabs {
+    display: flex;
+    /* Transparent : le givrage est porté par .booking-frost. */
+    background: transparent;
+}
+
+/* Un onglet : largeur égale (flex:1), label centré, coins francs, bordure surface. */
+.need-tab {
+    flex: 1;
+    padding: 18px 12px;
+    /* Bords fins visibles comme la carte (--line). */
+    border: 1px solid var(--line);
+    /* Barre haute épaisse comme les blocs / le menu : surface par défaut. */
+    border-top: var(--nav-accent-height) solid var(--surface);
+    border-bottom: none;
+    background: transparent;
+    color: var(--muted);
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+/* Onglets jointifs : on évite la double bordure entre deux onglets. */
+.need-tab+.need-tab {
+    border-left: none;
+}
+
+.need-tab:hover {
+    color: var(--txt);
+}
+
+/* Onglet actif (radio, un seul) : bord haut rouge + léger dégradé rouge →
+   transparent depuis le bas. */
+.need-tab.is-selected {
+    border-top-color: var(--acc);
+    background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--red-primary) 16%, transparent),
+        transparent 65%
+    );
+    color: var(--txt);
+}
+
+/* Invite affichée à droite tant qu'aucun besoin n'est coché. */
+.details-placeholder {
+    padding: 40px 22px;
+    border: 1px dashed var(--line);
+    border-radius: var(--radius-card);
+    color: var(--muted);
+    text-align: center;
+}
+
+/* Bloc d'envoi commun (message + bouton) en bas de la colonne de droite. */
+.lead-submit {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+}
+
+/* Grille 50/50 des champs propres à un besoin (colonne de droite). */
+.fields-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 11px;
+}
+
+.fields-2col>.full {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+    .fields-2col {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Bouton d'accès au popup des créneaux, sous le calendrier. */
+.slot-trigger {
+    margin-top: 14px;
+}
+
+/* Champ « radio » (intitulé + groupe), pleine largeur. Reset du fieldset natif. */
+.radio-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.radio-field__label {
+    padding: 0;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--subtle);
+}
+
+/* Groupe radio : toujours 2 colonnes. */
+.radio-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+/* Une option : vrai radio + libellé, sans fond (bordure seule). */
+.radio-group__btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: transparent;
+    color: var(--txt);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s;
+}
+
+.radio-group__btn:hover {
+    border-color: var(--acc);
+}
+
+/* Case mise en évidence quand son radio est coché : bordure accent, sans fond. */
+.radio-group__btn:has(input:checked) {
+    border-color: var(--acc);
+}
+
+/* Vrai radio natif, teinté accent (on neutralise le style générique des champs). */
+.radio-group__btn input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    accent-color: var(--acc);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Texte d'attente du résumé tant que rien n'est sélectionné. */
+.panel-resume__wait {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* Bascule J'achète / Je vends, posée au-dessus des champs du projet. */
+.need-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.need-toggle__btn {
+    flex: 1;
+    padding: 11px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--surface2);
+    color: var(--txt);
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.need-toggle__btn:hover {
+    border-color: var(--acc);
+}
+
+.need-toggle__btn.is-selected {
+    border-color: var(--acc);
+    background: var(--acc);
+    color: #fff;
 }
 
 /* 4. Coordonnées : grille 2 colonnes. Le téléphone, le message et les éléments de
@@ -2149,7 +2436,7 @@ main::after {
 }
 
 /* Sur fond rouge : lignes et séparateurs passent en clair. */
-.panel-resume .formula-recap__lines li + li {
+.panel-resume .formula-recap__lines li+li {
     border-top-color: rgba(255, 255, 255, 0.25);
 }
 
@@ -2217,7 +2504,7 @@ main::after {
     font-size: 13px;
 }
 
-.formula-recap__lines li + li {
+.formula-recap__lines li+li {
     border-top: 1px dashed var(--line);
 }
 
@@ -2343,6 +2630,34 @@ main::after {
 
 .admin-auth input {
     width: 240px;
+}
+
+/* Onglets de l'admin : bascule rendez-vous / demandes. */
+.admin-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+}
+
+.admin-tab {
+    padding: 10px 16px;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: var(--muted);
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.admin-tab:hover {
+    color: var(--txt);
+}
+
+.admin-tab.is-active {
+    color: var(--txt);
+    border-bottom-color: var(--acc);
 }
 
 .admin-toolbar {
@@ -2542,12 +2857,15 @@ main::after {
         width: 80%;
         height: 100vh;
         flex-direction: column;
+        align-items: center;
         justify-content: center;
         /* Beaucoup d'air entre les liens : la barre rouge appartient clairement
            au lien qu'elle surmonte. */
         gap: 26px;
         padding: 24px;
-        background: var(--surface);
+        /* Fond identique à la carte (givré, surface semi-transparente). */
+        background: color-mix(in srgb, var(--surface), transparent 50%);
+        backdrop-filter: blur(100px);
         box-shadow: -12px 0 32px rgba(0, 0, 0, 0.35);
         /* Hors écran par défaut, glisse vers le centre à l'ouverture. */
         transform: translateX(100%);
@@ -2558,25 +2876,21 @@ main::after {
         transform: translateX(0);
     }
 
-    /* Liens pleine largeur en colonne, plus gros que sur desktop. */
+    /* Liens centrés, largeur du texte (pas pleine largeur), plus gros que desktop.
+       Barre rouge réservée en haut (transparente) pour éviter tout décalage. */
     .site-nav a {
-        width: 100%;
+        width: auto;
         text-align: center;
         font-size: 18px;
         padding: 14px 16px;
-        border-radius: var(--radius-card);
+        border-top: var(--nav-accent-height) solid transparent;
     }
 
-    /* Page en cours : barre rouge AU-DESSUS du lien, exactement comme l'indicateur
-       du menu normal (qui est posé en haut). Texte blanc, pas de pavé plein. */
-    .site-nav a {
-        border-radius: 0;
-    }
-
+    /* Page en cours : barre rouge AU-DESSUS du lien, largeur du lien (= texte),
+       exactement comme l'indicateur du menu desktop. */
     .site-nav a.active {
         color: var(--txt);
-        background: transparent;
-        box-shadow: inset 0 var(--nav-accent-height) 0 0 var(--acc);
+        border-top-color: var(--acc);
     }
 
     .site-nav__indicator {
@@ -2649,6 +2963,16 @@ main::after {
         display: none;
     }
 
+    /* Le bouton RDV d'en-tête disparaît → on le replace au bas du tiroir mobile. */
+    .site-nav__cta {
+        display: inline-flex;
+        position: absolute;
+        bottom: 32px;
+        left: 24px;
+        right: 24px;
+        justify-content: center;
+    }
+
     .hero {
         min-height: 620px;
     }
@@ -2686,6 +3010,11 @@ main::after {
     }
 
     .beyond-card .button {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .beyond-card__actions {
         width: 100%;
         margin-left: 0;
     }

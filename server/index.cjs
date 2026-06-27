@@ -2,9 +2,13 @@ const express = require("express");
 const path = require("node:path");
 const {
     createAppointment,
+    createRequest,
     deleteAppointment,
+    deleteRequest,
     readAppointments,
+    readRequests,
     updateAppointment,
+    updateRequest,
 } = require("./store.cjs");
 
 // Version CommonJS (.cjs) pour Phusion Passenger (o2switch). Passenger charge le
@@ -29,6 +33,9 @@ const allowedSlots = [
     "18:00",
 ];
 const allowedStatuses = ["pending", "confirmed", "completed", "cancelled"];
+// Types de demandes sans créneau et cycle de vie côté admin (à rappeler → traité).
+const allowedRequestTypes = ["achat-vente", "pieces"];
+const allowedRequestStatuses = ["pending", "contacted", "closed", "cancelled"];
 
 app.use(express.json({ limit: "100kb" }));
 
@@ -67,6 +74,56 @@ function validateAppointment(body) {
     }
     if (new Date(`${data.date}T${data.slot}:00`) < new Date()) {
         return { error: "Ce créneau est déjà passé." };
+    }
+    if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+        return { error: "L’adresse email est invalide." };
+    }
+    return { data };
+}
+
+/**
+ * Valide et normalise une demande SANS créneau (projet achat/vente ou pièces).
+ * Ni date ni créneau ne sont requis : seuls le type, le nom et le téléphone sont
+ * indispensables pour pouvoir rappeler le client.
+ * @param {object} body Corps de la requête.
+ * @returns {{ data?: object, error?: string }} Résultat de validation.
+ */
+function validateRequest(body) {
+    // Multi-sélection : on retient les besoins (hors lavage) reçus dans `needs`,
+    // avec repli sur l'ancien champ `type` pour compatibilité.
+    const needs = Array.isArray(body.needs)
+        ? body.needs.filter((need) => allowedRequestTypes.includes(need))
+        : [];
+    const primaryType = needs[0] || cleanString(body.type, 20);
+    if (!allowedRequestTypes.includes(primaryType)) {
+        return { error: "Le type de demande est invalide." };
+    }
+
+    const data = {
+        needs: needs.length ? needs : [primaryType],
+        type: primaryType,
+        // Sous-type achat/vente (sans objet pour une recherche de pièces).
+        projet: cleanString(body.projet, 10),
+        name: cleanString(body.name, 120),
+        phone: cleanString(body.phone, 40),
+        email: cleanString(body.email, 160),
+        city: cleanString(body.city, 120),
+        vehicle: cleanString(body.vehicle, 300),
+        message: cleanString(body.message, 1200),
+        // Champs propres au projet achat/vente.
+        budget: cleanString(body.budget, 60),
+        modele: cleanString(body.modele, 120),
+        annee: cleanString(body.annee, 20),
+        etat: cleanString(body.etat, 120),
+        delai: cleanString(body.delai, 60),
+        // Champs propres à la recherche de pièces.
+        piece: cleanString(body.piece, 200),
+        reference: cleanString(body.reference, 120),
+        urgence: cleanString(body.urgence, 60),
+    };
+
+    if (!data.name || !data.phone) {
+        return { error: "Nom et téléphone sont requis." };
     }
     if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
         return { error: "L’adresse email est invalide." };
@@ -118,6 +175,60 @@ app.post("/api/appointments", async (request, response, next) => {
             response.status(409).json({ message: error.message });
             return;
         }
+        next(error);
+    }
+});
+
+app.post("/api/requests", async (request, response, next) => {
+    try {
+        const validation = validateRequest(request.body);
+        if (validation.error) {
+            response.status(400).json({ message: validation.error });
+            return;
+        }
+        const created = await createRequest(validation.data);
+        response.status(201).json(created);
+    } catch (error) {
+        next(error);
+    }
+});
+
+app.get("/api/requests", requireAdmin, async (_request, response, next) => {
+    try {
+        const requests = await readRequests();
+        // Les demandes les plus récentes d'abord (rappel prioritaire).
+        const sortedRequests = requests.sort((first, second) =>
+            second.createdAt.localeCompare(first.createdAt),
+        );
+        response.json(sortedRequests);
+    } catch (error) {
+        next(error);
+    }
+});
+
+app.patch("/api/requests/:id", requireAdmin, async (request, response, next) => {
+    try {
+        const status = cleanString(request.body.status, 20);
+        if (!allowedRequestStatuses.includes(status)) {
+            response.status(400).json({ message: "Statut invalide." });
+            return;
+        }
+        const updated = await updateRequest(request.params.id, { status });
+        if (!updated) {
+            response.status(404).json({ message: "Demande introuvable." });
+            return;
+        }
+        response.json(updated);
+    } catch (error) {
+        next(error);
+    }
+});
+
+app.delete("/api/requests/:id", requireAdmin, async (request, response, next) => {
+    try {
+        const deleted = await deleteRequest(request.params.id);
+        response.status(deleted ? 204 : 404).end();
+    } catch (error) {
         next(error);
     }
 });

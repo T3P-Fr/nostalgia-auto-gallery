@@ -1,5 +1,5 @@
 {
-    "_comment": "Contenu éditorial centralisé — architecture v3 recentrée SEO (cf. Site_Structure.md). 5 pages : Accueil, Detailing, Réalisations, À propos, Contact. Le detailing est l'activité principale ; l'achat/vente n'apparaît que dans une section discrète d'À propos. SOURCE UNIQUE des prix : pricing.groups (page Detailing + grille de réservation de Contact). Dans les titres de héros, \\n = retour à la ligne et *un mot* = mot en accent. Les images de galerie commençant par http sont des PLACEHOLDERS distants (à remplacer par de vraies photos). Icônes = noms lucide (cf. data.js).",
+    "_comment": "Contenu éditorial centralisé — architecture v3 recentrée SEO (cf. Site_Structure.md). Le detailing reste l'activité principale ; le négoce est traité dans sa page dédiée et évoqué discrètement ailleurs. SOURCE UNIQUE des prix : pricing.groups (page Detailing + grille de réservation de Contact). Dans les titres de héros, \\n = retour à la ligne et *un mot* = mot en accent. Les images de galerie commençant par http sont des PLACEHOLDERS distants (à remplacer par de vraies photos). Icônes = noms lucide (cf. data.js).",
     "site": {
         "phone": "06 36 37 22 10",
         "phoneHref": "tel:+33636372210",
@@ -11,9 +11,18 @@
         "footerTagline": "Le detailing automobile à domicile dans le Gard. Nettoyage, rénovation esthétique et protection, autour de Parignargues et Nîmes.",
         "copyright": "© 2026 Nostalgia Auto Gallery — Corentin Jammes. Tous droits réservés.",
         "legalLinks": [
-            { "label": "Mentions légales", "to": "/informations#mentions-legales" },
-            { "label": "Politique de confidentialité", "to": "/informations#confidentialite" },
-            { "label": "Conditions de réservation", "to": "/informations#conditions" }
+            {
+                "label": "Mentions légales",
+                "to": "/informations#mentions-legales"
+            },
+            {
+                "label": "Politique de confidentialité",
+                "to": "/informations#confidentialite"
+            },
+            {
+                "label": "Conditions de réservation",
+                "to": "/informations#conditions"
+            }
         ],
         "secondaryActivity": "Achat & vente de véhicules"
     },
@@ -228,7 +237,7 @@
                     {
                         "tier": "Platine",
                         "price": 15,
-                        "duration": "≈ 5 min",
+                        "duration": "≈ 15 min",
                         "features": [
                             "Contrôle visuel du niveau des liquides",
                             "Contrôle de l’état des pneus",
@@ -238,7 +247,7 @@
                     {
                         "tier": "Premium",
                         "price": 25,
-                        "duration": "≈ 15 min",
+                        "duration": "≈ 30 min",
                         "includes": "Platine",
                         "features": [
                             "Nettoyage de la baie de pare-brise",
@@ -250,7 +259,7 @@
                     {
                         "tier": "Deluxe",
                         "price": 35,
-                        "duration": "≈ 30 min",
+                        "duration": "≈ 1h",
                         "includes": "Premium",
                         "features": [
                             "Remise à niveau des liquides",
@@ -285,13 +294,13 @@
         "home": {
             "hero": {
                 "image": "/assets/bckgHome.png",
-                "eyebrow": "Detailing automobile à domicile · Gard",
-                "title": "le detailing automobile,\nà domicile dans le *Gard*.",
-                "description": "Nettoyage, rénovation esthétique et protection de votre voiture, directement chez vous, autour de Parignargues et Nîmes. Lavage à la main, produits professionnels, formules dès 65 €."
+                "eyebrow": "Nostalgia Auto Gallery · Parignargues",
+                "title": "votre partenaire passionné\npour l’*automobile*.",
+                "description": "Basé à Parignargues, Nostalgia Auto Gallery est né d’une passion profonde pour l’automobile. Parce qu’une voiture n’est pas seulement un moyen de transport, je mets mon expertise à votre service pour le soin, la préparation esthétique et vos projets auto dans le Gard."
             },
             "actions": [
                 {
-                    "label": "Prendre rendez-vous →",
+                    "label": "Présenter mon projet →",
                     "to": "/contact"
                 },
                 {
@@ -303,29 +312,29 @@
             "stats": [
                 {
                     "value": "dès 65 €",
-                    "label": "la formule"
+                    "label": "soin esthétique"
                 },
                 {
                     "value": "15 km",
                     "label": "déplacement offert"
                 },
                 {
-                    "value": "à domicile",
-                    "label": "service itinérant"
+                    "value": "Gard (30)",
+                    "label": "et départements voisins"
                 }
             ],
             "trust": [
                 {
                     "icon": "Gauge",
-                    "label": "Lavage 100 % à la main"
+                    "label": "Expertise & rigueur"
                 },
                 {
-                    "icon": "Droplets",
-                    "label": "Produits & équipements pro"
+                    "icon": "Heart",
+                    "label": "Passion automobile"
                 },
                 {
                     "icon": "MapPin",
-                    "label": "Déplacement offert 15 km"
+                    "label": "À domicile ou lieu choisi"
                 },
                 {
                     "icon": "BadgeCheck",
@@ -333,9 +342,16 @@
                 }
             ],
             "heading": {
-                "overline": "Plus qu’un simple lavage",
-                "title": "choisissez le soin adapté",
-                "description": "Intérieur, extérieur ou complet : sélectionnez la prestation correspondant à l’état de votre véhicule et au résultat recherché."
+                "overline": "Notre expertise",
+                "title": "de l’entretien à la transaction automobile",
+                "description": "J’accompagne les passionnés et les particuliers autour de deux piliers : le soin et la préparation esthétique, puis l’achat, la revente et la recherche de pièces.",
+                "beyond": {
+                    "text": "Pour le soin, retrouvez les formules intérieur, extérieur et complète. Pour un achat, une revente ou des pièces spécifiques, chaque demande est étudiée individuellement.",
+                    "primaryCta": "Voir toutes les formules →",
+                    "primaryTo": "/detailing",
+                    "secondaryCta": "Achat, vente & pièces",
+                    "secondaryTo": "/negoce"
+                }
             },
             "comparison": {
                 "overline": "Le résultat en images",
@@ -371,15 +387,15 @@
                 ]
             },
             "final": {
-                "title": "Votre véhicule mérite une attention particulière",
-                "text": "Choisissez votre formule ou décrivez votre besoin. Je vous accompagne pour sélectionner la prestation la plus adaptée, autour de Parignargues et Nîmes.",
-                "cta": "Prendre rendez-vous →",
+                "title": "Un projet auto ? Contactez-moi",
+                "text": "Que vous cherchiez votre prochain véhicule, des pièces spécifiques ou que vous souhaitiez redonner une seconde jeunesse à votre auto, je suis à votre disposition pour une demande ou un devis personnalisé.",
+                "cta": "Échanger sur mon projet →",
                 "to": "/contact"
             },
             "about": {
-                "overline": "À propos",
+                "overline": "La démarche",
                 "title": "un interlocuteur unique, passionné",
-                "text": "Nostalgia Auto Gallery, c’est Corentin Jammes : un seul interlocuteur, de la prise de contact jusqu’à la prestation, animé par la passion de l’automobile et le goût du travail soigné.",
+                "text": "Nostalgia Auto Gallery, c’est Corentin Jammes : basé à Parignargues, je traite chaque véhicule avec soin, qu’il s’agisse d’une prestation de detailing, d’une vente ou d’un projet automobile plus spécifique.",
                 "image": "/assets/context.jpg",
                 "cta": "Découvrir Corentin →",
                 "to": "/a-propos"
@@ -675,7 +691,30 @@
                 "eyebrow": "Contact et réservation · Gard",
                 "title": "parlons de votre\n*véhicule*.",
                 "description": "Choisissez une prestation ou décrivez votre besoin. Après réception de votre demande, je vous contacte pour vérifier les informations et confirmer le rendez-vous."
-            }
+            },
+            "needs": [
+                {
+                    "key": "lavage",
+                    "icon": "Droplets",
+                    "label": "Mettre ma voiture en valeur",
+                    "description": "Lavage et préparation esthétique. Choisissez votre formule et vos options, puis un créneau.",
+                    "submitLabel": "Demander ce rendez-vous"
+                },
+                {
+                    "key": "achat-vente",
+                    "icon": "CarFront",
+                    "label": "Acheter ou vendre un véhicule",
+                    "description": "Présentez votre projet : véhicule, budget, état, délai. Je vous rappelle pour l’étudier ensemble.",
+                    "submitLabel": "Envoyer mon projet"
+                },
+                {
+                    "key": "pieces",
+                    "icon": "PackageSearch",
+                    "label": "Rechercher des pièces détachées",
+                    "description": "Décrivez la pièce et le véhicule concerné. Je vous recontacte sur sa disponibilité.",
+                    "submitLabel": "Envoyer ma recherche"
+                }
+            ]
         },
         "informations": {
             "hero": {

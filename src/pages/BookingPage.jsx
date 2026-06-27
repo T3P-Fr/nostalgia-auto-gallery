@@ -5,17 +5,33 @@ import {
     Mail,
     MapPin,
     Phone,
+    X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { PageHero, ZonePanel } from "../components/Ui.jsx";
 import {
     comboDiscounts,
     detailingOptions,
     formulaCategories,
     formulaLevels,
+    icons,
     pages,
     site,
 } from "../data.js";
+
+// Les trois besoins (lavage, achat/vente, pièces) pilotent tout le parcours.
+const needs = pages.booking.needs;
+// Clés des besoins acceptées en pré-sélection via l'URL (?besoin=…).
+const needKeys = needs.map((need) => need.key);
+
+// Échelle de délai partagée : projet véhicule (achat/vente) ET recherche de pièces.
+const delaiLevels = [
+    "Pas pressé",
+    "Sous quelques mois",
+    "Sous quelques semaines",
+    "Sous quelques jours",
+];
 
 const weekDays = ["L", "M", "M", "J", "V", "S", "D"];
 
@@ -28,6 +44,17 @@ const initialForm = {
     city: "",
     vehicle: "",
     message: "",
+    // Champs du projet achat/vente (ignorés hors de ce besoin).
+    projet: "achat",
+    budget: "",
+    modele: "",
+    annee: "",
+    etat: "",
+    delai: "Pas pressé",
+    // Champs de la recherche de pièces.
+    piece: "",
+    reference: "",
+    urgence: "Pas pressé",
 };
 
 // Aucune catégorie sélectionnée au départ (chaîne vide = aucun niveau pris).
@@ -234,6 +261,15 @@ function BookPanel({ id, step, title, aside, className = "", children }) {
  * @returns {JSX.Element} La page de rendez-vous.
  */
 export default function BookingPage() {
+    // Besoins cochés (multi-sélection) : chaque besoin actif affiche son formulaire
+    // à droite. Le lavage est le seul à requérir un créneau.
+    const [besoins, setBesoins] = useState({
+        // Premier onglet (lavage) actif par défaut au chargement.
+        lavage: true,
+        "achat-vente": false,
+        pieces: false,
+    });
+    const [searchParams] = useSearchParams();
     const [visibleMonth, setVisibleMonth] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState("");
     const [selectedSlot, setSelectedSlot] = useState("");
@@ -243,9 +279,28 @@ export default function BookingPage() {
     const [form, setForm] = useState(initialForm);
     const [feedback, setFeedback] = useState("");
     const [createdAppointment, setCreatedAppointment] = useState(null);
+    // Demande sans créneau confirmée (achat/vente ou pièces) : écran de remerciement.
+    const [createdLead, setCreatedLead] = useState(null);
     // Pop-up affichée quand un changement de formule invalide le créneau déjà choisi.
     const [slotNotice, setSlotNotice] = useState(false);
+    // Popup de sélection du créneau (ouvert au choix d'une date, cas lavage).
+    const [slotModalOpen, setSlotModalOpen] = useState(false);
     const calendarCells = useMemo(() => buildCalendar(visibleMonth), [visibleMonth]);
+
+    // Pré-cochage d'un besoin depuis l'URL : ?besoin=achat-vente|pieces|lavage, ou
+    // ?service=… (liens des pages Tarifs/Detailing) qui ciblent forcément un lavage.
+    useEffect(() => {
+        const requested = searchParams.get("besoin");
+        // Sélection exclusive (radio) : on n'active que le besoin demandé.
+        if (requested && needKeys.includes(requested)) {
+            setBesoins({ lavage: false, "achat-vente": false, pieces: false, [requested]: true });
+        } else if (searchParams.get("service")) {
+            setBesoins({ lavage: true, "achat-vente": false, pieces: false });
+        }
+    }, [searchParams]);
+
+    // Au moins un besoin coché : conditionne l'affichage des coordonnées et l'envoi.
+    const hasNeed = besoins.lavage || besoins["achat-vente"] || besoins.pieces;
 
     // Un « lavage complet » = un intérieur ET un extérieur ; il débloque la remise
     // combinée et rend la méca offerte.
@@ -512,21 +567,98 @@ export default function BookingPage() {
      */
     function resetBooking() {
         setCreatedAppointment(null);
+        setCreatedLead(null);
+        setBesoins({ lavage: true, "achat-vente": false, pieces: false });
         setSelectedDate("");
         setSelectedSlot("");
         setForm(initialForm);
         setFormula(emptyFormula);
         setOptions([]);
+        setFeedback("");
     }
 
     /**
-     * Envoie la demande au backend et affiche son récapitulatif.
-     * @param {React.FormEvent<HTMLFormElement>} event Soumission du formulaire.
+     * Sélectionne un besoin en mode RADIO : un seul actif à la fois. Re-cliquer
+     * l'onglet actif le désactive. Nettoie l'erreur résiduelle.
+     * @param {string} key Clé du besoin (lavage/achat-vente/pieces).
+     * @returns {void} Aucune valeur de retour.
+     */
+    function toggleBesoin(key) {
+        setBesoins((current) => ({
+            lavage: false,
+            "achat-vente": false,
+            pieces: false,
+            // Re-clic sur l'actif = désélection ; sinon on active uniquement celui-ci.
+            [key]: !current[key],
+        }));
+        setFeedback("");
+    }
+
+    /**
+     * Construit un résumé texte des besoins HORS lavage (projet, pièces) pour les
+     * joindre au message lorsqu'un rendez-vous lavage porte aussi ces demandes.
+     * @returns {string} Les blocs de détails non vides, un par ligne.
+     */
+    function extraNeedsMessage() {
+        const blocks = [];
+        if (besoins["achat-vente"]) {
+            const details = [
+                form.projet === "vente" ? "Vente" : "Achat",
+                form.vehicle,
+                form.annee,
+                form.modele,
+                form.budget && `budget ${form.budget}`,
+                form.etat,
+                form.delai,
+            ].filter(Boolean).join(", ");
+            blocks.push(`Projet véhicule : ${details}`);
+        }
+        if (besoins.pieces) {
+            const details = [
+                form.vehicle,
+                form.piece,
+                form.reference && `réf. ${form.reference}`,
+                form.urgence,
+            ].filter(Boolean).join(", ");
+            blocks.push(`Recherche pièces : ${details}`);
+        }
+        return blocks.join("\n");
+    }
+
+    /**
+     * Envoie une demande SANS créneau (lavage non coché) : un ou plusieurs besoins
+     * parmi achat/vente et pièces, vers l'endpoint dédié.
      * @returns {Promise<void>} Aucune valeur de retour.
      */
-    async function submitAppointment(event) {
-        event.preventDefault();
-        setFeedback("");
+    async function postRequest() {
+        const needsList = ["achat-vente", "pieces"].filter((key) => besoins[key]);
+        try {
+            const response = await fetch("/api/requests", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                // Le backend ne retient que les champs pertinents selon les besoins.
+                body: JSON.stringify({ ...form, needs: needsList, type: needsList[0] }),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message);
+            setCreatedLead(data);
+        } catch (error) {
+            setFeedback(error.message || "La demande n’a pas pu être envoyée.");
+        }
+    }
+
+    /**
+     * Envoie un rendez-vous (lavage coché) : la prestation et le créneau, en
+     * joignant au message les éventuels autres besoins (projet, pièces).
+     * @returns {Promise<void>} Aucune valeur de retour.
+     */
+    async function postAppointment() {
+        // Message = attentes du client + options choisies + autres besoins joints.
+        const message = [
+            form.message,
+            options.length ? `Options : ${options.join(", ")}` : "",
+            extraNeedsMessage(),
+        ].filter(Boolean).join("\n").trim();
 
         try {
             const response = await fetch("/api/appointments", {
@@ -536,10 +668,7 @@ export default function BookingPage() {
                     ...form,
                     // La « prestation » résume la formule + le prix de vente.
                     service: `${serviceSummary} — ${pricing.sale} €`,
-                    // Les options choisies sont consignées dans le message.
-                    message: options.length
-                        ? `${form.message}\nOptions : ${options.join(", ")}`.trim()
-                        : form.message,
+                    message,
                     date: selectedDate,
                     slot: selectedSlot,
                 }),
@@ -549,6 +678,22 @@ export default function BookingPage() {
             setCreatedAppointment(data);
         } catch (error) {
             setFeedback(error.message || "La demande n’a pas pu être envoyée.");
+        }
+    }
+
+    /**
+     * Aiguille l'envoi unique : si le lavage est coché, on crée un rendez-vous
+     * (avec créneau) qui porte aussi les autres besoins ; sinon une demande à rappeler.
+     * @param {React.FormEvent<HTMLFormElement>} event Soumission du formulaire.
+     * @returns {void} Aucune valeur de retour.
+     */
+    function handleSubmit(event) {
+        event.preventDefault();
+        setFeedback("");
+        if (besoins.lavage) {
+            postAppointment();
+        } else {
+            postRequest();
         }
     }
 
@@ -623,72 +768,360 @@ export default function BookingPage() {
      * total. Rendue à DEUX emplacements (sous le créneau en desktop, en bas en mobile),
      * un seul étant visible à la fois via CSS — d'où cette factorisation.
      */
-    const resumePanel =
-        hasFormula || selectedDate ? (
-            <div className="panel-resume">
-                <h3 className="panel-resume__title">Résumé</h3>
-                <ul className="formula-recap__lines">
-                    <li>
-                        <span>Date</span>
-                        <span>
-                            {selectedDate
-                                ? new Date(`${selectedDate}T12:00:00`).toLocaleDateString("fr-FR")
-                                : "—"}
-                        </span>
-                    </li>
-                    <li>
-                        <span>Créneau</span>
-                        <span>{slotRange}</span>
-                    </li>
-                    {hasFormula && (
-                        <>
-                            <li>
-                                <span>Lavages</span>
-                                <span>{pricing.washBase} €</span>
-                            </li>
-                            {pricing.mecaBase > 0 && (
+    const resumePanel = (
+        <div className="panel-resume">
+            <h3 className="panel-resume__title">Résumé</h3>
+            {!hasFormula && !selectedDate ? (
+                // Mode attente : aucune date ni formule encore choisie.
+                <p className="panel-resume__wait">
+                    En attente de votre sélection…
+                </p>
+            ) : (
+                <>
+                    <ul className="formula-recap__lines">
+                        <li>
+                            <span>Date</span>
+                            <span>
+                                {selectedDate
+                                    ? new Date(`${selectedDate}T12:00:00`).toLocaleDateString("fr-FR")
+                                    : "—"}
+                            </span>
+                        </li>
+                        <li>
+                            <span>Créneau</span>
+                            <span>{slotRange}</span>
+                        </li>
+                        {hasFormula && (
+                            <>
                                 <li>
-                                    <span>Mécanique</span>
-                                    <span>+{pricing.mecaBase} €</span>
+                                    <span>Lavages</span>
+                                    <span>{pricing.washBase} €</span>
                                 </li>
-                            )}
-                            {pricing.optionsBase > 0 && (
-                                <li>
-                                    <span>Options</span>
-                                    <span>+{pricing.optionsBase} €</span>
-                                </li>
-                            )}
-                            {pricing.washEconomy > 0 && (
+                                {pricing.mecaBase > 0 && (
+                                    <li>
+                                        <span>Mécanique</span>
+                                        <span>+{pricing.mecaBase} €</span>
+                                    </li>
+                                )}
+                                {pricing.optionsBase > 0 && (
+                                    <li>
+                                        <span>Options</span>
+                                        <span>+{pricing.optionsBase} €</span>
+                                    </li>
+                                )}
+                                {pricing.washEconomy > 0 && (
+                                    <li className="is-discount">
+                                        <span>Remise lavage complet</span>
+                                        <span>−{pricing.washEconomy} €</span>
+                                    </li>
+                                )}
+                                {/* Remise options toujours affichée (même à 0) : anti-saut. */}
                                 <li className="is-discount">
-                                    <span>Remise lavage complet</span>
-                                    <span>−{pricing.washEconomy} €</span>
+                                    <span>Remise options −{Math.round(pricing.optionsRate * 100)} %</span>
+                                    <span>−{pricing.optionsDiscount} €</span>
                                 </li>
-                            )}
-                            {/* Remise options toujours affichée (même à 0) : anti-saut. */}
-                            <li className="is-discount">
-                                <span>Remise options −{Math.round(pricing.optionsRate * 100)} %</span>
-                                <span>−{pricing.optionsDiscount} €</span>
-                            </li>
-                        </>
-                    )}
-                </ul>
-                {hasFormula && (
-                    <div className="formula-total">
-                        {pricing.economy > 0 && (
-                            <s className="formula-total__strike">{pricing.base} €</s>
+                            </>
                         )}
-                        <span className="formula-total__label">À payer</span>
-                        <strong className="formula-total__sale">{pricing.sale} €</strong>
-                    </div>
-                )}
+                    </ul>
+                    {hasFormula && (
+                        <div className="formula-total">
+                            {pricing.economy > 0 && (
+                                <s className="formula-total__strike">{pricing.base} €</s>
+                            )}
+                            <span className="formula-total__label">À payer</span>
+                            <strong className="formula-total__sale">{pricing.sale} €</strong>
+                        </div>
+                    )}
+                </>
+            )}
+        </div>
+    );
+
+    /**
+     * Colonne de gauche : contact commun (nom, téléphone, email) empilé, puis les
+     * champs d'adresse propres au besoin (adresse d'intervention pour le lavage).
+     * @returns {JSX.Element} Le panneau contact + adresse.
+     */
+    function renderContact() {
+        return (
+            <BookPanel id="panel-coordonnees" title="Vos coordonnées">
+                <div className="coord-grid">
+                    {/* Contact commun, en colonne (un champ par ligne). */}
+                    <input className="field-full" required value={form.name} onChange={(event) => updateField("name", event.target.value)} placeholder="Nom & prénom *" />
+                    <input className="field-full" required value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Téléphone *" inputMode="tel" />
+                    <input className="field-full" value={form.email} onChange={(event) => updateField("email", event.target.value)} placeholder="Email" type="email" />
+                    {/* Adresse, sous le contact : propre au besoin. */}
+                    {besoins.lavage ? (
+                        <>
+                            <input className="field-full" value={form.address} onChange={(event) => updateField("address", event.target.value)} placeholder="Adresse d’intervention" />
+                            <input className="field-third" value={form.postalCode} onChange={(event) => updateField("postalCode", event.target.value)} placeholder="Code postal" inputMode="numeric" />
+                            <input className="field-twothird" value={form.city} onChange={(event) => updateField("city", event.target.value)} placeholder="Ville" />
+                        </>
+                    ) : (
+                        <input className="field-full" value={form.city} onChange={(event) => updateField("city", event.target.value)} placeholder="Ville" />
+                    )}
+                </div>
+            </BookPanel>
+        );
+    }
+
+    /**
+     * Groupe de vrais boutons radio pour l'échelle de délai (4 niveaux), partagé
+     * entre le délai du projet et l'urgence des pièces. 4 colonnes desktop, 2 mobile.
+     * @param {string} field Champ du formulaire à piloter (delai / urgence).
+     * @param {string} legend Intitulé affiché au-dessus du groupe.
+     * @returns {JSX.Element} Le groupe radio.
+     */
+    function renderDelaiRadios(field, legend) {
+        return (
+            <fieldset className="full radio-field">
+                <legend className="radio-field__label">{legend}</legend>
+                <div className="radio-group">
+                    {delaiLevels.map((level) => (
+                        <label key={level} className="radio-group__btn">
+                            <input
+                                type="radio"
+                                name={field}
+                                value={level}
+                                checked={form[field] === level}
+                                onChange={() => updateField(field, level)}
+                            />
+                            <span>{level}</span>
+                        </label>
+                    ))}
+                </div>
+            </fieldset>
+        );
+    }
+
+    /**
+     * Section « projet véhicule » (achat/vente) : champs propres au besoin en 50/50.
+     * @returns {JSX.Element} Le panneau du projet achat/vente.
+     */
+    function renderProjetSection() {
+        const isSale = form.projet === "vente";
+        return (
+            <BookPanel title="Votre projet véhicule">
+                {/* Bascule J'achète / Je vends. */}
+                <div className="need-toggle">
+                    {[
+                        { key: "achat", label: "J’achète" },
+                        { key: "vente", label: "Je vends" },
+                    ].map((choice) => (
+                        <button
+                            type="button"
+                            key={choice.key}
+                            aria-pressed={form.projet === choice.key}
+                            className={`need-toggle__btn${form.projet === choice.key ? " is-selected" : ""}`}
+                            onClick={() => updateField("projet", choice.key)}
+                        >
+                            {choice.label}
+                        </button>
+                    ))}
+                </div>
+
+                <div className="fields-2col">
+                    <input className="full" value={form.vehicle} onChange={(event) => updateField("vehicle", event.target.value)} placeholder={isSale ? "Véhicule à vendre (marque, modèle)" : "Véhicule recherché (marque, modèle)"} />
+                    <input value={form.annee} onChange={(event) => updateField("annee", event.target.value)} placeholder="Année" inputMode="numeric" />
+                    <input value={form.modele} onChange={(event) => updateField("modele", event.target.value)} placeholder="Motorisation / finition" />
+                    <input value={form.budget} onChange={(event) => updateField("budget", event.target.value)} placeholder="Budget" />
+                    <input value={form.etat} onChange={(event) => updateField("etat", event.target.value)} placeholder={isSale ? "État du véhicule" : "État souhaité"} />
+                    {renderDelaiRadios("delai", "Délai du projet")}
+                </div>
+            </BookPanel>
+        );
+    }
+
+    /**
+     * Section « recherche de pièces » : champs propres au besoin en 50/50.
+     * @returns {JSX.Element} Le panneau de recherche de pièces.
+     */
+    function renderPiecesSection() {
+        return (
+            <BookPanel title="Votre recherche de pièces">
+                <div className="fields-2col">
+                    <input className="full" value={form.vehicle} onChange={(event) => updateField("vehicle", event.target.value)} placeholder="Véhicule concerné (marque, modèle, année)" />
+                    <input value={form.piece} onChange={(event) => updateField("piece", event.target.value)} placeholder="Pièce recherchée" />
+                    <input value={form.reference} onChange={(event) => updateField("reference", event.target.value)} placeholder="Référence (si connue)" />
+                    {renderDelaiRadios("urgence", "Niveau d’urgence")}
+                </div>
+            </BookPanel>
+        );
+    }
+
+    /**
+     * Bouton (colonne droite, lavage) qui ouvre le popup agenda + créneaux. Affiche
+     * la date et le créneau choisis, ou invite à les sélectionner.
+     * @returns {JSX.Element} Le panneau déclencheur du popup.
+     */
+    function renderAgendaTrigger() {
+        const dateLabel = selectedDate
+            ? new Date(`${selectedDate}T12:00:00`).toLocaleDateString("fr-FR")
+            : "";
+        return (
+            <BookPanel
+                id="panel-date"
+                title="Date & créneau"
+                aside={durationMinutes > 0 ? `Durée estimée : ${formatDuration(durationMinutes)}` : null}
+            >
+                <button
+                    type="button"
+                    className="button button--secondary button--block"
+                    onClick={() => setSlotModalOpen(true)}
+                >
+                    {selectedDate && selectedSlot
+                        ? `${dateLabel} · ${slotRange}`
+                        : "Choisir la date et le créneau"}
+                </button>
+            </BookPanel>
+        );
+    }
+
+    /**
+     * Calendrier du mois, rendu DANS le popup. Cliquer une date la sélectionne et
+     * révèle les créneaux du jour (juste en dessous, dans le même popup).
+     * @returns {JSX.Element} La grille calendrier.
+     */
+    function renderCalendar() {
+        return (
+            <div className="agenda-calendar">
+                <div className="calendar-nav">
+                    <button
+                        type="button"
+                        disabled={!canGoBack}
+                        onClick={() => setVisibleMonth(new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() - 1, 1))}
+                    >
+                        <ChevronLeft />
+                    </button>
+                    <strong>{visibleMonth.toLocaleDateString("fr-FR", { month: "long", year: "numeric" })}</strong>
+                    <button
+                        type="button"
+                        onClick={() => setVisibleMonth(new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 1))}
+                    >
+                        <ChevronRight />
+                    </button>
+                </div>
+                <div className="calendar-grid calendar-grid--labels">
+                    {weekDays.map((day, index) => (
+                        <span key={`${day}-${index}`}>{day}</span>
+                    ))}
+                </div>
+                <div className="calendar-grid">
+                    {calendarCells.map((cell, index) => {
+                        if (!cell) return <span key={`empty-${index}`} />;
+                        const isDisabled = cell.date < today || cell.date.getDay() === 0;
+                        return (
+                            <button
+                                key={cell.iso}
+                                type="button"
+                                disabled={isDisabled}
+                                className={selectedDate === cell.iso ? "is-selected" : ""}
+                                onClick={() => {
+                                    // Sélectionne la date ; les créneaux apparaissent dessous.
+                                    setSelectedDate(cell.iso);
+                                    setSelectedSlot("");
+                                }}
+                            >
+                                {cell.date.getDate()}
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
-        ) : null;
+        );
+    }
+
+    /**
+     * Grille des créneaux d'une journée, rendue dans le popup. La logique de
+     * compatibilité/chevauchement est conservée ; choisir un créneau ferme le popup.
+     * @returns {React.ReactNode} Les boutons de créneaux, ou une invite.
+     */
+    function renderSlotGrid() {
+        if (!selectedDate) {
+            return <p>Sélectionnez d’abord une date.</p>;
+        }
+        return slots.map((slot) => {
+            const start = slotToMinutes(slot.time);
+            const taken = !slot.available;
+            const selected = selectedSlot === slot.time;
+            const covered =
+                Boolean(selectedSlot) &&
+                start > slotToMinutes(selectedSlot) &&
+                start < slotToMinutes(selectedSlot) + durationMinutes;
+            const isLastCovered =
+                covered && start + 60 >= slotToMinutes(selectedSlot) + durationMinutes;
+            const chevronLeft = covered;
+            const chevronRight =
+                (selected && durationMinutes > 60) || (covered && !isLastCovered);
+            const compatible = canStartAt(slot.time);
+            const disabled = taken || (!compatible && !selected && !covered);
+            const className = [
+                selected && "is-selected",
+                !selected && covered && "is-covered",
+                taken && "is-taken",
+            ]
+                .filter(Boolean)
+                .join(" ");
+            return (
+                <button
+                    key={slot.time}
+                    type="button"
+                    disabled={disabled}
+                    className={className}
+                    onClick={() => {
+                        // On sélectionne le créneau ; la fermeture se fait via « Valider ».
+                        if (canStartAt(slot.time)) {
+                            setSelectedSlot(slot.time);
+                        } else {
+                            setSelectedSlot("");
+                            setSlotNotice(true);
+                        }
+                    }}
+                >
+                    {chevronLeft && <ChevronLeft />}
+                    {slot.time}
+                    {chevronRight && <ChevronRight />}
+                </button>
+            );
+        });
+    }
+
+    // Le lavage exige date + créneau + formule ; les autres besoins non.
+    const lavageReady = !besoins.lavage || (selectedDate && selectedSlot && hasFormula);
+    const canSubmit =
+        hasNeed && Boolean(form.name.trim()) && Boolean(form.phone.trim()) && Boolean(lavageReady);
+    // Libellé d'envoi : un rendez-vous si lavage coché, sinon une demande à rappeler.
+    const submitLabel = besoins.lavage ? "Demander ce rendez-vous" : "Envoyer ma demande";
 
     return (
         <>
             <PageHero {...pages.booking.hero} />
 
             <section className="booking-layout container">
+                {/* Calque givré UNIQUE englobant tabs + carte : un seul backdrop-filter
+                    pour éviter la jointure entre deux flous calculés séparément. */}
+                <div className="booking-frost">
+                {/* Bloc TABS à part : 3 onglets de besoins (multi-sélection), bordures
+                    franches sans radius. Masqué une fois la demande envoyée. */}
+                {!createdAppointment && !createdLead && (
+                    <div className="need-tabs">
+                        {needs.map((need) => {
+                            const active = besoins[need.key];
+                            return (
+                                <button
+                                    type="button"
+                                    key={need.key}
+                                    aria-pressed={active}
+                                    className={`need-tab${active ? " is-selected" : ""}`}
+                                    onClick={() => toggleBesoin(need.key)}
+                                >
+                                    {need.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+                )}
+
                 <div className="card booking-card">
                     {createdAppointment ? (
                         <div className="success-state">
@@ -717,175 +1150,54 @@ export default function BookingPage() {
                                 Nouvelle demande
                             </button>
                         </div>
+                    ) : createdLead ? (
+                        /* Demande sans créneau confirmée : remerciement sans date/créneau. */
+                        <div className="success-state">
+                            <span><Check /></span>
+                            <h2>demande envoyée</h2>
+                            <p>
+                                Merci {createdLead.name} ! J’étudie votre demande et je
+                                vous rappelle au plus vite.
+                            </p>
+                            <button
+                                className="button button--secondary"
+                                type="button"
+                                onClick={resetBooking}
+                            >
+                                Nouvelle demande
+                            </button>
+                        </div>
                     ) : (
-                        <form className="booking-form" onSubmit={submitAppointment}>
-                            {/* Colonne gauche : 1. date (agenda), 2. créneau, puis le résumé. */}
+                        <form className="booking-form" onSubmit={handleSubmit}>
+                            {/* Colonne gauche : contact + adresse, puis résumé. */}
                             <div className="calendar-panel">
-                                <BookPanel
-                                    id="panel-date"
-                                    step={1}
-                                    title="Choisissez une date"
-                                    aside={
-                                        selectedDate
-                                            ? new Date(`${selectedDate}T12:00:00`)
-                                                .toLocaleDateString("fr-FR")
-                                            : null
-                                    }
-                                >
-                                    <div className="calendar-nav">
-                                        <button
-                                            type="button"
-                                            disabled={!canGoBack}
-                                            onClick={() => setVisibleMonth(
-                                                new Date(
-                                                    visibleMonth.getFullYear(),
-                                                    visibleMonth.getMonth() - 1,
-                                                    1,
-                                                ),
-                                            )}
-                                        >
-                                            <ChevronLeft />
-                                        </button>
-                                        <strong>
-                                            {visibleMonth.toLocaleDateString("fr-FR", {
-                                                month: "long",
-                                                year: "numeric",
-                                            })}
-                                        </strong>
-                                        <button
-                                            type="button"
-                                            onClick={() => setVisibleMonth(
-                                                new Date(
-                                                    visibleMonth.getFullYear(),
-                                                    visibleMonth.getMonth() + 1,
-                                                    1,
-                                                ),
-                                            )}
-                                        >
-                                            <ChevronRight />
-                                        </button>
-                                    </div>
-                                    <div className="calendar-grid calendar-grid--labels">
-                                        {weekDays.map((day, index) => (
-                                            <span key={`${day}-${index}`}>{day}</span>
-                                        ))}
-                                    </div>
-                                    <div className="calendar-grid">
-                                        {calendarCells.map((cell, index) => {
-                                            if (!cell) return <span key={`empty-${index}`} />;
-                                            const isDisabled =
-                                                cell.date < today || cell.date.getDay() === 0;
-                                            return (
-                                                <button
-                                                    key={cell.iso}
-                                                    type="button"
-                                                    disabled={isDisabled}
-                                                    className={selectedDate === cell.iso ? "is-selected" : ""}
-                                                    onClick={() => {
-                                                        setSelectedDate(cell.iso);
-                                                        setSelectedSlot("");
-                                                    }}
-                                                >
-                                                    {cell.date.getDate()}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </BookPanel>
+                                {/* Contact commun + adresse propre au besoin (gauche). */}
+                                {hasNeed && renderContact()}
 
-                                <BookPanel
-                                    id="panel-creneau"
-                                    step={2}
-                                    title="Créneau"
-                                    aside={
-                                        durationMinutes > 0
-                                            ? `Durée estimée : ${formatDuration(durationMinutes)}`
-                                            : null
-                                    }
-                                >
-                                    <div className="slot-grid">
-                                        {selectedDate ? (
-                                            slots.map((slot) => {
-                                                const start = slotToMinutes(slot.time);
-                                                // Réservé/confirmé par un client : seul cas « dur » de blocage.
-                                                const taken = !slot.available;
-                                                const selected = selectedSlot === slot.time;
-                                                // Heure couverte par la prestation en cours (entre début et fin).
-                                                const covered =
-                                                    Boolean(selectedSlot) &&
-                                                    start > slotToMinutes(selectedSlot) &&
-                                                    start < slotToMinutes(selectedSlot) + durationMinutes;
-                                                // Dernière heure couverte : l'heure suivante sort de la durée.
-                                                const isLastCovered =
-                                                    covered &&
-                                                    start + 60 >=
-                                                        slotToMinutes(selectedSlot) + durationMinutes;
-                                                // Chevrons d'association : droite au départ (si le service
-                                                // déborde son heure), gauche+droite au milieu, gauche à la fin.
-                                                const chevronLeft = covered;
-                                                const chevronRight =
-                                                    (selected && durationMinutes > 60) ||
-                                                    (covered && !isLastCovered);
-                                                // Peut-on démarrer ici (durée compatible, sans chevauchement) ?
-                                                const compatible = canStartAt(slot.time);
-                                                // Désactivé seulement si réservé, ou incompatible ET hors du
-                                                // service en cours. Une heure couverte (ou le créneau choisi)
-                                                // reste active : cliquer dessus ré-ancre le service.
-                                                const disabled =
-                                                    taken || (!compatible && !selected && !covered);
-                                                // Le créneau choisi (vert) prime ; sinon une heure couverte est
-                                                // entourée en rouge mais reste cliquable pour ré-ancrer le service.
-                                                const className = [
-                                                    selected && "is-selected",
-                                                    !selected && covered && "is-covered",
-                                                    taken && "is-taken",
-                                                ]
-                                                    .filter(Boolean)
-                                                    .join(" ");
-                                                return (
-                                                    <button
-                                                        key={slot.time}
-                                                        type="button"
-                                                        disabled={disabled}
-                                                        className={className}
-                                                        onClick={() => {
-                                                            // Ré-ancrage : valide seulement si la durée rentre
-                                                            // à partir de cette heure, sinon on invite à choisir.
-                                                            if (canStartAt(slot.time)) {
-                                                                setSelectedSlot(slot.time);
-                                                            } else {
-                                                                setSelectedSlot("");
-                                                                setSlotNotice(true);
-                                                            }
-                                                        }}
-                                                    >
-                                                        {chevronLeft && <ChevronLeft />}
-                                                        {slot.time}
-                                                        {chevronRight && <ChevronRight />}
-                                                    </button>
-                                                );
-                                            })
-                                        ) : (
-                                            <p>Sélectionnez d’abord une date.</p>
-                                        )}
-                                    </div>
-                                </BookPanel>
-
-                                {/* Résumé (carte rouge) sous le créneau, sticky (desktop). */}
-                                {resumePanel && (
+                                {/* Résumé (carte rouge) : uniquement pour le lavage (prix/créneau). */}
+                                {besoins.lavage && (
                                     <div className="montant-slot montant-slot--desktop">
                                         {resumePanel}
                                     </div>
                                 )}
                             </div>
 
-                            {/* Colonne droite : 3. lavages, 4. révision, 5. options, 6. coordonnées. */}
+                            {/* Colonne droite : champs propres au besoin choisi. */}
                             <div className="details-panel">
-                                {/* 3. Lavages : sélection Intérieur/Extérieur + prix. L'incitation
+                                {/* Aucun besoin coché : invite à choisir un onglet. */}
+                                {!hasNeed && (
+                                    <div className="details-placeholder">
+                                        Choisissez un besoin ci-dessus pour afficher le formulaire.
+                                    </div>
+                                )}
+
+                                {/* Lavage : agenda (créneaux en popup) → formules → révision → options. */}
+                                {besoins.lavage && (
+                                <>
+                                {/* Lavages : sélection Intérieur/Extérieur + prix. L'incitation
                                     (statique, atténuée) est posée à droite du titre (aside). */}
                                 <BookPanel
                                     id="panel-lavages"
-                                    step={3}
                                     title="Lavages"
                                     aside={`----- Économisez jusqu’à ${maxComboDiscount} € pour un lavage complet`}
                                 >
@@ -909,7 +1221,7 @@ export default function BookingPage() {
                                 {/* 4. Révision de base (méca) : grille toujours visible, mais
                                     grisée/désactivée tant qu'aucun lavage n'est sélectionné. */}
                                 {mecaCategory && (
-                                    <BookPanel id="panel-revision" step={4} title="Révision de base">
+                                    <BookPanel id="panel-revision" title="Révision de base">
                                         {!hasWash && (
                                             <p className="formula-options__hint">
                                                 Sélectionnez un lavage pour ajouter la révision (offerte avec un lavage complet).
@@ -932,7 +1244,7 @@ export default function BookingPage() {
                                 )}
 
                                 {/* 5. Options : cases à cocher, actives seulement avec un lavage. */}
-                                <BookPanel id="panel-options" step={5} title="Options">
+                                <BookPanel id="panel-options" title="Options">
                                     <div className="formula-options">
                                         {!hasWash && (
                                             <p className="formula-options__hint">
@@ -975,44 +1287,39 @@ export default function BookingPage() {
                                     )}
                                 </BookPanel>
 
-                                {/* 6. Coordonnées : grille 3 colonnes (1/3 - 2/3) sur desktop,
-                                    chaque champ sur sa propre ligne en mode téléphone. */}
-                                <BookPanel id="panel-coordonnees" step={6} title="Vos coordonnées">
-                                    <div className="coord-grid">
-                                    {/* Ligne 1 : Nom & prénom (2/3) + Téléphone (1/3). */}
-                                    <input className="field-twothird" required value={form.name} onChange={(event) => updateField("name", event.target.value)} placeholder="Nom & prénom *" />
-                                    <input className="field-third" required value={form.phone} onChange={(event) => updateField("phone", event.target.value)} placeholder="Téléphone *" inputMode="tel" />
-                                    {/* Email : pleine largeur. */}
-                                    <input className="field-full" value={form.email} onChange={(event) => updateField("email", event.target.value)} placeholder="Email" type="email" />
-                                    {/* Adresse : pleine largeur. */}
-                                    <input className="field-full" value={form.address} onChange={(event) => updateField("address", event.target.value)} placeholder="Adresse d’intervention" />
-                                    {/* Ligne : Code postal (1/3) + Ville (2/3). */}
-                                    <input className="field-third" value={form.postalCode} onChange={(event) => updateField("postalCode", event.target.value)} placeholder="Code postal" inputMode="numeric" />
-                                    <input className="field-twothird" value={form.city} onChange={(event) => updateField("city", event.target.value)} placeholder="Ville" />
-                                    {/* Véhicule : pleine largeur. */}
-                                    <input className="field-full" value={form.vehicle} onChange={(event) => updateField("vehicle", event.target.value)} placeholder="Véhicule (modèle, année)" />
-                                    <textarea value={form.message} onChange={(event) => updateField("message", event.target.value)} placeholder="Vos attentes…" rows="3" />
-                                    {feedback && <p className="form-error">{feedback}</p>}
-                                    <button
-                                        className="button button--block"
-                                        type="submit"
-                                        disabled={!selectedDate || !selectedSlot || !hasFormula}
-                                    >
-                                        Confirmer la demande
-                                    </button>
-                                    <small>Demande sans paiement. Confirmation par téléphone.</small>
-                                </div>
-                                </BookPanel>
+                                {/* Date & créneau : sous les choix de lavage/révision/options. */}
+                                {renderAgendaTrigger()}
+                                </>
+                                )}
+
+                                {/* Projet achat/vente (si coché). */}
+                                {besoins["achat-vente"] && renderProjetSection()}
+
+                                {/* Recherche de pièces (si coché). */}
+                                {besoins.pieces && renderPiecesSection()}
+
+                                {/* Message libre + envoi unique, dès qu'au moins un besoin est coché. */}
+                                {hasNeed && (
+                                    <div className="lead-submit">
+                                        <textarea value={form.message} onChange={(event) => updateField("message", event.target.value)} placeholder="Votre message (précisions, attentes…)" rows="3" />
+                                        {feedback && <p className="form-error">{feedback}</p>}
+                                        <button className="button button--block" type="submit" disabled={!canSubmit}>
+                                            {submitLabel}
+                                        </button>
+                                        <small>Demande sans engagement. Je vous recontacte pour confirmer.</small>
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Résumé (carte rouge) en bas de tout, sticky (mobile uniquement). */}
-                            {resumePanel && (
+                            {/* Résumé (carte rouge) en bas, sticky (mobile) : lavage uniquement. */}
+                            {besoins.lavage && (
                                 <div className="montant-slot montant-slot--mobile">
                                     {resumePanel}
                                 </div>
                             )}
                         </form>
                     )}
+                </div>
                 </div>
 
                 <aside className="card contact-card">
@@ -1033,6 +1340,65 @@ export default function BookingPage() {
                 </aside>
             </section>
 
+            {/* Popup de sélection du créneau (lavage) : ouvert au choix d'une date. */}
+            {slotModalOpen && (
+                <div
+                    className="slot-modal"
+                    role="dialog"
+                    aria-modal="true"
+                    onClick={() => setSlotModalOpen(false)}
+                >
+                    <div className="slot-modal__box slot-modal__box--agenda" onClick={(event) => event.stopPropagation()}>
+                        {/* En-tête : titre + croix de fermeture (blanche, rouge au survol). */}
+                        <div className="slot-modal__head">
+                            <h3>Choisissez la date et le créneau</h3>
+                            <button
+                                type="button"
+                                className="slot-modal__close"
+                                aria-label="Fermer"
+                                onClick={() => setSlotModalOpen(false)}
+                            >
+                                <X />
+                            </button>
+                        </div>
+                        {durationMinutes > 0 && (
+                            <p>Durée estimée : {formatDuration(durationMinutes)}</p>
+                        )}
+
+                        {/* Calendrier puis, sous lui, les créneaux du jour sélectionné. */}
+                        {renderCalendar()}
+
+                        <div className="agenda-slots">
+                            <h4>
+                                {selectedDate
+                                    ? `Créneaux du ${new Date(`${selectedDate}T12:00:00`).toLocaleDateString("fr-FR")}`
+                                    : "Créneaux"}
+                            </h4>
+                            <div className="slot-grid">{renderSlotGrid()}</div>
+                        </div>
+
+                        {/* Bas : Annuler (secondaire) + Valider (primaire). */}
+                        <div className="slot-modal__actions">
+                            <button
+                                type="button"
+                                className="button button--secondary"
+                                onClick={() => setSlotModalOpen(false)}
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                type="button"
+                                className="button"
+                                disabled={!selectedSlot}
+                                onClick={() => setSlotModalOpen(false)}
+                            >
+                                Valider
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Pop-up : la formule a changé et le créneau choisi ne rentre plus.
                 On invite à en choisir un nouveau et on recentre la grille des créneaux. */}
             {slotNotice && (
@@ -1049,9 +1415,7 @@ export default function BookingPage() {
                             type="button"
                             onClick={() => {
                                 setSlotNotice(false);
-                                document
-                                    .getElementById("panel-creneau")
-                                    ?.scrollIntoView({ behavior: "smooth", block: "center" });
+                                setSlotModalOpen(true);
                             }}
                         >
                             Choisir un créneau

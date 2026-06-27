@@ -178,6 +178,15 @@ export function HeaderPage() {
                 <NavLink to="/realisations" onClick={closeMenu}>
                     Réalisations
                 </NavLink>
+                {/* CTA repris au bas du tiroir mobile quand il disparaît de l'en-tête. */}
+                <ButtonLink
+                    className="site-nav__cta"
+                    size="small"
+                    to="/contact"
+                    onClick={closeMenu}
+                >
+                    Prendre RDV
+                </ButtonLink>
             </nav>
             <div className="header-actions">
                 <ButtonLink size="small" to="/contact">
