@@ -1665,15 +1665,43 @@ main::after {
     align-self: stretch;
 }
 
+/* En-tête de panneau : grand numéro (display) suivi d'un point rouge, puis le
+   titre plus petit en Archivo, aligné sur la ligne de base du numéro. */
 .booking-form h3 {
     margin: 0;
-    font-size: 12px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+    letter-spacing: normal;
+    text-transform: none;
 }
 
-.booking-form h3 span {
+/* Numéro d'étape : chiffre blanc en police display. */
+/* Gros numéro display (blanc) + point rouge, dimensionné pour couvrir la hauteur
+   des deux lignes de la colonne titre (titre + tagline). */
+.panel__step {
+    font-family: "DM Serif Display", serif;
+    line-height: 1;
+    flex-shrink: 0;
+    font-size: 44px;
+}
+
+.panel__num {
+    color: #fff;
+}
+
+/* Le point qui suit le numéro, en rouge d'accent. */
+.panel__dot {
     color: var(--acc);
+}
+
+/* Titre du panneau : Archivo majuscules, blanc. */
+.panel__title {
+    font-family: "Archivo", sans-serif;
+    font-size: 15px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #fff;
 }
 
 /* Panneau d'étape commun (1. Date, 2. Créneau, 3. Lavages…). */
@@ -1681,24 +1709,35 @@ main::after {
     margin-bottom: 22px;
 }
 
-/* En-tête du panneau : titre à gauche, texte atténué optionnel à droite. */
 .panel__head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 14px;
     margin-bottom: 14px;
 }
 
-/* Texte atténué à droite de l'en-tête (date choisie, durée, incitation…). */
+/* Ligne d'en-tête : numéro à gauche, colonne titre/tagline à droite, centrés. */
+.panel__heading-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+}
+
+/* Colonne de droite : titre puis, juste sous lui, la tagline. */
+.panel__heading {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+}
+
+/* Tagline / texte atténué SOUS le titre (incitation, date choisie, durée…). */
 .panel__aside {
-    flex-shrink: 1;
     color: var(--subtle);
     font-size: 11px;
     font-weight: 400;
     letter-spacing: normal;
     text-transform: none;
-    text-align: right;
+    text-align: left;
 }
 
 .calendar-nav {
@@ -1741,12 +1780,20 @@ main::after {
     gap: 6px;
 }
 
+/* En-têtes de jours : display, lettre blanche + point rouge, 20% plus grand (10 → 12px). */
 .calendar-grid--labels {
     margin-bottom: 8px;
-    color: var(--subtle);
-    font-size: 10px;
-    font-weight: 800;
+    font-family: "DM Serif Display", serif;
+    font-size: 12px;
     text-align: center;
+}
+
+.calendar-grid--labels .cal-day__letter {
+    color: #fff;
+}
+
+.calendar-grid--labels .cal-day__dot {
+    color: var(--acc);
 }
 
 .calendar-grid button {
@@ -1828,14 +1875,20 @@ main::after {
     position: fixed;
     inset: 0;
     z-index: 100;
-    display: grid;
-    place-items: center;
+    /* Flex (et non grid) pour centrer : sur une grille sans colonnes définies, la
+       boîte prendrait sa largeur max-content et déborderait sur petit écran. */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 20px;
     background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(20px);
 }
 
 .slot-modal__box {
     width: min(420px, 100%);
+    max-height: 100%;
+    overflow-y: auto;
     padding: 26px;
     border-radius: 14px;
     background: var(--surface);
@@ -1856,6 +1909,23 @@ main::after {
 /* Variante « agenda » : plus large pour accueillir calendrier + créneaux. */
 .slot-modal__box--agenda {
     width: min(460px, 100%);
+}
+
+/* Téléphone : on resserre les marges du popup et on densifie la grille de créneaux
+   (colonnes plus étroites) pour que tout tienne sans débordement horizontal. */
+@media (max-width: 480px) {
+    .slot-modal {
+        padding: 12px;
+    }
+
+    .slot-modal__box {
+        padding: 18px;
+    }
+
+    .slot-grid {
+        grid-template-columns: repeat(auto-fit, minmax(56px, 1fr));
+        gap: 6px;
+    }
 }
 
 /* Bloc des créneaux sous le calendrier, dans le popup. */
@@ -2017,11 +2087,9 @@ main::after {
    transparent depuis le bas. */
 .need-tab.is-selected {
     border-top-color: var(--acc);
-    background: linear-gradient(
-        to bottom,
-        color-mix(in srgb, var(--red-primary) 16%, transparent),
-        transparent 65%
-    );
+    background: linear-gradient(to bottom,
+            color-mix(in srgb, var(--red-primary) 16%, transparent),
+            transparent 65%);
     color: var(--txt);
 }
 
@@ -2066,14 +2134,17 @@ main::after {
 /* Champ « radio » (intitulé + groupe), pleine largeur. Reset du fieldset natif. */
 .radio-field {
     display: flex;
+    margin-top: 1rem;
     flex-direction: column;
     gap: 8px;
-    margin: 0;
+    margin: 0.5em;
     padding: 0;
     border: 0;
 }
 
 .radio-field__label {
+    margin-top: 2em;
+    margin-bottom: 1em;
     padding: 0;
     font-size: 12px;
     font-weight: 700;
@@ -2082,36 +2153,35 @@ main::after {
     color: var(--subtle);
 }
 
-/* Groupe radio : toujours 2 colonnes. */
+/* Groupe radio : toujours 2 colonnes, avec de l'air entre les options. */
 .radio-group {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: 16px 28px;
 }
 
-/* Une option : vrai radio + libellé, sans fond (bordure seule). */
+/* Une option : vrai radio + libellé, SANS cadre ni fond (juste le texte). */
 .radio-group__btn {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 11px 10px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-card);
+    gap: 10px;
+    padding: 4px 0;
+    border: 0;
     background: transparent;
     color: var(--txt);
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 400;
     cursor: pointer;
-    transition: border-color 0.15s;
+    transition: color 0.15s;
 }
 
 .radio-group__btn:hover {
-    border-color: var(--acc);
+    color: #fff;
 }
 
-/* Case mise en évidence quand son radio est coché : bordure accent, sans fond. */
+/* Option mise en évidence quand son radio est coché : libellé blanc. */
 .radio-group__btn:has(input:checked) {
-    border-color: var(--acc);
+    color: #fff;
 }
 
 /* Vrai radio natif, teinté accent (on neutralise le style générique des champs). */
@@ -2428,11 +2498,84 @@ main::after {
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
 }
 
+/* Titre du résumé : display, blanc, avec un point noir (motif des en-têtes). */
+/* En-tête du résumé : titre à gauche, date · créneau à droite, même ligne. */
+.panel-resume__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
 .panel-resume__title {
-    margin: 0 0 10px;
+    margin: 0;
+    font-family: "DM Serif Display", serif;
+    font-size: 22px;
+    letter-spacing: 0.02em;
+}
+
+.panel-resume__dot {
+    color: #000;
+}
+
+/* Date puis créneau EMPILÉS, alignés à droite du titre. */
+.panel-resume__when {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
     font-size: 12px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-weight: 600;
+    text-align: right;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Accordéon : un groupe thématique (Lavages, Révision, Options). */
+.resume-group {
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* En-tête cliquable du groupe : chevron + titre + sous-total. */
+.resume-group__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 0;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.resume-group__title {
+    flex: 1;
+    text-align: left;
+}
+
+.resume-group__chevron {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s;
+}
+
+/* Chevron tourné vers le bas quand le groupe est ouvert. */
+.resume-group__chevron.is-open {
+    transform: rotate(180deg);
+}
+
+/* Lignes d'un groupe ouvert : pas de séparateur supérieur (le bord du groupe le
+   porte déjà) et INDENTÉES sous le libellé de l'onglet (largeur chevron + gap),
+   pour qu'elles paraissent appartenir au groupe et non « en dehors ». */
+.resume-group .formula-recap__lines {
+    padding: 0 0 8px 24px;
+}
+
+.resume-group .formula-recap__lines li:first-child {
+    border-top: 0;
 }
 
 /* Sur fond rouge : lignes et séparateurs passent en clair. */
@@ -2628,8 +2771,40 @@ main::after {
     gap: 10px;
 }
 
-.admin-auth input {
+/* Champ clé : conteneur relatif pour poser l'œil à droite. */
+.admin-auth__field {
+    position: relative;
     width: 240px;
+}
+
+.admin-auth__field input {
+    width: 100%;
+    /* Place pour l'œil. */
+    padding-right: 42px;
+}
+
+/* Bouton œil : superposé à droite du champ. */
+.admin-auth__eye {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    display: inline-flex;
+    padding: 4px;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.admin-auth__eye:hover {
+    color: var(--acc);
+}
+
+.admin-auth__eye svg {
+    width: 18px;
+    height: 18px;
 }
 
 /* Onglets de l'admin : bascule rendez-vous / demandes. */
