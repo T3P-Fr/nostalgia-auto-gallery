@@ -86,6 +86,32 @@
 
 html {
     scroll-behavior: smooth;
+    /* Barre de défilement aux couleurs de la marque (Firefox). */
+    scrollbar-color: var(--acc) transparent;
+    scrollbar-width: thin;
+}
+
+/* Barre de défilement rouge (navigateurs WebKit/Chromium). */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--acc);
+    border-radius: 999px;
+    /* Marge transparente : le pouce paraît plus fin et détaché des bords. */
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--acc), white 15%);
+    background-clip: padding-box;
 }
 
 body {
@@ -252,6 +278,8 @@ img {
     color: #fff;
     font-family: "DM Serif Display", serif;
     text-transform: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
 }
 
 /* Point noir minuscule, réservé au lien actif. */
@@ -3187,12 +3215,6 @@ main::after {
    ========================================================================== */
 
 @media (max-width: 620px) {
-
-    /* Sur petit écran, le sous-titre du logo s'efface ; le bouton RDV reste géré
-       par le plein écran (.header-nav--open), inutile de le masquer ici. */
-    .brand__words {
-        display: none;
-    }
 
     .hero {
         min-height: 620px;
