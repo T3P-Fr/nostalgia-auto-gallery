@@ -11,7 +11,7 @@ import { Brand } from "./Brand.jsx";
  */
 export function FooterPage() {
     return (
-        <footer className="site-footer">
+        <footer className="site-footer bluredBackground--card">
             <div className="footer-grid container">
                 <div className="footer-about">
                     <Brand footer />

@@ -78,13 +78,30 @@ export default function BookingPage() {
 
     // Pré-cochage d'un besoin depuis l'URL : ?besoin=achat-vente|pieces|lavage, ou
     // ?service=… (liens des pages Tarifs/Detailing) qui ciblent forcément un lavage.
+    // Les liens des cartes de prestation passent aussi les niveaux de lavage à
+    // pré-sélectionner (?interieur=Platine&exterieur=…), pour ouvrir le RDV prêt.
     useEffect(() => {
         const requested = searchParams.get("besoin");
+        // Niveaux de lavage demandés dans l'URL (validés contre les paliers connus).
+        const presetFormula = {};
+        ["interieur", "exterieur", "meca"].forEach((key) => {
+            const level = searchParams.get(key);
+            if (level && formulaLevels.includes(level)) {
+                presetFormula[key] = level;
+            }
+        });
+        const hasPresetFormula = Object.keys(presetFormula).length > 0;
+
         // Sélection exclusive (radio) : on n'active que le besoin demandé.
         if (requested && needKeys.includes(requested)) {
             setBesoins({lavage: false, "achat-vente": false, pieces: false, [requested]: true});
-        } else if (searchParams.get("service")) {
+        } else if (searchParams.get("service") || hasPresetFormula) {
             setBesoins({lavage: true, "achat-vente": false, pieces: false});
+        }
+
+        // Pré-sélection des lavages correspondant à la prestation cliquée.
+        if (hasPresetFormula) {
+            setFormula((current) => ({...current, ...presetFormula}));
         }
     }, [searchParams]);
 
@@ -523,7 +540,7 @@ export default function BookingPage() {
                         <NeedTabs besoins={besoins} onToggle={toggleBesoin} />
                     )}
 
-                    <div className="card blureBackground--card booking-card">
+                    <div className="card bluredBackground--card booking-card">
                         {createdAppointment || createdLead ? (
                             <SuccessState
                                 appointment={createdAppointment}
@@ -695,7 +712,7 @@ export default function BookingPage() {
                     </div>
                 </div>
 
-                <aside className="card blureBackground--card contact-card">
+                <aside className="card bluredBackground--card contact-card">
                     <span className="overline">Contact direct</span>
                     <a href={site.phoneHref}>
                         <Phone />

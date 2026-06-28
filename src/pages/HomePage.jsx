@@ -6,11 +6,17 @@ import {
     ServiceCard,
     ZonePanel,
 } from "../components/Ui.jsx";
-import { icons, pages, services } from "../data.js";
+import { cheapestWashFrom, icons, pages, services } from "../data.js";
 
 // Contenu éditorial centralisé (cf. content.json → pages.home).
-const { hero, actions, stats, trust, heading, comparison, process, about, final } =
+const { hero, actions, stats: rawStats, trust, heading, comparison, process, about, final } =
     pages.home;
+
+// Le stat « soin esthétique » affiche dynamiquement le lavage le moins cher
+// (dérivé des tarifs), pour rester synchronisé avec content.pricing.
+const stats = rawStats.map((stat) =>
+    stat.label === "soin esthétique" ? { ...stat, value: cheapestWashFrom } : stat,
+);
 
 /**
  * Page d'accueil v3 : promesse, aperçu des formules, preuve avant/après,
@@ -32,7 +38,7 @@ export default function HomePage() {
             </PageHero>
 
             {/* Bandeau de réassurance. */}
-            <section className="trust-strip blureBackground--features">
+            <section className="trust-strip bluredBackground--features">
                 <div className="container trust-grid">
                     {trust.map((item) => {
                         const Icon = icons[item.icon];
@@ -53,7 +59,7 @@ export default function HomePage() {
                         <ServiceCard key={service.title} service={service} />
                     ))}
                 </div>
-                <div className="card blureBackground--card beyond-card">
+                <div className="card bluredBackground--card beyond-card">
                     <span>{heading.beyond.text}</span>
                     {/* Les deux piliers restent accessibles sans alourdir la section. */}
                     <div className="beyond-card__actions">
@@ -80,7 +86,7 @@ export default function HomePage() {
                     split
                 />
                 <BeforeAfterComparison />
-                <div className="card blureBackground--card beyond-card">
+                <div className="card bluredBackground--card beyond-card">
                     <ButtonLink size="small" to={comparison.to}>
                         {comparison.cta}
                     </ButtonLink>
@@ -88,7 +94,7 @@ export default function HomePage() {
             </section>
 
             {/* Déroulement d'une intervention en quatre étapes. */}
-            <section className="section--surface">
+            <section className="section--surface bluredBackground--features">
                 <div className="container">
                     <SectionHeading
                         overline={process.overline}
@@ -98,7 +104,7 @@ export default function HomePage() {
                         {process.steps.map((step) => {
                             const Icon = icons[step.icon];
                             return (
-                                <article className="card blureBackground--card service-card" key={step.title}>
+                                <article className="card bluredBackground--card service-card" key={step.title}>
                                     <span className="icon-tile">
                                         <Icon />
                                     </span>
@@ -116,7 +122,7 @@ export default function HomePage() {
 
             {/* Présentation « À propos » en bas de page → renvoie vers la page dédiée. */}
             <section className="container">
-                <article className="card blureBackground--card nav-card nav-card--wide">
+                <article className="card bluredBackground--card nav-card nav-card--wide">
                     <img src={about.image} alt="Corentin Jammes — Nostalgia Auto Gallery" />
                     <div className="content">
                         <span className="overline">{about.overline}</span>
@@ -131,7 +137,7 @@ export default function HomePage() {
 
             {/* Appel à l'action final. */}
             <section className="container">
-                <div className="card blureBackground--card beyond-card">
+                <div className="card bluredBackground--card beyond-card">
                     <strong>{final.title}</strong>
                     <span>{final.text}</span>
                     <ButtonLink size="small" to={final.to}>

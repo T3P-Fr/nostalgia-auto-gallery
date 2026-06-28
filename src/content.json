@@ -406,7 +406,7 @@
         },
         "detailing": {
             "hero": {
-                "image": "/assets/Peugeot205gti.webp",
+                "image": "/assets/Interieur--apres.webp",
                 "eyebrow": "Formules de detailing à domicile",
                 "title": "le bon soin,\nau bon *niveau*.",
                 "description": "De l’entretien régulier à la remise en état approfondie, chaque formule répond à un besoin précis. Tout est réalisé à la main, avec des produits adaptés à chaque surface du véhicule."
@@ -584,6 +584,11 @@
                     "label": "Scène complète",
                     "before": "/assets/AVANT_MEME_SCENE_MATIN_TRES_SALE_PHARES_FERMES.png",
                     "after": "/assets/AVANT_APRES_JOUR_APRES_ULTRA_CLEAN.png"
+                },
+                {
+                    "label": "Intérieur",
+                    "before": "/assets/Interieur--avant.webp",
+                    "after": "/assets/Interieur--apres.webp"
                 }
             ],
             "reviewsHeading": {
@@ -619,75 +624,6 @@
                 "to": "/contact"
             }
         },
-        "about": {
-            "hero": {
-                "image": "/assets/Detailling.webp",
-                "eyebrow": "À propos · Corentin Jammes",
-                "title": "la passion,\nmise à votre *service*.",
-                "description": "Nostalgia Auto Gallery est né à Parignargues d’une passion profonde pour l’automobile et du goût du travail réalisé avec soin."
-            },
-            "actions": [
-                {
-                    "label": "Échanger sur mon véhicule →",
-                    "to": "/contact"
-                }
-            ],
-            "heading": {
-                "overline": "Un interlocuteur unique",
-                "title": "vous échangez directement avec Corentin",
-                "description": "Je m’appelle Corentin Jammes et j’accompagne personnellement chaque demande, de la prise de contact jusqu’à la réalisation de la prestation. Cette proximité permet de mieux comprendre vos attentes et d’y répondre sans prestation inutile."
-            },
-            "cards": [
-                {
-                    "image": "/assets/context.jpg",
-                    "alt": "Intervention à domicile",
-                    "title": "Le soin, d’abord",
-                    "text": "Nettoyage intérieur, lavage extérieur, finitions et protections : chaque intervention vise un véhicule propre, agréable et mieux préservé.",
-                    "cta": "Voir le detailing →",
-                    "to": "/detailing"
-                },
-                {
-                    "image": "/assets/peugeot-front.jpg",
-                    "alt": "Peugeot 205 rouge préparée",
-                    "title": "La passion du détail",
-                    "text": "Chaque véhicule reçoit la même attention, qu’il s’agisse d’une voiture du quotidien, d’une ancienne ou d’un projet de passionné.",
-                    "cta": "Voir les réalisations →",
-                    "to": "/realisations"
-                }
-            ],
-            "surface": {
-                "heading": {
-                    "overline": "Pourquoi me faire confiance ?",
-                    "title": "trois engagements simples",
-                    "description": "Une même exigence guide chaque intervention."
-                },
-                "footerLabel": "Nostalgia",
-                "commitments": [
-                    {
-                        "title": "Expertise & rigueur",
-                        "description": "Une méthode de travail organisée, des prestations clairement expliquées et une attention constante portée aux détails.",
-                        "icon": "BadgeCheck"
-                    },
-                    {
-                        "title": "Passion automobile",
-                        "description": "Chaque véhicule reçoit la même considération, quels que soient son âge, sa valeur ou son usage.",
-                        "icon": "Heart"
-                    },
-                    {
-                        "title": "Proximité & mobilité",
-                        "description": "Basé à Parignargues, je me déplace à domicile dans le Gard et, selon le projet, dans les départements voisins.",
-                        "icon": "MapPin"
-                    }
-                ],
-                "beyond": {
-                    "icon": "Search",
-                    "title": "Au-delà du detailing",
-                    "text": "J’accompagne aussi des projets d’achat, de vente et de recherche de pièces automobiles. Chaque demande est étudiée individuellement.",
-                    "cta": "Découvrir le négoce →",
-                    "to": "/negoce"
-                }
-            }
-        },
         "booking": {
             "hero": {
                 "image": "/assets/Booking.webp",
@@ -721,7 +657,7 @@
         },
         "informations": {
             "hero": {
-                "image": "/assets/hero-night.jpg",
+                "image": "/assets/Corentin-Magnum.webp",
                 "eyebrow": "Informations",
                 "title": "informations &\nmentions *légales*.",
                 "description": "Éditeur, données personnelles et conditions de réservation du site Nostalgia Auto Gallery, réunis sur une seule page."

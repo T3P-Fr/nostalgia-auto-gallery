@@ -115,6 +115,9 @@ const exterieurFrom = minGroupPrice("exterieur");
 const lowestLevel = pricing.levels[0];
 const completeFrom =
     interieurFrom + exterieurFrom - (pricing.comboDiscounts[lowestLevel] || 0);
+
+// Prix d'appel du stat héros : le lavage le moins cher, tous groupes confondus.
+export const cheapestWashFrom = `dès ${Math.min(interieurFrom, exterieurFrom)} €`;
 // Prix d'appel par titre de prestation (repli sur la valeur du JSON si non géré).
 const serviceFromByTitle = {
     Intérieur: interieurFrom,
@@ -122,7 +125,19 @@ const serviceFromByTitle = {
     Complète: completeFrom,
 };
 
-// Prestations : icône (nom → composant) et prix d'appel dynamique.
+/*
+ * Lien de réservation par prestation : ouvre la page RDV sur l'onglet « lavage »
+ * avec le(s) lavage(s) correspondant(s) pré-sélectionné(s) au niveau le moins cher
+ * (premier palier). « Complète » pré-coche intérieur ET extérieur.
+ */
+const baseLevel = pricing.levels[0];
+const serviceBookingByTitle = {
+    Intérieur: `besoin=lavage&interieur=${baseLevel}`,
+    Extérieur: `besoin=lavage&exterieur=${baseLevel}`,
+    Complète: `besoin=lavage&interieur=${baseLevel}&exterieur=${baseLevel}`,
+};
+
+// Prestations : icône (nom → composant), prix d'appel dynamique et lien de réservation.
 export const services = content.services.map((service) => ({
     ...service,
     icon: icons[service.icon],
@@ -130,4 +145,7 @@ export const services = content.services.map((service) => ({
         serviceFromByTitle[service.title] != null
             ? `dès ${serviceFromByTitle[service.title]} €`
             : service.from,
+    to: serviceBookingByTitle[service.title]
+        ? `/contact?${serviceBookingByTitle[service.title]}`
+        : `/contact?service=${encodeURIComponent(service.title)}`,
 }));

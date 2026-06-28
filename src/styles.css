@@ -40,7 +40,7 @@
             var(--surface) calc(var(--veil-min) + (var(--veil-max) - var(--veil-min)) * var(--scroll-factor)),
             transparent);
     --surface: #0b0d10;
-    --surface2: #090e13;
+    --surface2: #0d1b29;
     --txt: #f5f7fa;
     --muted: #9ba8b7;
     --subtle: #687789;
@@ -67,30 +67,31 @@
     --radius: 8px;
     /* Rayons centralisés : changer ici se répercute sur toutes les cartes/sections
        (--radius-card) et tous les boutons (--radius-button). */
-    --radius-card: var(--radius);
     --radius-button: var(--radius);
+    --radius-card: calc(var(--radius) * 1.5);
 
     /* Gradient d'accentuation */
     --acc-gradient: linear-gradient(color-mix(in oklab, var(--red-primary) 32%, transparent), var(--surface));
 }
 
-/* Cible tout élément ayant une classe qui COMMENCE par « blureBackground »
-   (ex. blureBackground, blureBackground--red), où qu'elle soit dans l'attribut. */
-[class^="bluredBackground"] {
-    backdrop-filter: blur(50px);
+/* Cible tout élément ayant une classe qui COMMENCE par « bluredBackground »
+   (ex. bluredBackground, bluredBackground--red), où qu'elle soit dans l'attribut. */
+[class^="bluredBackground"],
+[class*=" bluredBackground"] {
+    backdrop-filter: blur(25px);
     background: linear-gradient(to bottom,
             var(--gradient-top),
             var(--gradient-bottom));
 }
 
-.blureBackground--features {
-    --gradient-top: color-mix(in oklab, var(--red-primary) 33% transparent);
-    --gradient-bottom: color-mix(in oklab, var(--surface) 75% transparent);
+.bluredBackground--features {
+    --gradient-top: color-mix(in oklab, var(--red-primary) 75%, transparent);
+    --gradient-bottom: color-mix(in oklab, var(--surface) 25%, transparent);
 }
 
-.blureBackground--card {
-    --gradient-top: color-mix(in oklab, black 66% transparent);
-    --gradient-bottom: color-mix(in oklab, var(--surface) 66% transparent);
+.bluredBackground--card {
+    --gradient-top: color-mix(in oklab, var(--surface2) 75%, transparent);
+    --gradient-bottom: color-mix(in oklab, var(--surface) 25%, transparent);
 }
 
 * {
@@ -211,6 +212,7 @@ img {
     background-color: color-mix(in oklab, var(--surface) 80%, transparent);
     backdrop-filter: blur(20px);
     mask-image: linear-gradient(0deg, transparent 5%, black 50%);
+    pointer-events: none;
 }
 
 .brand {
@@ -227,7 +229,14 @@ img {
 }
 
 .brand__image--footer {
-    height: 64px;
+    /* Emblème agrandi de 25 % dans le pied de page (64 → 80px). */
+    height: 80px;
+}
+
+/* Logo texte agrandi de 10 % dans le pied de page uniquement. */
+.site-footer .brand__words {
+    transform: scale(1.1);
+    transform-origin: left center;
 }
 
 .brand__words {
@@ -637,10 +646,6 @@ main::after {
    (cf. point 5 — rouge renforcé appliqué au bloc assurance). */
 .trust-strip {
     border-block: 0;
-    background-color: color-mix(in oklab, var(--red-primary) 50%, transparent);
-    backdrop-filter: blur(50px);
-    --gradient--color: var(--red-primary);
-    --gradient--shine: 16%;
     color: #fff;
 }
 
@@ -686,7 +691,7 @@ main::after {
 
 .section-heading {
     max-width: 650px;
-    margin-bottom: 38px;
+    margin: 4rem 0 1rem 0;
 }
 
 .section-heading--split {
@@ -751,7 +756,7 @@ main::after {
     border: 1px solid var(--line);
     border-top: 0;
     border-radius: 0 0 var(--radius-card) var(--radius-card);
-    /* Fond flou délégué à .blureBackground--card (toutes les cartes la portent),
+    /* Fond flou délégué à .bluredBackground--card (toutes les cartes la portent),
        pour que le variant pilote réellement dégradé + flou. */
 }
 
@@ -949,10 +954,8 @@ main::after {
 /* Bandeau de section pleine largeur : base bien rouge, contenu blanc, beaucoup
    d'espace en haut et en bas. */
 .section--surface {
-    background-color: var(--red-primary);
-    background-image: var(--shining-gradient);
-    --gradient--color: var(--red-primary);
-    --gradient--shine: 16%;
+    /* Fond délégué à .bluredBackground--features (même dégradé rouge que la home),
+       appliqué sur les sections via la classe : uniformité sur toutes les pages. */
     color: #fff;
     padding-block: 72px;
 }
@@ -1229,9 +1232,13 @@ main::after {
 
 /* Page Informations : pleine largeur du site (le .container fixe déjà la largeur),
    une section par document légal. */
+/* Documents légaux sur 2 colonnes (desktop), alignés en haut. Une seule colonne
+   sur téléphone. Le Hero n'est pas concerné (il est hors .legal-page). */
 .legal-page {
     display: grid;
-    gap: 56px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 48px 56px;
+    align-items: start;
 }
 
 .legal-section {
@@ -1239,8 +1246,15 @@ main::after {
     scroll-margin-top: 96px;
 }
 
-/* Petit trait de séparation au-dessus de chaque document (sauf le premier). */
-.legal-section:not(:first-child)::before {
+/* Téléphone : une seule colonne. */
+@media (max-width: 720px) {
+    .legal-page {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Liseré d'accent au-dessus de chaque document (cohérent sur les deux colonnes). */
+.legal-section::before {
     content: "";
     display: block;
     width: 56px;

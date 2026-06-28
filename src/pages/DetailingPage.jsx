@@ -52,7 +52,7 @@ export default function DetailingPage() {
                             const service = `${group.title} — ${tier.tier} · ${tier.price} €`;
                             return (
                                 <article
-                                    className={`card blureBackground--card price-card price-card--${tier.tier.toLowerCase()} ${tier.tier === "Premium" ? "price-card--featured" : ""}`}
+                                    className={`card bluredBackground--card price-card price-card--${tier.tier.toLowerCase()} ${tier.tier === "Premium" ? "price-card--featured" : ""}`}
                                     key={tier.tier}
                                 >
                                     <div className="price-card__top">
@@ -110,7 +110,7 @@ export default function DetailingPage() {
                     <div className="pricing-grid">
                         {mecaGroup.tiers.map((tier) => (
                             <article
-                                className={`card blureBackground--card price-card price-card--${tier.tier.toLowerCase()}`}
+                                className={`card bluredBackground--card price-card price-card--${tier.tier.toLowerCase()}`}
                                 key={tier.tier}
                             >
                                 <div className="price-card__top">
@@ -184,7 +184,7 @@ export default function DetailingPage() {
 
             {/* Section 5 — Appel à l'action final. */}
             <section className="container">
-                <div className="card blureBackground--card beyond-card">
+                <div className="card bluredBackground--card beyond-card">
                     <strong>{final.title}</strong>
                     <span>{final.text}</span>
                     <ButtonLink size="small" to={final.to}>

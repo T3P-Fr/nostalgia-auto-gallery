@@ -130,7 +130,7 @@ export function ServiceCard({ service }) {
     const Icon = service.icon;
 
     return (
-        <article className="card blureBackground--card service-card">
+        <article className="card bluredBackground--card service-card">
             <span className="icon-tile">
                 <Icon />
             </span>
@@ -141,7 +141,7 @@ export function ServiceCard({ service }) {
                 <ButtonLink
                     size="small"
                     variant="secondary"
-                    to={`/contact?service=${encodeURIComponent(service.title)}`}
+                    to={service.to ?? `/contact?service=${encodeURIComponent(service.title)}`}
                 >
                     Réserver
                 </ButtonLink>

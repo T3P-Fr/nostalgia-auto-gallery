@@ -34,7 +34,7 @@ export default function NegocePage() {
             </section>
 
             {/* Méthode d'accompagnement en quatre étapes. */}
-            <section className="section--surface">
+            <section className="section--surface bluredBackground--features">
                 <div className="container">
                     <SectionHeading {...methodHeading} />
                     <div className="service-grid">
@@ -42,7 +42,7 @@ export default function NegocePage() {
                             const Icon = icons[step.icon];
 
                             return (
-                                <article className="card blureBackground--card service-card" key={step.title}>
+                                <article className="card bluredBackground--card service-card" key={step.title}>
                                     <span className="icon-tile">
                                         <Icon />
                                     </span>
@@ -60,7 +60,7 @@ export default function NegocePage() {
 
             {/* Véhicules disponibles / appel à confier une recherche. */}
             <section className="container">
-                <div className="card blureBackground--card beyond-card">
+                <div className="card bluredBackground--card beyond-card">
                     <span className="icon-tile">
                         <BeyondIcon />
                     </span>

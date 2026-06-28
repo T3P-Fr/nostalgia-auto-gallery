@@ -141,12 +141,12 @@ export default function GalleryPage() {
             </section>
 
             {/* Avis clients authentiques. */}
-            <section className="section--surface">
+            <section className="section--surface bluredBackground--features">
                 <div className="container">
                     <SectionHeading {...reviewsHeading} />
                     <div className="service-grid">
                         {reviews.map((review) => (
-                            <article className="card blureBackground--card review-card" key={review.author}>
+                            <article className="card bluredBackground--card review-card" key={review.author}>
                                 <p className="review-card__quote">« {review.quote} »</p>
                                 <div className="review-card__author">
                                     <strong>{review.author}</strong>
@@ -160,7 +160,7 @@ export default function GalleryPage() {
 
             {/* Note de précision et transparence. */}
             <section className="container">
-                <div className="card blureBackground--card beyond-card">
+                <div className="card bluredBackground--card beyond-card">
                     <strong>{transparency.title}</strong>
                     <span>{transparency.text}</span>
                 </div>
@@ -168,7 +168,7 @@ export default function GalleryPage() {
 
             {/* Appel à l'action final. */}
             <section className="container">
-                <div className="card blureBackground--card beyond-card">
+                <div className="card bluredBackground--card beyond-card">
                     <strong>{final.title}</strong>
                     <span>{final.text}</span>
                     <ButtonLink size="small" to={final.to}>
