@@ -28,6 +28,7 @@ export default function FormulaCategory({
     const isMeca = category.key === "meca";
     // Prestations incluses propres à CETTE catégorie, sous ses boutons.
     const features = collectFeatures([category], formula);
+    const hasFeatures = features.length > 0;
     // Accordéon « Détail » : les prestations sont repliées par défaut (on les dévoile
     // au clic, façon résumé), pour garder la grille de prix compacte.
     const [detailOpen, setDetailOpen] = useState(false);
@@ -39,7 +40,7 @@ export default function FormulaCategory({
                 regroupés en bout de ligne, à droite. */}
             <div className="formula-cat__top">
                 {!isMeca && <span className="formula-cat__label">{category.label}</span>}
-                {features.length > 0 && (
+                {hasFeatures && (
                     <button
                         type="button"
                         className="formula-detail__head"

@@ -39,6 +39,10 @@ export function HeaderPage() {
         top: 0,
         bottom: 0,
     });
+    // L'indicateur (pilule rouge) n'est visible que sur une page DU menu : sur les
+    // pages absentes de la nav (Informations, Contact, Admin…), aucun lien n'est
+    // actif → on le masque au lieu de le coller à tort sous le premier lien.
+    const [isIndicatorVisible, setIsIndicatorVisible] = useState(false);
     const navRef = useRef(null);
     const navIndicatorRef = useRef({
         left: 0,
@@ -69,10 +73,9 @@ export function HeaderPage() {
          * @returns {{ left: number, right: number, top: number, bottom: number, initialized: true } | null} Position, ou null si aucun lien.
          */
         function measureTarget() {
-            // À défaut de lien actif (ex. page d'accueil), on cadre l'indicateur sur
-            // le premier lien plutôt que de le laisser couvrir toute la barre.
-            const activeLink =
-                navigation.querySelector("a.active") || navigation.querySelector("a");
+            // Seul un lien réellement actif cible l'indicateur : sans lien actif
+            // (page hors menu), on renvoie null et l'indicateur sera masqué.
+            const activeLink = navigation.querySelector("a.active");
 
             if (!activeLink) {
                 return null;
@@ -103,10 +106,12 @@ export function HeaderPage() {
             const target = measureTarget();
 
             if (!target) {
+                setIsIndicatorVisible(false);
                 return;
             }
 
             navIndicatorRef.current = target;
+            setIsIndicatorVisible(true);
             setNavIndicator({
                 left: target.left,
                 right: target.right,
@@ -127,8 +132,14 @@ export function HeaderPage() {
             const target = measureTarget();
 
             if (!target) {
+                // Page hors menu : on masque l'indicateur et on « désinitialise » la
+                // mémoire pour qu'il réapparaisse net sous le bon lien au retour.
+                setIsIndicatorVisible(false);
+                navIndicatorRef.current = { ...navIndicatorRef.current, initialized: false };
                 return;
             }
+
+            setIsIndicatorVisible(true);
 
             const current = navIndicatorRef.current;
 
@@ -258,7 +269,7 @@ export function HeaderPage() {
                 className={`site-nav ${isMenuOpen ? "site-nav--open" : ""}`}
             >
                 <span
-                    className="site-nav__indicator"
+                    className={`site-nav__indicator${isIndicatorVisible ? "" : " is-hidden"}`}
                     style={{
                         left: `${navIndicator.left}px`,
                         right: `${navIndicator.right}px`,
