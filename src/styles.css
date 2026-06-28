@@ -135,20 +135,20 @@ img {
 
 /* En-tête collant. Le voile flouté est porté par ::before (ci-dessous) afin de
    déborder légèrement et de s'estomper vers le bas via un masque. */
-.site-header {
+.header-nav {
     position: sticky;
     top: 0;
     z-index: 50;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
+    gap: 0px;
     padding: 14px 32px;
 }
 
 /* Voile flouté sous l'en-tête : surface semi-transparente + flou d'arrière-plan,
    estompé vers le bas par un masque dégradé. (color-mix exige « in srgb ».) */
-.site-header::before {
+.header-nav::before {
     content: "";
     position: absolute;
     z-index: -1;
@@ -202,37 +202,68 @@ img {
     letter-spacing: 0.34em;
 }
 
-/* L'indicateur est unique afin de relier visuellement deux liens pendant le trajet. */
+/* « Segment » : piste givrée arrondie contenant les liens. La pilule rouge (indicateur)
+   unique glisse d'un lien à l'autre, reliant visuellement les deux pendant le trajet. */
 .site-nav {
     position: relative;
     display: flex;
     align-items: center;
+    gap: 2px;
+    padding: 5px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--surface) 60%, transparent);
+    border: 1px solid color-mix(in srgb, var(--txt) 8%, transparent);
 }
 
 .site-nav a {
-    padding: 10px 13px;
+    /* Au-dessus de la pilule pour que le texte reste lisible par-dessus le rouge. */
+    position: relative;
+    z-index: 1;
+    padding: 10px 16px;
+    border-radius: 999px;
     color: var(--muted);
-    font-size: 13px;
-    font-weight: 600;
+    /* Liens en police Display (serif), comme le titre de page. */
+    font-family: "DM Serif Display", serif;
+    font-size: 15px;
     text-decoration: none;
-    /* Les deux menus (desktop + tiroir mobile) affichent les liens en majuscules. */
-    text-transform: uppercase;
     transition: color 180ms ease;
 }
 
-.site-nav__indicator {
-    position: absolute;
-    top: 0;
-    height: var(--nav-accent-height);
-    background: var(--acc);
-    pointer-events: none;
-    transition: left 300ms var(--ease-out),
-        right 300ms var(--ease-out);
+/* Point minuscule collé à la fin de chaque lien : blanc au repos. */
+.site-nav a::after {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    margin-left: 3px;
+    border-radius: 50%;
+    background: #fff;
+    vertical-align: baseline;
 }
 
-.site-nav a:hover,
-.site-nav a.active {
+/* Pilule rouge : épouse la boîte du lien actif (les quatre côtés sont pilotés en JS)
+   et glisse vers la page courante, horizontalement en desktop, verticalement en mobile. */
+.site-nav__indicator {
+    position: absolute;
+    z-index: 0;
+    border-radius: 999px;
+    background: var(--acc);
+    pointer-events: none;
+    transition: left 300ms var(--ease-out), right 300ms var(--ease-out),
+        top 300ms var(--ease-out), bottom 300ms var(--ease-out);
+}
+
+.site-nav a:hover {
     color: var(--txt);
+}
+
+/* Lien de la page courante : texte blanc sur la pilule rouge, point noir. */
+.site-nav a.active {
+    color: #fff;
+}
+
+.site-nav a.active::after {
+    background: #000;
 }
 
 /* La préférence système neutralise seulement l'animation propre au menu. */
@@ -261,10 +292,24 @@ img {
     color: var(--txt);
 }
 
-/* CTA du tiroir mobile : masqué par défaut, affiché en bas du menu uniquement
-   quand le bouton « Prendre RDV » de l'en-tête disparaît (≤620px). */
-.site-nav__cta {
+/* Titre de page actif : réservé au mode téléphone, masqué sur grand écran. */
+.header-page-title {
     display: none;
+    font-family: "DM Serif Display", serif;
+    font-size: 18px;
+    color: var(--txt);
+}
+
+/* Point rouge minuscule collé à la fin du titre (rappel de l'accent de la marque). */
+.header-page-title::after {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    margin-left: 2px;
+    border-radius: 50%;
+    background: var(--acc);
+    vertical-align: baseline;
 }
 
 /* ==========================================================================
@@ -3001,43 +3046,70 @@ main::after {
         width: min(100% - 32px, 1180px);
     }
 
-    .site-header {
+    .header-nav {
         flex-wrap: wrap;
         padding: 10px 16px;
     }
 
-    /* Ordre mobile imposé : Logo … bouton ROUGE (RDV) puis bouton MENU (à droite). */
-    .header-actions {
-        order: 2;
+    /* Logo (gauche) et bouton menu (droite) restent au-dessus du voile plein écran. */
+    .brand {
+        position: relative;
+        z-index: 60;
+    }
+
+    /* Poussé à droite, juste à gauche du bouton menu, pour signaler la page courante. */
+    .header-page-title {
+        display: inline-block;
         margin-left: auto;
+        position: relative;
+        z-index: 60;
     }
 
     .menu-button {
         display: block;
-        order: 3;
         margin-left: 12px;
         /* Au-dessus du panneau (z-index 50) pour rester cliquable et fermer le menu. */
         position: relative;
         z-index: 60;
     }
 
-    /* Menu mobile : panneau qui glisse depuis la droite vers le centre,
-       occupant 80% de la largeur, liens empilés en colonne. */
+    /* Bouton RDV masqué dans la barre repliée ; il réapparaît en bas du plein écran. */
+    .header-actions {
+        display: none;
+    }
+
+    .header-nav--open .header-actions {
+        display: flex;
+        position: fixed;
+        z-index: 55;
+        left: 24px;
+        right: 24px;
+        bottom: 32px;
+        justify-content: center;
+    }
+
+    .header-nav--open .header-actions .button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Menu mobile plein écran : panneau givré qui glisse depuis la droite,
+       liens empilés en colonne avec la pilule rouge qui coulisse verticalement. */
     .site-nav {
         display: flex;
         position: fixed;
-        top: 0;
-        right: 0;
+        inset: 0;
         z-index: 50;
-        width: 80%;
+        width: 100%;
         height: 100vh;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        /* Beaucoup d'air entre les liens : la barre rouge appartient clairement
-           au lien qu'elle surmonte. */
-        gap: 26px;
+        gap: 12px;
         padding: 24px;
+        /* La piste « segment » du desktop laisse place au fond plein écran. */
+        border: 0;
+        border-radius: 0;
         /* Fond identique à la carte (givré, surface semi-transparente). */
         background: color-mix(in srgb, var(--surface), transparent 50%);
         backdrop-filter: blur(100px);
@@ -3051,25 +3123,12 @@ main::after {
         transform: translateX(0);
     }
 
-    /* Liens centrés, largeur du texte (pas pleine largeur), plus gros que desktop.
-       Barre rouge réservée en haut (transparente) pour éviter tout décalage. */
+    /* Liens centrés, plus gros que desktop ; la pilule rouge épouse chaque lien. */
     .site-nav a {
         width: auto;
         text-align: center;
         font-size: 18px;
-        padding: 14px 16px;
-        border-top: var(--nav-accent-height) solid transparent;
-    }
-
-    /* Page en cours : barre rouge AU-DESSUS du lien, largeur du lien (= texte),
-       exactement comme l'indicateur du menu desktop. */
-    .site-nav a.active {
-        color: var(--txt);
-        border-top-color: var(--acc);
-    }
-
-    .site-nav__indicator {
-        display: none;
+        padding: 14px 22px;
     }
 
     .header-phone {
@@ -3133,19 +3192,10 @@ main::after {
 
 @media (max-width: 620px) {
 
-    .brand__words,
-    .header-actions .button {
+    /* Sur petit écran, le sous-titre du logo s'efface ; le bouton RDV reste géré
+       par le plein écran (.header-nav--open), inutile de le masquer ici. */
+    .brand__words {
         display: none;
-    }
-
-    /* Le bouton RDV d'en-tête disparaît → on le replace au bas du tiroir mobile. */
-    .site-nav__cta {
-        display: inline-flex;
-        position: absolute;
-        bottom: 32px;
-        left: 24px;
-        right: 24px;
-        justify-content: center;
     }
 
     .hero {

@@ -11,6 +11,18 @@ import { ButtonLink } from "./Ui.jsx";
  */
 const INDICATOR_SETTLE_MS = 320;
 
+/*
+ * Libellé de page affiché à côté du bouton menu en mode téléphone. La clé est le
+ * chemin exact de l'URL ; un repli sur « Accueil » couvre la racine et l'inconnu.
+ */
+const PAGE_TITLES = {
+    "/": "Accueil",
+    "/negoce": "Négoce",
+    "/detailing": "Detailing",
+    "/realisations": "Réalisations",
+    "/contact": "Prendre RDV",
+};
+
 /**
  * En-tête fixe : logo, navigation principale (avec indicateur animé) et actions.
  *
@@ -21,9 +33,20 @@ const INDICATOR_SETTLE_MS = 320;
  */
 export function HeaderPage() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [navIndicator, setNavIndicator] = useState({ left: 0, right: 0 });
+    const [navIndicator, setNavIndicator] = useState({
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+    });
     const navRef = useRef(null);
-    const navIndicatorRef = useRef({ left: 0, right: 0, initialized: false });
+    const navIndicatorRef = useRef({
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        initialized: false,
+    });
     const navAnimationTimerRef = useRef(null);
     const isNavIndicatorAnimatingRef = useRef(false);
     const location = useLocation();
@@ -38,8 +61,12 @@ export function HeaderPage() {
         }
 
         /**
-         * Mesure la position du lien à cibler, avec repli sur le premier lien.
-         * @returns {{ left: number, right: number, initialized: true } | null} Position, ou null si aucun lien.
+         * Mesure la boîte du lien à cibler (les quatre côtés), avec repli sur le premier lien.
+         *
+         * On renvoie left/right ET top/bottom : la pilule épouse exactement la boîte du lien
+         * sur les deux axes. En desktop (liens en ligne) seuls left/right varient → glissement
+         * horizontal ; en mobile (liens en colonne) seuls top/bottom varient → glissement vertical.
+         * @returns {{ left: number, right: number, top: number, bottom: number, initialized: true } | null} Position, ou null si aucun lien.
          */
         function measureTarget() {
             // À défaut de lien actif (ex. page d'accueil), on cadre l'indicateur sur
@@ -57,6 +84,8 @@ export function HeaderPage() {
             return {
                 left: activeLinkBounds.left - navigationBounds.left,
                 right: navigationBounds.right - activeLinkBounds.right,
+                top: activeLinkBounds.top - navigationBounds.top,
+                bottom: navigationBounds.bottom - activeLinkBounds.bottom,
                 initialized: true,
             };
         }
@@ -78,11 +107,20 @@ export function HeaderPage() {
             }
 
             navIndicatorRef.current = target;
-            setNavIndicator({ left: target.left, right: target.right });
+            setNavIndicator({
+                left: target.left,
+                right: target.right,
+                top: target.top,
+                bottom: target.bottom,
+            });
         }
 
         /**
-         * Étire la barre jusqu'au nouveau lien, puis la resserre sous celui-ci.
+         * Étire la pilule jusqu'au nouveau lien, puis la resserre sur celui-ci.
+         *
+         * L'effet en deux temps s'applique sur l'axe du déplacement : horizontal en
+         * desktop (left/right), vertical en mobile (top/bottom). On détecte l'axe en
+         * comparant l'amplitude du mouvement sur chacun.
          * @returns {void} Aucune valeur de retour.
          */
         function animateNavIndicator() {
@@ -94,29 +132,86 @@ export function HeaderPage() {
 
             const current = navIndicatorRef.current;
 
-            // Au premier affichage, la barre apparaît directement sous le lien actif.
+            // Au premier affichage, la pilule apparaît directement sous le lien actif.
             if (!current.initialized) {
                 navIndicatorRef.current = target;
-                setNavIndicator({ left: target.left, right: target.right });
+                setNavIndicator({
+                    left: target.left,
+                    right: target.right,
+                    top: target.top,
+                    bottom: target.bottom,
+                });
                 return;
             }
 
-            // Un bord reste fixe pendant que l'autre rejoint le nouvel élément.
-            const movesLeft = target.left < current.left;
-            const stretched = movesLeft
-                ? { left: target.left, right: current.right, initialized: true }
-                : { left: current.left, right: target.right, initialized: true };
+            // L'axe dominant du déplacement décide quel couple de bords s'étire.
+            const horizontalMove =
+                Math.abs(target.left - current.left) +
+                Math.abs(target.right - current.right);
+            const verticalMove =
+                Math.abs(target.top - current.top) +
+                Math.abs(target.bottom - current.bottom);
+
+            let stretched;
+
+            if (verticalMove > horizontalMove) {
+                // Glissement vertical (mobile) : un bord haut/bas reste fixe.
+                const movesUp = target.top < current.top;
+                stretched = movesUp
+                    ? {
+                          left: target.left,
+                          right: target.right,
+                          top: target.top,
+                          bottom: current.bottom,
+                          initialized: true,
+                      }
+                    : {
+                          left: target.left,
+                          right: target.right,
+                          top: current.top,
+                          bottom: target.bottom,
+                          initialized: true,
+                      };
+            } else {
+                // Glissement horizontal (desktop) : un bord gauche/droite reste fixe.
+                const movesLeft = target.left < current.left;
+                stretched = movesLeft
+                    ? {
+                          left: target.left,
+                          right: current.right,
+                          top: target.top,
+                          bottom: target.bottom,
+                          initialized: true,
+                      }
+                    : {
+                          left: current.left,
+                          right: target.right,
+                          top: target.top,
+                          bottom: target.bottom,
+                          initialized: true,
+                      };
+            }
 
             window.clearTimeout(navAnimationTimerRef.current);
             isNavIndicatorAnimatingRef.current = true;
             navIndicatorRef.current = stretched;
-            setNavIndicator({ left: stretched.left, right: stretched.right });
+            setNavIndicator({
+                left: stretched.left,
+                right: stretched.right,
+                top: stretched.top,
+                bottom: stretched.bottom,
+            });
 
-            // Le bord opposé se referme ensuite sur la largeur exacte du lien choisi.
+            // Le bord opposé se referme ensuite sur la boîte exacte du lien choisi.
             navAnimationTimerRef.current = window.setTimeout(() => {
                 isNavIndicatorAnimatingRef.current = false;
                 navIndicatorRef.current = target;
-                setNavIndicator({ left: target.left, right: target.right });
+                setNavIndicator({
+                    left: target.left,
+                    right: target.right,
+                    top: target.top,
+                    bottom: target.bottom,
+                });
             }, INDICATOR_SETTLE_MS);
         }
 
@@ -144,8 +239,12 @@ export function HeaderPage() {
     }
 
     return (
-        <header className="site-header">
+        <header className={`header-nav ${isMenuOpen ? "header-nav--open" : ""}`}>
             <Brand />
+            {/* Titre de la page active, visible seulement en mode téléphone près du menu. */}
+            <span className="header-page-title" aria-hidden="true">
+                {PAGE_TITLES[location.pathname] ?? "Accueil"}
+            </span>
             <button
                 className="menu-button"
                 type="button"
@@ -163,6 +262,8 @@ export function HeaderPage() {
                     style={{
                         left: `${navIndicator.left}px`,
                         right: `${navIndicator.right}px`,
+                        top: `${navIndicator.top}px`,
+                        bottom: `${navIndicator.bottom}px`,
                     }}
                     aria-hidden="true"
                 />
@@ -178,18 +279,10 @@ export function HeaderPage() {
                 <NavLink to="/realisations" onClick={closeMenu}>
                     Réalisations
                 </NavLink>
-                {/* CTA repris au bas du tiroir mobile quand il disparaît de l'en-tête. */}
-                <ButtonLink
-                    className="site-nav__cta"
-                    size="small"
-                    to="/contact"
-                    onClick={closeMenu}
-                >
-                    Prendre RDV
-                </ButtonLink>
             </nav>
+            {/* Bouton RDV unique : à droite en desktop, déplacé en bas du plein écran en mobile. */}
             <div className="header-actions">
-                <ButtonLink size="small" to="/contact">
+                <ButtonLink size="small" to="/contact" onClick={closeMenu}>
                     Prendre RDV
                 </ButtonLink>
             </div>
