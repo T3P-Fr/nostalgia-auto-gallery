@@ -36,9 +36,17 @@ export default function ResumePanel({ hasFormula, selectedDate, slotRange, prici
                 <h3 className="panel-resume__title">
                     Résumé<span className="panel-resume__dot">.</span>
                 </h3>
-                {selectedDate && (
+                {/* Date + créneau toujours présents dès que le résumé est actif
+                    (une formule est choisie OU une date posée), avec un repère « — »
+                    tant que la sélection n'est pas faite : ils ne « disparaissent »
+                    plus entre deux étapes du parcours. */}
+                {(hasFormula || selectedDate) && (
                     <span className="panel-resume__when">
-                        <span>{new Date(`${selectedDate}T12:00:00`).toLocaleDateString("fr-FR")}</span>
+                        <span>
+                            {selectedDate
+                                ? new Date(`${selectedDate}T12:00:00`).toLocaleDateString("fr-FR")
+                                : "—"}
+                        </span>
                         <span>{slotRange}</span>
                     </span>
                 )}

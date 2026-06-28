@@ -7,8 +7,8 @@
     /* Deux nuances de rouge : l'accent principal et une variante claire. */
     --red-primary: #b81e29;
     --red-light: #df5660;
-    --bg: #080f18;
-    --bg2: #0d1722;
+    --bg: #000000;
+    --bg2: #000000;
     /* Système de défilement global. Le JS n'écrit que deux MESURES BRUTES (nombres
        sans unité, px sous-entendu) : --scroll-position et --page-height. La hauteur
        d'écran se dérive en CSS (pas besoin de la stocker en JS) ; tout le reste
@@ -39,13 +39,18 @@
     --veil: color-mix(in srgb,
             var(--surface) calc(var(--veil-min) + (var(--veil-max) - var(--veil-min)) * var(--scroll-factor)),
             transparent);
-    --surface: #121e2a;
-    --surface2: #0e1924;
+    --surface: #0b0d10;
+    --surface2: #090e13;
     --txt: #f5f7fa;
     --muted: #9ba8b7;
     --subtle: #687789;
     --line: rgba(255, 255, 255, 0.09);
     --acc: var(--red-primary);
+    /* Couleurs d'identité des niveaux de detailing, calquées sur leur icône :
+       Platine = bronze (étoile), Premium = argent (diamant), Deluxe = or (couronne). */
+    --tier-platine: #c08a3e;
+    --tier-premium: #9aa6b4;
+    --tier-deluxe: #e0b020;
     --ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
     /* Hauteur partagée : même liseré/barre d'accent partout (nav, cartes). */
     --nav-accent-height: 4px;
@@ -254,7 +259,7 @@ img {
     font-weight: 600;
     text-transform: uppercase;
     text-decoration: none;
-    transition: color 180ms ease;
+    transition: color 150ms ease;
 }
 
 /* Pilule rouge : épouse la boîte du lien actif (les quatre côtés sont pilotés en JS)
@@ -326,6 +331,7 @@ img {
     font-family: "DM Serif Display", serif;
     font-size: 18px;
     color: var(--txt);
+    text-transform: uppercase;
 }
 
 /* Point rouge minuscule collé à la fin du titre (rappel de l'accent de la marque). */
@@ -508,6 +514,11 @@ main::after {
     flex-direction: column;
     align-items: flex-start;
     text-align: left;
+    width: 65%;
+
+    @media (max-width: 720px) {
+        width: 100%;
+    }
 }
 
 .hero__content h1 {
@@ -1503,10 +1514,21 @@ main::after {
     padding: 25px;
 }
 
-.price-card--featured {
-    /* La formule Premium reçoit un contraste discret sans animation de carte. */
-    border-color: color-mix(in srgb, var(--red-primary) 65%, transparent);
+/* Couleur d'identité de la carte, calquée sur l'icône du niveau. */
+.price-card--platine {
+    --level-color: var(--tier-platine);
 }
+
+.price-card--premium {
+    --level-color: var(--tier-premium);
+}
+
+.price-card--deluxe {
+    --level-color: var(--tier-deluxe);
+}
+
+/* Les 3 cartes partagent la même bordure neutre (cf. .card) : la Premium n'est
+   plus distinguée par sa bordure, pour une grille homogène. */
 
 .price-card__top {
     display: flex;
@@ -1514,8 +1536,37 @@ main::after {
     justify-content: space-between;
 }
 
-.price-card__top>strong {
-    color: var(--acc);
+/* Icône + nom du niveau regroupés à gauche de l'en-tête de carte. */
+.price-card__ident {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Groupe d'icônes répétées d'un niveau (1 étoile / 2 diamants / 3 couronnes). */
+.tier-badges {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    flex: none;
+}
+
+/* Pastille illustrant le niveau (étoile/diamant/couronne). */
+.tier-badge {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    flex: none;
+}
+
+/* Version compacte dans les boutons de formule du formulaire de réservation. */
+.tier-badge--sm {
+    width: 17px;
+    height: 17px;
+}
+
+.price-card__top>.price-card__ident>strong {
+    color: var(--level-color, var(--acc));
     font-size: 13px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -1875,6 +1926,17 @@ main::after {
     border-radius: 50%;
     background: transparent;
     font-size: 13px;
+}
+
+/* Jours des mois précédent/suivant : très estompés, non interactifs (repère visuel). */
+.cal-cell--outside {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    color: color-mix(in srgb, var(--txt) 14%, transparent);
+    font-size: 13px;
+    pointer-events: none;
 }
 
 .calendar-grid button:hover:not(:disabled),
@@ -2394,15 +2456,15 @@ main::after {
    formulaire pour être PARTAGÉE par les en-têtes de colonnes, les boutons ET les
    pills de prestations : changez --level-color pour recolorer un niveau partout. */
 .booking-form .platine {
-    --level-color: #101216;
+    --level-color: var(--tier-platine);
 }
 
 .booking-form .premium {
-    --level-color: var(--acc);
+    --level-color: var(--tier-premium);
 }
 
 .booking-form .deluxe {
-    --level-color: var(--acc);
+    --level-color: var(--tier-deluxe);
 }
 
 /* Prix cliquable (bascule). Survol = bordure du niveau ; sélection = fond du niveau. */
@@ -2433,19 +2495,21 @@ main::after {
     color: var(--level-color);
 }
 
-/* Sélectionné : tout le texte passe en blanc (cf. .is-selected). */
+/* Sélectionné : tout le texte passe en sombre (cf. .is-selected). */
 .formula-price.is-selected .formula-price__level {
-    color: #fff;
+    color: #14181d;
 }
 
 .formula-price:hover:not(:disabled) {
     border-color: var(--level-color, var(--acc));
 }
 
+/* Sélectionné : fond à la couleur du niveau. Texte sombre car les teintes
+   métalliques (or/argent/bronze) sont claires et lisent mal avec du blanc. */
 .formula-price.is-selected {
     border-color: var(--level-color, var(--acc));
     background: var(--level-color, var(--acc));
-    color: #fff;
+    color: #14181d;
 }
 
 .formula-price:disabled {
@@ -2462,22 +2526,51 @@ main::after {
     text-decoration: line-through;
 }
 
+/* Bouton « offert » mis en valeur : liseré et lueur verts pour le repérer d'un coup d'œil. */
+.formula-price.is-offered {
+    border-color: #19c37d;
+    box-shadow: 0 0 0 1px #19c37d, 0 0 16px #19c37d;
+}
+
 .formula-price.is-offered::after {
     content: "Offert";
     position: absolute;
-    top: 7px;
-    right: -24px;
-    width: 86px;
-    padding: 2px 0;
+    top: 1em;
+    right: -22px;
+    width: 80px;
+    padding: 0.3em 0;
     transform: rotate(45deg);
-    background: #2b9d5f;
-    color: #fff;
-    font-size: 8px;
-    font-weight: 800;
-    letter-spacing: 0.06em;
+    /* Vert plus vif + dégradé pour un ruban net et lumineux. */
+    background: linear-gradient(180deg, #21d989, #11a368);
+    color: #000000;
+    font-size: 0.75em;
+    font-weight: 900;
+    letter-spacing: 0.03em;
     text-align: center;
     text-decoration: none;
     text-transform: uppercase;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.4);
+    /* Léger battement pour accrocher le regard. */
+    animation: offert-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes offert-pulse {
+
+    0%,
+    100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(1.18);
+    }
+}
+
+/* Respect de la préférence système : pas de battement. */
+@media (prefers-reduced-motion: reduce) {
+    .formula-price.is-offered::after {
+        animation: none;
+    }
 }
 
 /* Prestations incluses, sous forme de pills. */
@@ -2488,13 +2581,17 @@ main::after {
     margin: 8px 0 14px;
 }
 
+/* Pill teintée à la couleur de son niveau (--level-color, posée par .platine/.premium/
+   .deluxe). Hors contexte de niveau (ex. galerie Avant/Après), repli sur l'accent rouge. */
 .pill {
     padding: 5px 11px;
-    border: 1px solid color-mix(in srgb, var(--acc) 40%, var(--line));
+    border: 1px solid color-mix(in srgb, var(--level-color, var(--acc)) 50%, var(--line));
     border-radius: 999px;
-    background: color-mix(in srgb, var(--acc) 12%, transparent);
-    font-size: 11px;
-    font-weight: 600;
+    background: color-mix(in srgb, var(--level-color, var(--acc)) 14%, transparent);
+    color: color-mix(in srgb, var(--level-color, var(--acc)) 55%, var(--txt));
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.05em;
 }
 
 /* Options à cocher (ajoutées au total). */
