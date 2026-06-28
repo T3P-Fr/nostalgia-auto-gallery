@@ -1,5 +1,6 @@
 import { formulaLevels } from "../../data.js";
 import { collectFeatures } from "../../utils/bookingHelpers.js";
+import { TierBadges } from "../TierBadges.jsx";
 
 /**
  * Rend une catégorie de la grille : titre, 3 prix cliquables et ses prestations
@@ -28,7 +29,10 @@ export default function FormulaCategory({
 
     return (
         <div className="formula-cat">
-            <span className="formula-cat__label">{category.label}</span>
+            {/* Le label de catégorie est masqué pour la méca : son intitulé
+                « Révision de base » est déjà porté par le titre du panneau parent
+                (on évite ainsi un titre affiché en double). */}
+            {!isMeca && <span className="formula-cat__label">{category.label}</span>}
             <div className="formula-grid__line">
                 {formulaLevels.map((level) => {
                     const selected = formula[category.key] === level;
@@ -52,12 +56,12 @@ export default function FormulaCategory({
                             className={`formula-price ${level.toLowerCase()}${selected ? " is-selected" : ""}${offered ? " is-offered" : ""}`}
                             onClick={() => onToggle(category.key, level)}
                         >
-                            {/* Qualité de l'intervention puis prix. Quand le palier est
-                                OFFERT (méca offerte), on n'affiche aucun prix (pas barré). */}
+                            {/* Icônes + qualité puis prix. Le prix reste affiché même
+                                quand le palier est OFFERT (barré via .is-offered) afin que
+                                le bouton garde la même taille que les autres. */}
+                            <TierBadges tier={level} small />
                             <span className="formula-price__level">{level}</span>
-                            {!offered && (
-                                <span className="formula-price__amount">{category.prices[level]} €</span>
-                            )}
+                            <span className="formula-price__amount">{category.prices[level]} €</span>
                         </button>
                     );
                 })}
@@ -67,7 +71,10 @@ export default function FormulaCategory({
             {features.length > 0 && (
                 <div className="formula-pills">
                     {features.map((feature) => (
-                        <span className="pill" key={feature.key}>
+                        <span
+                            className={`pill ${feature.level.toLowerCase()}`}
+                            key={feature.key}
+                        >
                             {feature.label}
                         </span>
                     ))}

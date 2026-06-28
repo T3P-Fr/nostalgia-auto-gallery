@@ -118,26 +118,42 @@ export function toLocalIso(date) {
 const CALENDAR_CELLS = 42;
 
 /**
- * Construit les cellules du mois, lundi étant le premier jour. La grille est toujours
- * complétée à 6 lignes (42 cellules) par des cases vides en tête ET en queue.
+ * Construit les cellules du mois, lundi étant le premier jour. La grille fait toujours
+ * 6 lignes (42 cellules) : les cases en tête et en queue sont COMBLÉES par les jours
+ * réels des mois précédent et suivant (marqués `outside`), affichés en très léger et
+ * non interactifs — simple repère visuel pour une grille pleine et stable.
  * @param {Date} monthDate Mois actuellement affiché.
- * @returns {Array<object|null>} 42 cellules (null = case de remplissage).
+ * @returns {Array<{ date: Date, iso: string, outside: boolean }>} 42 cellules.
  */
 export function buildCalendar(monthDate) {
     const year = monthDate.getFullYear();
     const month = monthDate.getMonth();
     const leadingEmptyCells = (new Date(year, month, 1).getDay() + 6) % 7;
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const cells = [
-        ...Array.from({ length: leadingEmptyCells }, () => null),
-        ...Array.from({ length: daysInMonth }, (_, index) => {
-            const date = new Date(year, month, index + 1);
-            return { date, iso: toLocalIso(date) };
-        }),
-    ];
-    // Cases de queue pour atteindre toujours 6 lignes pleines.
+    // Nombre de jours du mois précédent (jour 0 du mois courant = dernier du précédent).
+    const prevMonthDays = new Date(year, month, 0).getDate();
+
+    // Tête : derniers jours du mois précédent pour démarrer la grille un lundi.
+    const leadingCells = Array.from({ length: leadingEmptyCells }, (_, index) => {
+        const day = prevMonthDays - leadingEmptyCells + index + 1;
+        const date = new Date(year, month - 1, day);
+        return { date, iso: toLocalIso(date), outside: true };
+    });
+
+    // Corps : les jours réels du mois affiché.
+    const monthCells = Array.from({ length: daysInMonth }, (_, index) => {
+        const date = new Date(year, month, index + 1);
+        return { date, iso: toLocalIso(date), outside: false };
+    });
+
+    const cells = [...leadingCells, ...monthCells];
+
+    // Queue : premiers jours du mois suivant jusqu'à compléter les 6 lignes.
+    let nextDay = 1;
     while (cells.length < CALENDAR_CELLS) {
-        cells.push(null);
+        const date = new Date(year, month + 1, nextDay);
+        cells.push({ date, iso: toLocalIso(date), outside: true });
+        nextDay += 1;
     }
     return cells;
 }
@@ -274,9 +290,12 @@ export function optionsDiscountRate(selectedCount, totalCount) {
 /**
  * Liste cumulée et dédoublonnée des prestations incluses pour des catégories données.
  * Cumule les prestations du palier le plus bas jusqu'au niveau choisi de chaque catégorie.
+ * Chaque prestation retient le niveau où elle APPARAÎT pour la première fois (du plus
+ * bas au plus haut), afin de la colorer à la teinte de ce niveau. Le tri suit l'ordre
+ * des niveaux (Platine → Premium → Deluxe), puis l'ordre alphabétique au sein de chacun.
  * @param {Array<object>} categories Catégories à parcourir (ex. lavages, ou méca seule).
  * @param {object} formula État de sélection { interieur, exterieur, meca }.
- * @returns {Array<{ key: string, label: string }>} Prestations triées alphabétiquement.
+ * @returns {Array<{ key: string, label: string, level: string }>} Prestations triées par niveau puis alpha.
  */
 export function collectFeatures(categories, formula) {
     const seen = new Set();
@@ -292,13 +311,19 @@ export function collectFeatures(categories, formula) {
                 category.features[currentLevel].forEach((label) => {
                     if (!seen.has(label)) {
                         seen.add(label);
-                        list.push({ key: label, label });
+                        // Le niveau courant est le plus bas qui inclut cette prestation.
+                        list.push({ key: label, label, level: currentLevel });
                     }
                 });
             }
         });
     });
-    return list.sort((a, b) => a.label.localeCompare(b.label, "fr"));
+    // Tri principal par niveau (rang croissant), tri secondaire alphabétique.
+    return list.sort((a, b) => {
+        const rankDelta =
+            formulaLevels.indexOf(a.level) - formulaLevels.indexOf(b.level);
+        return rankDelta !== 0 ? rankDelta : a.label.localeCompare(b.label, "fr");
+    });
 }
 
 /**
@@ -320,14 +345,26 @@ export function computePricing(formula, options, isCompleteWash) {
             return;
         }
         if (category.key === "meca") {
-            // Méca OFFERTE avec un lavage complet : elle ne compte pas dans le total.
-            if (!isCompleteWash) {
-                mecaBase += category.prices[level];
-            }
+            // La méca compte TOUJOURS à son prix plein dans la base ; en lavage
+            // complet, seule la valeur du niveau OFFERT est ensuite déduite (cf.
+            // mecaEconomy), si bien qu'une montée en gamme reste facturée (sa
+            // différence par rapport au niveau offert).
+            mecaBase += category.prices[level];
             return;
         }
         washBase += category.prices[level];
     });
+
+    // Remise « révision offerte » : en lavage complet, on offre la méca à hauteur
+    // du niveau OFFERT (le plus bas des deux lavages). Si le client a choisi un
+    // niveau de méca supérieur, il ne paie que la différence.
+    let mecaEconomy = 0;
+    if (isCompleteWash && formula.meca) {
+        const offeredLevel = getMecaOfferedLevel(formula, isCompleteWash);
+        const mecaPrices = formulaCategories.find((category) => category.key === "meca").prices;
+        // Plafonné au prix réellement sélectionné pour ne jamais offrir plus que dû.
+        mecaEconomy = Math.min(mecaPrices[offeredLevel], mecaPrices[formula.meca]);
+    }
 
     // Sous-total des options choisies (la remise progressive s'y applique).
     let optionsBase = 0;
@@ -354,8 +391,8 @@ export function computePricing(formula, options, isCompleteWash) {
     const optionsRate = optionsDiscountRate(options.length, detailingOptions.length);
     const optionsDiscount = Math.round(optionsBase * optionsRate);
 
-    // Économie totale = remise lavage complet + remise options.
-    const economy = washEconomy + optionsDiscount;
+    // Économie totale = remise lavage complet + révision offerte + remise options.
+    const economy = washEconomy + mecaEconomy + optionsDiscount;
 
     return {
         base,
@@ -363,6 +400,8 @@ export function computePricing(formula, options, isCompleteWash) {
         washBase,
         mecaBase,
         washEconomy,
+        mecaEconomy,
+        mecaNet: mecaBase - mecaEconomy,
         optionsBase,
         optionsDiscount,
         optionsRate,

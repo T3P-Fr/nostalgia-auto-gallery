@@ -197,21 +197,33 @@ export default function BookingPage() {
             groups.push({ key: "lavages", title: "Lavages", items: washItems, total: washSubtotal });
         }
 
-        // Groupe RÉVISION : la méca seule (« Offert » en lavage complet).
+        // Groupe RÉVISION : la méca seule. En lavage complet, on n'offre QUE le
+        // niveau offert (mecaEconomy) : une montée en gamme reste donc facturée à
+        // hauteur de sa différence. Le prix de ligne est toujours celui du niveau
+        // RÉELLEMENT sélectionné, pour rester cohérent avec le total.
         if (mecaCategory && formula.meca) {
-            const offered = isCompleteWash;
+            // La ligne du niveau choisi affiche le prix NET (prestation − offert) ;
+            // la ligne du niveau offert juste en dessous porte la mention « Offert ».
+            const revisionItems = [
+                {
+                    key: "meca",
+                    label: `Révision ${formula.meca}`,
+                    value: `${pricing.mecaNet} €`,
+                },
+            ];
+            if (pricing.mecaEconomy > 0) {
+                revisionItems.push({
+                    key: "meca-economy",
+                    label: `Révision ${mecaOfferedLevel}`,
+                    value: "Offert",
+                    offered: true,
+                });
+            }
             groups.push({
                 key: "revision",
                 title: "Révision",
-                items: [
-                    {
-                        key: "meca",
-                        label: `${mecaCategory.label} ${formula.meca}`,
-                        value: offered ? "Offert" : `${mecaCategory.prices[formula.meca]} €`,
-                        offered,
-                    },
-                ],
-                total: offered ? 0 : mecaCategory.prices[formula.meca],
+                items: revisionItems,
+                total: pricing.mecaNet,
             });
         }
 
