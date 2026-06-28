@@ -20,7 +20,7 @@ export default function AboutPage() {
                 <SectionHeading {...heading} split />
                 <div className="nav-grid">
                     {cards.map((card) => (
-                        <article className="card nav-card" key={card.title}>
+                        <article className="card blureBackground--card nav-card" key={card.title}>
                             <img src={card.image} alt={card.alt} />
                             <div className="content">
                                 <h2>{card.title}</h2>
@@ -42,7 +42,7 @@ export default function AboutPage() {
                             const Icon = icons[commitment.icon];
 
                             return (
-                                <article className="card service-card" key={commitment.title}>
+                                <article className="card blureBackground--card service-card" key={commitment.title}>
                                     <span className="icon-tile">
                                         <Icon />
                                     </span>
@@ -55,7 +55,7 @@ export default function AboutPage() {
                             );
                         })}
                     </div>
-                    <div className="card beyond-card">
+                    <div className="card blureBackground--card beyond-card">
                         {surface.beyond.icon && (
                             <span className="icon-tile">
                                 <BeyondIcon />

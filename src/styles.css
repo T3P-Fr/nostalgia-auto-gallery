@@ -84,13 +84,13 @@
 }
 
 .blureBackground--features {
-    --gradient-top: red;
-    --gradient-bottom: red;
+    --gradient-top: color-mix(in oklab, var(--red-primary) 33% transparent);
+    --gradient-bottom: color-mix(in oklab, var(--surface) 75% transparent);
 }
 
 .blureBackground--card {
-    --gradient-top: red;
-    --gradient-bottom: red;
+    --gradient-top: color-mix(in oklab, black 66% transparent);
+    --gradient-bottom: color-mix(in oklab, var(--surface) 66% transparent);
 }
 
 * {
@@ -751,8 +751,8 @@ main::after {
     border: 1px solid var(--line);
     border-top: 0;
     border-radius: 0 0 var(--radius-card) var(--radius-card);
-    background: color-mix(in oklab, var(--surface), transparent 50%);
-    backdrop-filter: blur(100px);
+    /* Fond flou délégué à .blureBackground--card (toutes les cartes la portent),
+       pour que le variant pilote réellement dégradé + flou. */
 }
 
 /* Bandeau d'accent : pleine largeur, coins droits, 1px plus haut que l'ancien

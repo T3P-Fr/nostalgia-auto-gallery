@@ -130,7 +130,7 @@ export function ServiceCard({ service }) {
     const Icon = service.icon;
 
     return (
-        <article className="card service-card">
+        <article className="card blureBackground--card service-card">
             <span className="icon-tile">
                 <Icon />
             </span>

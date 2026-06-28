@@ -71,8 +71,19 @@ function Calendar({
                 ))}
             </div>
             <div className="calendar-grid">
-                {calendarCells.map((cell, index) => {
-                    if (!cell) return <span key={`empty-${index}`} />;
+                {calendarCells.map((cell) => {
+                    // Jours des mois adjacents : repère visuel léger, non interactif.
+                    if (cell.outside) {
+                        return (
+                            <span
+                                key={`out-${cell.iso}`}
+                                className="cal-cell--outside"
+                                aria-hidden="true"
+                            >
+                                {cell.date.getDate()}
+                            </span>
+                        );
+                    }
                     // Passé et dimanches (getDay() === 0) non réservables.
                     const isDisabled = cell.date < today || cell.date.getDay() === 0;
                     return (

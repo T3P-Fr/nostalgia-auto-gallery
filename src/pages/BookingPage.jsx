@@ -523,7 +523,7 @@ export default function BookingPage() {
                         <NeedTabs besoins={besoins} onToggle={toggleBesoin} />
                     )}
 
-                    <div className="card booking-card">
+                    <div className="card blureBackground--card booking-card">
                         {createdAppointment || createdLead ? (
                             <SuccessState
                                 appointment={createdAppointment}
@@ -695,7 +695,7 @@ export default function BookingPage() {
                     </div>
                 </div>
 
-                <aside className="card contact-card">
+                <aside className="card blureBackground--card contact-card">
                     <span className="overline">Contact direct</span>
                     <a href={site.phoneHref}>
                         <Phone />

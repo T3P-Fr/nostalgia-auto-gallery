@@ -5,6 +5,7 @@ import {
     SectionHeading,
     ServiceCard,
 } from "../components/Ui.jsx";
+import { TierBadges } from "../components/TierBadges.jsx";
 import { pages, pricingGroups, pricingOptions, services } from "../data.js";
 
 // Contenu centralisé (cf. content.json → pages.detailing + services + pricing.*).
@@ -51,11 +52,15 @@ export default function DetailingPage() {
                             const service = `${group.title} — ${tier.tier} · ${tier.price} €`;
                             return (
                                 <article
-                                    className={`card price-card ${tier.tier === "Premium" ? "price-card--featured" : ""}`}
+                                    className={`card blureBackground--card price-card price-card--${tier.tier.toLowerCase()} ${tier.tier === "Premium" ? "price-card--featured" : ""}`}
                                     key={tier.tier}
                                 >
                                     <div className="price-card__top">
-                                        <strong>{tier.tier}</strong>
+                                        <span className="price-card__ident">
+                                            {/* Icônes du niveau (1 étoile / 2 diamants / 3 couronnes). */}
+                                            <TierBadges tier={tier.tier} />
+                                            <strong>{tier.tier}</strong>
+                                        </span>
                                         <span>{tier.duration}</span>
                                     </div>
                                     {/* Prix à gauche, bouton « Réserver » compact à droite. */}
@@ -104,9 +109,15 @@ export default function DetailingPage() {
                     <p className="meca-condition">{mecaGroup.condition}</p>
                     <div className="pricing-grid">
                         {mecaGroup.tiers.map((tier) => (
-                            <article className="card price-card" key={tier.tier}>
+                            <article
+                                className={`card blureBackground--card price-card price-card--${tier.tier.toLowerCase()}`}
+                                key={tier.tier}
+                            >
                                 <div className="price-card__top">
-                                    <strong>{tier.tier}</strong>
+                                    <span className="price-card__ident">
+                                        <TierBadges tier={tier.tier} />
+                                        <strong>{tier.tier}</strong>
+                                    </span>
                                     <span>{tier.duration}</span>
                                 </div>
                                 <div className="price-row">
@@ -173,7 +184,7 @@ export default function DetailingPage() {
 
             {/* Section 5 — Appel à l'action final. */}
             <section className="container">
-                <div className="card beyond-card">
+                <div className="card blureBackground--card beyond-card">
                     <strong>{final.title}</strong>
                     <span>{final.text}</span>
                     <ButtonLink size="small" to={final.to}>

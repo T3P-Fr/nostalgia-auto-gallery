@@ -1,4 +1,4 @@
-import { RefreshCw, Trash2 } from "lucide-react";
+import { Eye, EyeOff, RefreshCw, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 // Statuts d'un rendez-vous (parcours lavage, avec créneau).
@@ -71,6 +71,8 @@ function requestDetails(request) {
  */
 export default function AdminPage() {
     const [adminKey, setAdminKey] = useState(() => sessionStorage.getItem("nag-admin-key") || "");
+    // Affichage en clair (œil) de la clé administrateur.
+    const [showKey, setShowKey] = useState(false);
     // Onglet actif : "appointments" (rendez-vous) ou "requests" (demandes).
     const [view, setView] = useState("appointments");
     const [appointments, setAppointments] = useState([]);
@@ -195,7 +197,23 @@ export default function AdminPage() {
                     <h1>{isRequestsView ? "demandes" : "rendez-vous"}</h1>
                 </div>
                 <div className="admin-auth">
-                    <input type="password" value={adminKey} onChange={(event) => setAdminKey(event.target.value)} placeholder="Clé administrateur" />
+                    {/* Champ clé + œil pour révéler/masquer la saisie. */}
+                    <div className="admin-auth__field">
+                        <input
+                            type={showKey ? "text" : "password"}
+                            value={adminKey}
+                            onChange={(event) => setAdminKey(event.target.value)}
+                            placeholder="Clé administrateur"
+                        />
+                        <button
+                            type="button"
+                            className="admin-auth__eye"
+                            onClick={() => setShowKey((current) => !current)}
+                            aria-label={showKey ? "Masquer la clé" : "Afficher la clé"}
+                        >
+                            {showKey ? <EyeOff /> : <Eye />}
+                        </button>
+                    </div>
                     <button className="button button--small" onClick={loadData}><RefreshCw />Actualiser</button>
                 </div>
             </div>

@@ -42,7 +42,7 @@ export default function NegocePage() {
                             const Icon = icons[step.icon];
 
                             return (
-                                <article className="card service-card" key={step.title}>
+                                <article className="card blureBackground--card service-card" key={step.title}>
                                     <span className="icon-tile">
                                         <Icon />
                                     </span>
@@ -60,7 +60,7 @@ export default function NegocePage() {
 
             {/* Véhicules disponibles / appel à confier une recherche. */}
             <section className="container">
-                <div className="card beyond-card">
+                <div className="card blureBackground--card beyond-card">
                     <span className="icon-tile">
                         <BeyondIcon />
                     </span>

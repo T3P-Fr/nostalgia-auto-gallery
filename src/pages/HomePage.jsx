@@ -32,7 +32,7 @@ export default function HomePage() {
             </PageHero>
 
             {/* Bandeau de réassurance. */}
-            <section className="trust-strip blureBackground--red">
+            <section className="trust-strip blureBackground--features">
                 <div className="container trust-grid">
                     {trust.map((item) => {
                         const Icon = icons[item.icon];
@@ -53,7 +53,7 @@ export default function HomePage() {
                         <ServiceCard key={service.title} service={service} />
                     ))}
                 </div>
-                <div className="card beyond-card">
+                <div className="card blureBackground--card beyond-card">
                     <span>{heading.beyond.text}</span>
                     {/* Les deux piliers restent accessibles sans alourdir la section. */}
                     <div className="beyond-card__actions">
@@ -80,7 +80,7 @@ export default function HomePage() {
                     split
                 />
                 <BeforeAfterComparison />
-                <div className="card beyond-card">
+                <div className="card blureBackground--card beyond-card">
                     <ButtonLink size="small" to={comparison.to}>
                         {comparison.cta}
                     </ButtonLink>
@@ -98,7 +98,7 @@ export default function HomePage() {
                         {process.steps.map((step) => {
                             const Icon = icons[step.icon];
                             return (
-                                <article className="card service-card" key={step.title}>
+                                <article className="card blureBackground--card service-card" key={step.title}>
                                     <span className="icon-tile">
                                         <Icon />
                                     </span>
@@ -116,7 +116,7 @@ export default function HomePage() {
 
             {/* Présentation « À propos » en bas de page → renvoie vers la page dédiée. */}
             <section className="container">
-                <article className="card nav-card nav-card--wide">
+                <article className="card blureBackground--card nav-card nav-card--wide">
                     <img src={about.image} alt="Corentin Jammes — Nostalgia Auto Gallery" />
                     <div className="content">
                         <span className="overline">{about.overline}</span>
@@ -131,7 +131,7 @@ export default function HomePage() {
 
             {/* Appel à l'action final. */}
             <section className="container">
-                <div className="card beyond-card">
+                <div className="card blureBackground--card beyond-card">
                     <strong>{final.title}</strong>
                     <span>{final.text}</span>
                     <ButtonLink size="small" to={final.to}>

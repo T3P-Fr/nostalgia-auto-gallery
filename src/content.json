@@ -145,7 +145,7 @@
                 "tiers": [
                     {
                         "tier": "Platine",
-                        "price": 65,
+                        "price": 99,
                         "duration": "≈ 1h45",
                         "features": [
                             "Aspiration de l’habitacle",
@@ -156,7 +156,7 @@
                     },
                     {
                         "tier": "Premium",
-                        "price": 110,
+                        "price": 149,
                         "duration": "≈ 2h15",
                         "includes": "Platine",
                         "features": [
@@ -167,7 +167,7 @@
                     },
                     {
                         "tier": "Deluxe",
-                        "price": 170,
+                        "price": 249,
                         "duration": "≈ 4h",
                         "includes": "Premium",
                         "features": [
@@ -191,7 +191,7 @@
                 "tiers": [
                     {
                         "tier": "Platine",
-                        "price": 65,
+                        "price": 89,
                         "duration": "≈ 1h45",
                         "features": [
                             "Roues & jantes",
@@ -203,7 +203,7 @@
                     },
                     {
                         "tier": "Premium",
-                        "price": 110,
+                        "price": 139,
                         "duration": "≈ 2h15",
                         "includes": "Platine",
                         "features": [
@@ -215,7 +215,7 @@
                     },
                     {
                         "tier": "Deluxe",
-                        "price": 170,
+                        "price": 239,
                         "duration": "≈ 4h",
                         "includes": "Premium",
                         "features": [
@@ -236,8 +236,8 @@
                 "tiers": [
                     {
                         "tier": "Platine",
-                        "price": 39,
-                        "discount": "-50%",
+                        "price": 19,
+                        "discount": "-40%",
                         "duration": "≈ 20 min",
                         "features": [
                             "Contrôle visuel du niveau des liquides",
@@ -247,8 +247,8 @@
                     },
                     {
                         "tier": "Premium",
-                        "price": 59,
-                        "discount": "-60%",
+                        "price": 49,
+                        "discount": "-50%",
                         "duration": "≈ 40 min",
                         "includes": "Platine",
                         "features": [
@@ -261,7 +261,7 @@
                     {
                         "tier": "Deluxe",
                         "price": 79,
-                        "discount": "-70%",
+                        "discount": "-60%",
                         "duration": "≈ 1h",
                         "includes": "Premium",
                         "features": [
@@ -406,7 +406,7 @@
         },
         "detailing": {
             "hero": {
-                "image": "/assets/Detailling.webp",
+                "image": "/assets/Peugeot205gti.webp",
                 "eyebrow": "Formules de detailing à domicile",
                 "title": "le bon soin,\nau bon *niveau*.",
                 "description": "De l’entretien régulier à la remise en état approfondie, chaque formule répond à un besoin précis. Tout est réalisé à la main, avec des produits adaptés à chaque surface du véhicule."
@@ -474,7 +474,7 @@
         },
         "negoce": {
             "hero": {
-                "image": "/assets/peugeot-side.jpg",
+                "image": "/assets/About.webp",
                 "eyebrow": "Achat, vente et solutions automobiles",
                 "title": "votre projet auto,\nsuivi avec *attention*.",
                 "description": "Nostalgia Auto Gallery accompagne les particuliers et les passionnés dans leurs projets d’achat, de vente et de recherche de pièces. Chaque demande est étudiée individuellement, avec une attention portée à l’état, à l’historique et à la cohérence du projet."
@@ -558,7 +558,7 @@
         },
         "gallery": {
             "hero": {
-                "image": "/assets/nissan-dusk2.jpg",
+                "image": "/assets/Realisation.webp",
                 "eyebrow": "Réalisations · avant / après",
                 "title": "le résultat parle\nde *lui-même*.",
                 "description": "Une sélection de véhicules confiés à Nostalgia Auto Gallery dans le Gard. Chaque réalisation montre l’état de départ, le travail effectué et le résultat obtenu."
