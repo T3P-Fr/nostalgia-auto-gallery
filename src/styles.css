@@ -69,6 +69,28 @@
        (--radius-card) et tous les boutons (--radius-button). */
     --radius-card: var(--radius);
     --radius-button: var(--radius);
+
+    /* Gradient d'accentuation */
+    --acc-gradient: linear-gradient(color-mix(in oklab, var(--red-primary) 32%, transparent), var(--surface));
+}
+
+/* Cible tout élément ayant une classe qui COMMENCE par « blureBackground »
+   (ex. blureBackground, blureBackground--red), où qu'elle soit dans l'attribut. */
+[class^="bluredBackground"] {
+    backdrop-filter: blur(50px);
+    background: linear-gradient(to bottom,
+            var(--gradient-top),
+            var(--gradient-bottom));
+}
+
+.blureBackground--features {
+    --gradient-top: red;
+    --gradient-bottom: red;
+}
+
+.blureBackground--card {
+    --gradient-top: red;
+    --gradient-bottom: red;
 }
 
 * {
@@ -615,8 +637,8 @@ main::after {
    (cf. point 5 — rouge renforcé appliqué au bloc assurance). */
 .trust-strip {
     border-block: 0;
-    background-color: var(--red-primary);
-    background-image: var(--shining-gradient);
+    background-color: color-mix(in oklab, var(--red-primary) 50%, transparent);
+    backdrop-filter: blur(50px);
     --gradient--color: var(--red-primary);
     --gradient--shine: 16%;
     color: #fff;

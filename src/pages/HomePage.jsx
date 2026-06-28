@@ -32,7 +32,7 @@ export default function HomePage() {
             </PageHero>
 
             {/* Bandeau de réassurance. */}
-            <section className="trust-strip">
+            <section className="trust-strip blureBackground--red">
                 <div className="container trust-grid">
                     {trust.map((item) => {
                         const Icon = icons[item.icon];

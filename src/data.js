@@ -100,8 +100,34 @@ export const formulaCategories = pricing.groups.map((group) => ({
     ),
 }));
 
-// Prestations : on remplace le NOM d'icône par le composant correspondant.
+/*
+ * Prix d'appel (« dès X € ») des cartes Prestations, DÉRIVÉS des tarifs de lavage
+ * pour rester synchronisés avec content.pricing (source unique des prix) :
+ *   - Intérieur / Extérieur → palier le moins cher de leur groupe ;
+ *   - Complète → intérieur + extérieur au niveau le plus bas, moins la remise combinée.
+ */
+const minGroupPrice = (key) => {
+    const group = pricing.groups.find((entry) => entry.key === key);
+    return group ? Math.min(...group.tiers.map((tier) => tier.price)) : 0;
+};
+const interieurFrom = minGroupPrice("interieur");
+const exterieurFrom = minGroupPrice("exterieur");
+const lowestLevel = pricing.levels[0];
+const completeFrom =
+    interieurFrom + exterieurFrom - (pricing.comboDiscounts[lowestLevel] || 0);
+// Prix d'appel par titre de prestation (repli sur la valeur du JSON si non géré).
+const serviceFromByTitle = {
+    Intérieur: interieurFrom,
+    Extérieur: exterieurFrom,
+    Complète: completeFrom,
+};
+
+// Prestations : icône (nom → composant) et prix d'appel dynamique.
 export const services = content.services.map((service) => ({
     ...service,
     icon: icons[service.icon],
+    from:
+        serviceFromByTitle[service.title] != null
+            ? `dès ${serviceFromByTitle[service.title]} €`
+            : service.from,
 }));
