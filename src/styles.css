@@ -222,23 +222,13 @@ img {
     padding: 10px 16px;
     border-radius: 999px;
     color: var(--muted);
-    /* Liens en police Display (serif), comme le titre de page. */
-    font-family: "DM Serif Display", serif;
-    font-size: 15px;
+    /* Liens non sélectionnés : Archivo (sans-serif), sans point, comme avant. */
+    font-family: "Archivo", system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
     text-decoration: none;
     transition: color 180ms ease;
-}
-
-/* Point minuscule collé à la fin de chaque lien : blanc au repos. */
-.site-nav a::after {
-    content: "";
-    display: inline-block;
-    width: 4px;
-    height: 4px;
-    margin-left: 3px;
-    border-radius: 50%;
-    background: #fff;
-    vertical-align: baseline;
 }
 
 /* Pilule rouge : épouse la boîte du lien actif (les quatre côtés sont pilotés en JS)
@@ -257,13 +247,23 @@ img {
     color: var(--txt);
 }
 
-/* Lien de la page courante : texte blanc sur la pilule rouge, point noir. */
+/* Lien de la page courante : texte blanc en Display sur la pilule rouge. */
 .site-nav a.active {
     color: #fff;
+    font-family: "DM Serif Display", serif;
+    text-transform: none;
 }
 
+/* Point noir minuscule, réservé au lien actif. */
 .site-nav a.active::after {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    margin-left: 3px;
+    border-radius: 50%;
     background: #000;
+    vertical-align: baseline;
 }
 
 /* La préférence système neutralise seulement l'animation propre au menu. */
@@ -3082,14 +3082,10 @@ main::after {
         display: flex;
         position: fixed;
         z-index: 55;
-        left: 24px;
-        right: 24px;
-        bottom: 32px;
-        justify-content: center;
-    }
-
-    .header-nav--open .header-actions .button {
-        width: 100%;
+        /* Centré horizontalement, largeur du contenu (pas pleine largeur). */
+        left: 0;
+        right: 0;
+        bottom: 64px;
         justify-content: center;
     }
 
