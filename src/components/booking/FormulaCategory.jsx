@@ -34,10 +34,23 @@ export default function FormulaCategory({
 
     return (
         <div className="formula-cat">
-            {/* Le label de catégorie est masqué pour la méca : son intitulé
-                « Révision de base » est déjà porté par le titre du panneau parent
-                (on évite ainsi un titre affiché en double). */}
-            {!isMeca && <span className="formula-cat__label">{category.label}</span>}
+            {/* Ligne de tête : label de catégorie à gauche (masqué pour la méca, dont
+                le titre est porté par le panneau parent) et le toggle « Détail » + œil
+                regroupés en bout de ligne, à droite. */}
+            <div className="formula-cat__top">
+                {!isMeca && <span className="formula-cat__label">{category.label}</span>}
+                {features.length > 0 && (
+                    <button
+                        type="button"
+                        className="formula-detail__head"
+                        aria-expanded={detailOpen}
+                        onClick={() => setDetailOpen((open) => !open)}
+                    >
+                        <span className="formula-detail__title">Détail</span>
+                        <Eye className="formula-detail__eye" />
+                    </button>
+                )}
+            </div>
             <div className="formula-grid__line">
                 {formulaLevels.map((level) => {
                     const selected = formula[category.key] === level;
@@ -90,41 +103,29 @@ export default function FormulaCategory({
                 })}
             </div>
 
-            {/* Prestations incluses repliées dans un accordéon « Détail » (un œil en
-                bout de ligne), présenté comme le détail de la carte résumé. */}
+            {/* Corps animé de l'accordéon « Détail » : prestations incluses repliées,
+                dépliées en douceur (grille 0fr → 1fr) par le toggle de la ligne de tête. */}
             {features.length > 0 && (
-                <div className="formula-detail">
-                    <button
-                        type="button"
-                        className="formula-detail__head"
-                        aria-expanded={detailOpen}
-                        onClick={() => setDetailOpen((open) => !open)}
-                    >
-                        <span className="formula-detail__title">Détail</span>
-                        <Eye className="formula-detail__eye" />
-                    </button>
-                    {/* Corps animé : grille 0fr → 1fr pour un dépliage en douceur. */}
-                    <div className={`formula-detail__body${detailOpen ? " is-open" : ""}`}>
-                        <div className="formula-pills">
-                            {features.map((feature) => (
-                                <span
-                                    className={`pill ${feature.level.toLowerCase()}`}
-                                    key={feature.key}
-                                >
-                                    {/* Préfixe : 1 icône du niveau (étoile/diamant/couronne)
-                                        pour identifier d'un coup d'œil le palier d'apparition. */}
-                                    {tierBadges[feature.level] && (
-                                        <img
-                                            className="pill__icon"
-                                            src={tierBadges[feature.level].icon}
-                                            alt=""
-                                            loading="lazy"
-                                        />
-                                    )}
-                                    {feature.label}
-                                </span>
-                            ))}
-                        </div>
+                <div className={`formula-detail__body${detailOpen ? " is-open" : ""}`}>
+                    <div className="formula-pills">
+                        {features.map((feature) => (
+                            <span
+                                className={`pill ${feature.level.toLowerCase()}`}
+                                key={feature.key}
+                            >
+                                {/* Préfixe : 1 icône du niveau (étoile/diamant/couronne)
+                                    pour identifier d'un coup d'œil le palier d'apparition. */}
+                                {tierBadges[feature.level] && (
+                                    <img
+                                        className="pill__icon"
+                                        src={tierBadges[feature.level].icon}
+                                        alt=""
+                                        loading="lazy"
+                                    />
+                                )}
+                                {feature.label}
+                            </span>
+                        ))}
                     </div>
                 </div>
             )}

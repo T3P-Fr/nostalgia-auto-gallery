@@ -2451,10 +2451,23 @@ main::after {
     border-top: 1px solid var(--line);
 }
 
-/* Titre de catégorie, posé au-dessus de ses trois boutons. */
-.formula-cat__label {
-    display: block;
+/* Deux lavages empilés (Intérieur puis Extérieur) : on retire la bordure haute du
+   second pour ne pas doubler le trait de séparation. */
+.formula-cat + .formula-cat {
+    border-top: 0;
+}
+
+/* Ligne de tête : label à gauche, toggle « Détail » à droite. */
+.formula-cat__top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 22px;
     margin-bottom: 8px;
+}
+
+/* Titre de catégorie, à gauche de la ligne de tête. */
+.formula-cat__label {
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.06em;
@@ -2608,17 +2621,14 @@ main::after {
 }
 
 /* Accordéon « Détail » : replie les prestations incluses (présenté comme le détail
-   de la carte résumé, avec un œil en bout de ligne). */
-.formula-detail {
-    margin: 6px 0 12px;
-}
-
+   de la carte résumé, avec un œil). Le toggle vit dans la ligne de tête de la
+   catégorie : « Détail » + œil regroupés, poussés en bout de ligne à droite. */
 .formula-detail__head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 6px 0;
+    gap: 6px;
+    margin-left: auto;
+    padding: 0;
     border: 0;
     background: transparent;
     color: var(--txt);
