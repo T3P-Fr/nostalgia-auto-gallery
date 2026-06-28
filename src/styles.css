@@ -2584,6 +2584,9 @@ main::after {
 /* Pill teintée à la couleur de son niveau (--level-color, posée par .platine/.premium/
    .deluxe). Hors contexte de niveau (ex. galerie Avant/Après), repli sur l'accent rouge. */
 .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     padding: 5px 11px;
     border: 1px solid color-mix(in srgb, var(--level-color, var(--acc)) 50%, var(--line));
     border-radius: 999px;
@@ -2592,6 +2595,14 @@ main::after {
     font-size: 10px;
     font-weight: 400;
     letter-spacing: 0.05em;
+}
+
+/* Icône de niveau préfixant le texte de la pill (étoile/diamant/couronne). */
+.pill__icon {
+    width: 13px;
+    height: 13px;
+    object-fit: contain;
+    flex: none;
 }
 
 /* Options à cocher (ajoutées au total). */

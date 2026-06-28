@@ -1,4 +1,4 @@
-import { formulaLevels } from "../../data.js";
+import { formulaLevels, tierBadges } from "../../data.js";
 import { collectFeatures } from "../../utils/bookingHelpers.js";
 import { TierBadges } from "../TierBadges.jsx";
 
@@ -75,6 +75,16 @@ export default function FormulaCategory({
                             className={`pill ${feature.level.toLowerCase()}`}
                             key={feature.key}
                         >
+                            {/* Préfixe : 1 icône du niveau (étoile/diamant/couronne)
+                                pour identifier d'un coup d'œil le palier d'apparition. */}
+                            {tierBadges[feature.level] && (
+                                <img
+                                    className="pill__icon"
+                                    src={tierBadges[feature.level].icon}
+                                    alt=""
+                                    loading="lazy"
+                                />
+                            )}
                             {feature.label}
                         </span>
                     ))}
