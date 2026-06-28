@@ -1,3 +1,5 @@
+import { Eye } from "lucide-react";
+import { useState } from "react";
 import { formulaLevels, tierBadges } from "../../data.js";
 import { collectFeatures } from "../../utils/bookingHelpers.js";
 import { TierBadges } from "../TierBadges.jsx";
@@ -26,6 +28,9 @@ export default function FormulaCategory({
     const isMeca = category.key === "meca";
     // Prestations incluses propres à CETTE catégorie, sous ses boutons.
     const features = collectFeatures([category], formula);
+    // Accordéon « Détail » : les prestations sont repliées par défaut (on les dévoile
+    // au clic, façon résumé), pour garder la grille de prix compacte.
+    const [detailOpen, setDetailOpen] = useState(false);
 
     return (
         <div className="formula-cat">
@@ -85,27 +90,42 @@ export default function FormulaCategory({
                 })}
             </div>
 
-            {/* Prestations incluses de la catégorie, en pleine largeur sous ses prix. */}
+            {/* Prestations incluses repliées dans un accordéon « Détail » (un œil en
+                bout de ligne), présenté comme le détail de la carte résumé. */}
             {features.length > 0 && (
-                <div className="formula-pills">
-                    {features.map((feature) => (
-                        <span
-                            className={`pill ${feature.level.toLowerCase()}`}
-                            key={feature.key}
-                        >
-                            {/* Préfixe : 1 icône du niveau (étoile/diamant/couronne)
-                                pour identifier d'un coup d'œil le palier d'apparition. */}
-                            {tierBadges[feature.level] && (
-                                <img
-                                    className="pill__icon"
-                                    src={tierBadges[feature.level].icon}
-                                    alt=""
-                                    loading="lazy"
-                                />
-                            )}
-                            {feature.label}
-                        </span>
-                    ))}
+                <div className="formula-detail">
+                    <button
+                        type="button"
+                        className="formula-detail__head"
+                        aria-expanded={detailOpen}
+                        onClick={() => setDetailOpen((open) => !open)}
+                    >
+                        <span className="formula-detail__title">Détail</span>
+                        <Eye className="formula-detail__eye" />
+                    </button>
+                    {/* Corps animé : grille 0fr → 1fr pour un dépliage en douceur. */}
+                    <div className={`formula-detail__body${detailOpen ? " is-open" : ""}`}>
+                        <div className="formula-pills">
+                            {features.map((feature) => (
+                                <span
+                                    className={`pill ${feature.level.toLowerCase()}`}
+                                    key={feature.key}
+                                >
+                                    {/* Préfixe : 1 icône du niveau (étoile/diamant/couronne)
+                                        pour identifier d'un coup d'œil le palier d'apparition. */}
+                                    {tierBadges[feature.level] && (
+                                        <img
+                                            className="pill__icon"
+                                            src={tierBadges[feature.level].icon}
+                                            alt=""
+                                            loading="lazy"
+                                        />
+                                    )}
+                                    {feature.label}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

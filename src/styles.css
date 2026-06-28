@@ -2033,12 +2033,21 @@ main::after {
 
 .slot-modal__box h3 {
     margin: 0 0 10px;
+    font-family: "Display";
+    text-transform: uppercase;
+}
+
+.slot-modal__box h3:after {
+    content: ".";
+    color: var(--acc);
+    font-size: 1.5em;
 }
 
 .slot-modal__box p {
-    margin: 0 0 18px;
+    margin: 0 0 25px 0;
     color: var(--muted);
-    font-size: 14px;
+    font-size: 16px;
+    line-height: 1.66;
 }
 
 /* Variante « agenda » : plus large pour accueillir calendrier + créneaux. */
@@ -2598,6 +2607,62 @@ main::after {
     line-height: 1.4;
 }
 
+/* Accordéon « Détail » : replie les prestations incluses (présenté comme le détail
+   de la carte résumé, avec un œil en bout de ligne). */
+.formula-detail {
+    margin: 6px 0 12px;
+}
+
+.formula-detail__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 6px 0;
+    border: 0;
+    background: transparent;
+    color: var(--txt);
+    font: inherit;
+    cursor: pointer;
+}
+
+.formula-detail__title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.75;
+}
+
+/* L'œil s'allume à l'ouverture pour signaler que le détail est dévoilé. */
+.formula-detail__eye {
+    width: 16px;
+    height: 16px;
+    color: var(--muted);
+    transition: color 180ms ease;
+}
+
+.formula-detail__head[aria-expanded="true"] .formula-detail__eye {
+    color: var(--acc);
+}
+
+/* Corps animé : grille 0fr → 1fr (même mécanique que la FAQ et le résumé). */
+.formula-detail__body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 260ms var(--ease-out);
+}
+
+.formula-detail__body.is-open {
+    grid-template-rows: 1fr;
+}
+
+.formula-detail__body > .formula-pills {
+    overflow: hidden;
+    margin: 0;
+    padding-top: 6px;
+}
+
 /* Prestations incluses, sous forme de pills. */
 .formula-pills {
     display: flex;
@@ -2771,6 +2836,22 @@ main::after {
 /* Chevron tourné vers le bas quand le groupe est ouvert. */
 .resume-group__chevron.is-open {
     transform: rotate(180deg);
+}
+
+/* Corps animé du groupe : grille 0fr → 1fr pour un dépliage en douceur. */
+.resume-group__body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 260ms var(--ease-out);
+}
+
+.resume-group__body.is-open {
+    grid-template-rows: 1fr;
+}
+
+.resume-group__body > .formula-recap__lines {
+    overflow: hidden;
+    margin: 0;
 }
 
 /* Lignes d'un groupe ouvert : pas de séparateur supérieur (le bord du groupe le

@@ -74,7 +74,9 @@ export default function ResumePanel({ hasFormula, selectedDate, slotRange, prici
                                         <span className="resume-group__title">{group.title}</span>
                                         <span className="resume-group__total">{group.total} €</span>
                                     </button>
-                                    {isOpen && (
+                                    {/* Corps animé : la grille 0fr → 1fr déplie en douceur
+                                        (même mécanique que la FAQ et l'accordéon « Détail »). */}
+                                    <div className={`resume-group__body${isOpen ? " is-open" : ""}`}>
                                         <ul className="formula-recap__lines">
                                             {group.items.map((item) => (
                                                 <li
@@ -91,7 +93,7 @@ export default function ResumePanel({ hasFormula, selectedDate, slotRange, prici
                                                 </li>
                                             ))}
                                         </ul>
-                                    )}
+                                    </div>
                                 </section>
                             );
                         })}
