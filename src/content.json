@@ -231,13 +231,14 @@
                 "key": "meca",
                 "title": "Révision de base",
                 "subtitle": "Complément · avec un lavage",
-                "condition": "Disponible uniquement avec un lavage. Offerte avec un lavage complet (intérieur + extérieur).",
+                "condition": "Disponible uniquement avec un lavage. Remisée jusqu’à −70 % avec un lavage complet (intérieur + extérieur).",
                 "bonusLabel": "Complément méca : à ajouter à un lavage",
                 "tiers": [
                     {
                         "tier": "Platine",
-                        "price": 15,
-                        "duration": "≈ 15 min",
+                        "price": 39,
+                        "discount": "-50%",
+                        "duration": "≈ 20 min",
                         "features": [
                             "Contrôle visuel du niveau des liquides",
                             "Contrôle de l’état des pneus",
@@ -246,8 +247,9 @@
                     },
                     {
                         "tier": "Premium",
-                        "price": 25,
-                        "duration": "≈ 30 min",
+                        "price": 59,
+                        "discount": "-60%",
+                        "duration": "≈ 40 min",
                         "includes": "Platine",
                         "features": [
                             "Nettoyage de la baie de pare-brise",
@@ -258,7 +260,8 @@
                     },
                     {
                         "tier": "Deluxe",
-                        "price": 35,
+                        "price": 79,
+                        "discount": "-70%",
                         "duration": "≈ 1h",
                         "includes": "Premium",
                         "features": [
@@ -293,10 +296,10 @@
     "pages": {
         "home": {
             "hero": {
-                "image": "/assets/bckgHome.png",
+                "image": "/assets/Reunion.webp",
                 "eyebrow": "Nostalgia Auto Gallery · Parignargues",
-                "title": "votre partenaire passionné\npour l’*automobile*.",
-                "description": "Basé à Parignargues, Nostalgia Auto Gallery est né d’une passion profonde pour l’automobile. Parce qu’une voiture n’est pas seulement un moyen de transport, je mets mon expertise à votre service pour le soin, la préparation esthétique et vos projets auto dans le Gard."
+                "title": "une passion commune\nl’*automobile*.",
+                "description": "Basé à Parignargues, Nostalgia Auto Gallery est né d'une passion profonde pour l'automobile. Parce que votre voiture est bien plus qu'un simple moyen de transport, je mets mon expertise et mon savoir-faire au service de tous vos projets. De la mécanique à l'esthétique, chaque intervention est réalisée avec le plus grand soin pour sublimer votre véhicule."
             },
             "actions": [
                 {
@@ -403,7 +406,7 @@
         },
         "detailing": {
             "hero": {
-                "image": "/assets/nissan-front.jpg",
+                "image": "/assets/Detailling.webp",
                 "eyebrow": "Formules de detailing à domicile",
                 "title": "le bon soin,\nau bon *niveau*.",
                 "description": "De l’entretien régulier à la remise en état approfondie, chaque formule répond à un besoin précis. Tout est réalisé à la main, avec des produits adaptés à chaque surface du véhicule."
@@ -618,7 +621,7 @@
         },
         "about": {
             "hero": {
-                "image": "/assets/bckgBooking.png",
+                "image": "/assets/Detailling.webp",
                 "eyebrow": "À propos · Corentin Jammes",
                 "title": "la passion,\nmise à votre *service*.",
                 "description": "Nostalgia Auto Gallery est né à Parignargues d’une passion profonde pour l’automobile et du goût du travail réalisé avec soin."
@@ -687,7 +690,7 @@
         },
         "booking": {
             "hero": {
-                "image": "/assets/hero-night.jpg",
+                "image": "/assets/Booking.webp",
                 "eyebrow": "Contact et réservation · Gard",
                 "title": "parlons de votre\n*véhicule*.",
                 "description": "Choisissez une prestation ou décrivez votre besoin. Après réception de votre demande, je vous contacte pour vérifier les informations et confirmer le rendez-vous."

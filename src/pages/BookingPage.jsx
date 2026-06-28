@@ -155,7 +155,7 @@ export default function BookingPage() {
             .filter((category) => formula[category.key])
             .map((category) =>
                 category.key === "meca" && isCompleteWash
-                    ? `${category.label} offert`
+                    ? `${category.label} ${formula.meca} (remisé)`
                     : `${category.label} ${formula[category.key]}`,
             )
             .join(" · ");
@@ -202,21 +202,22 @@ export default function BookingPage() {
         // hauteur de sa différence. Le prix de ligne est toujours celui du niveau
         // RÉELLEMENT sélectionné, pour rester cohérent avec le total.
         if (mecaCategory && formula.meca) {
-            // La ligne du niveau choisi affiche le prix NET (prestation − offert) ;
-            // la ligne du niveau offert juste en dessous porte la mention « Offert ».
+            // Ligne 1 : la méca à son prix plein. Ligne 2 (si lavage complet) : la
+            // remise du palier (−X %), déduite. Le sous-total = prix net.
             const revisionItems = [
                 {
                     key: "meca",
                     label: `Révision ${formula.meca}`,
-                    value: `${pricing.mecaNet} €`,
+                    value: `${mecaCategory.prices[formula.meca]} €`,
                 },
             ];
             if (pricing.mecaEconomy > 0) {
+                const rate = Math.round((mecaCategory.tierDiscounts[formula.meca] || 0) * 100);
                 revisionItems.push({
                     key: "meca-economy",
-                    label: `Révision ${mecaOfferedLevel}`,
-                    value: "Offert",
-                    offered: true,
+                    label: `Remise révision −${rate} %`,
+                    value: `−${pricing.mecaEconomy} €`,
+                    discount: true,
                 });
             }
             groups.push({
@@ -589,7 +590,7 @@ export default function BookingPage() {
                                                     id="panel-revision"
                                                     step={3}
                                                     title="Révision de base"
-                                                    aside="Offerte avec un lavage complet."
+                                                    aside="Jusqu’à −70 % avec un lavage complet."
                                                 >
                                                     <div className={`formula-grid${hasWash ? "" : " is-disabled"}`}>
                                                         <FormulaCategory

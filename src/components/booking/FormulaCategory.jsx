@@ -36,32 +36,50 @@ export default function FormulaCategory({
             <div className="formula-grid__line">
                 {formulaLevels.map((level) => {
                     const selected = formula[category.key] === level;
-                    // Le flag « Offert » se place toujours sur la méca la moins chère
-                    // disponible (le niveau offert), quelle que soit la sélection.
-                    const offered = isMeca && isCompleteWash && level === mecaOfferedLevel;
-                    // Méca : indisponible sans lavage ; et sous le niveau offert
-                    // (lavage complet) seuls les niveaux supérieurs sont sélectionnables.
+                    // Méca : indisponible sans lavage ; et sous le niveau du lavage le
+                    // plus bas (lavage complet) seuls les niveaux supérieurs restent
+                    // sélectionnables (contrainte conservée).
                     const disabled =
                         isMeca &&
                         (!hasWash ||
                             (mecaOfferedLevel &&
                                 formulaLevels.indexOf(level) <
                                     formulaLevels.indexOf(mecaOfferedLevel)));
+                    // Remise méca : en lavage complet, chaque palier sélectionnable est
+                    // remisé de son propre taux (−50/−60/−70 %). Le prix n'est plus offert.
+                    const discountRate =
+                        isMeca && isCompleteWash && !disabled
+                            ? category.tierDiscounts[level] || 0
+                            : 0;
+                    const netPrice = Math.round(category.prices[level] * (1 - discountRate));
                     return (
                         <button
                             type="button"
                             key={level}
                             disabled={disabled}
                             aria-pressed={selected}
-                            className={`formula-price ${level.toLowerCase()}${selected ? " is-selected" : ""}${offered ? " is-offered" : ""}`}
+                            className={`formula-price ${level.toLowerCase()}${selected ? " is-selected" : ""}${discountRate > 0 ? " is-discounted" : ""}`}
                             onClick={() => onToggle(category.key, level)}
                         >
-                            {/* Icônes + qualité puis prix. Le prix reste affiché même
-                                quand le palier est OFFERT (barré via .is-offered) afin que
-                                le bouton garde la même taille que les autres. */}
+                            {/* Pastille de remise (méca en lavage complet). */}
+                            {discountRate > 0 && (
+                                <span className="formula-price__deal">
+                                    −{Math.round(discountRate * 100)}%
+                                </span>
+                            )}
+                            {/* Icônes + qualité puis prix. En cas de remise, le prix plein
+                                est barré et le prix net affiché à côté. */}
                             <TierBadges tier={level} small />
                             <span className="formula-price__level">{level}</span>
-                            <span className="formula-price__amount">{category.prices[level]} €</span>
+                            <span className="formula-price__amount">
+                                {discountRate > 0 ? (
+                                    <>
+                                        <s>{category.prices[level]} €</s> {netPrice} €
+                                    </>
+                                ) : (
+                                    `${category.prices[level]} €`
+                                )}
+                            </span>
                         </button>
                     );
                 })}

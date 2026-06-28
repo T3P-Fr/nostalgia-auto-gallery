@@ -346,24 +346,22 @@ export function computePricing(formula, options, isCompleteWash) {
         }
         if (category.key === "meca") {
             // La méca compte TOUJOURS à son prix plein dans la base ; en lavage
-            // complet, seule la valeur du niveau OFFERT est ensuite déduite (cf.
-            // mecaEconomy), si bien qu'une montée en gamme reste facturée (sa
-            // différence par rapport au niveau offert).
+            // complet, une remise (propre à son palier) est ensuite déduite
+            // (cf. mecaEconomy) — elle n'est plus offerte mais remisée.
             mecaBase += category.prices[level];
             return;
         }
         washBase += category.prices[level];
     });
 
-    // Remise « révision offerte » : en lavage complet, on offre la méca à hauteur
-    // du niveau OFFERT (le plus bas des deux lavages). Si le client a choisi un
-    // niveau de méca supérieur, il ne paie que la différence.
+    // Remise « révision » : en lavage complet, la méca bénéficie du taux de remise
+    // de son palier (−50/−60/−70 %), appliqué à son prix. Hors lavage complet, la
+    // méca reste à plein tarif.
     let mecaEconomy = 0;
     if (isCompleteWash && formula.meca) {
-        const offeredLevel = getMecaOfferedLevel(formula, isCompleteWash);
-        const mecaPrices = formulaCategories.find((category) => category.key === "meca").prices;
-        // Plafonné au prix réellement sélectionné pour ne jamais offrir plus que dû.
-        mecaEconomy = Math.min(mecaPrices[offeredLevel], mecaPrices[formula.meca]);
+        const mecaCategory = formulaCategories.find((category) => category.key === "meca");
+        const rate = mecaCategory.tierDiscounts[formula.meca] || 0;
+        mecaEconomy = Math.round(mecaCategory.prices[formula.meca] * rate);
     }
 
     // Sous-total des options choisies (la remise progressive s'y applique).

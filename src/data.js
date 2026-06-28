@@ -56,6 +56,19 @@ export const interventionTowns = content.interventionTowns;
  */
 const pricing = content.pricing;
 
+/*
+ * Pastille illustrant chaque niveau de detailing : l'icône (servie depuis /assets)
+ * et la couleur d'identité, calquée sur la teinte dominante de l'icône.
+ * Platine → étoile bronze, Premium → diamant argent, Deluxe → couronne or.
+ * La couleur est aussi exposée en CSS (variables --tier-* / --level-color).
+ */
+// `count` : nombre d'icônes répétées (1 étoile, 2 diamants, 3 couronnes).
+export const tierBadges = {
+    Platine: { icon: "/assets/NAG--Platine.webp", color: "#c08a3e", count: 1 },
+    Premium: { icon: "/assets/NAG--Premium.webp", color: "#9aa6b4", count: 2 },
+    Deluxe: { icon: "/assets/NAG--Deluxe.webp", color: "#e0b020", count: 3 },
+};
+
 // Page Tarifs : groupes (avec paliers) et options au format [libellé, "30 €"].
 export const pricingGroups = pricing.groups;
 export const pricingOptions = pricing.options.map((option) => [
@@ -78,6 +91,13 @@ export const formulaCategories = pricing.groups.map((group) => ({
     prices: Object.fromEntries(group.tiers.map((tier) => [tier.tier, tier.price])),
     durations: Object.fromEntries(group.tiers.map((tier) => [tier.tier, tier.duration])),
     features: Object.fromEntries(group.tiers.map((tier) => [tier.tier, tier.features])),
+    // Taux de remise par palier (méca uniquement) : « -50% » → 0.5. Appliqué au
+    // prix du palier en lavage complet (la méca n'est plus offerte mais remisée).
+    tierDiscounts: Object.fromEntries(
+        group.tiers
+            .filter((tier) => tier.discount)
+            .map((tier) => [tier.tier, Math.abs(parseFloat(tier.discount)) / 100]),
+    ),
 }));
 
 // Prestations : on remplace le NOM d'icône par le composant correspondant.

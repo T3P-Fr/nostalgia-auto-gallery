@@ -34,9 +34,9 @@
                       interpolée de --veil-min → --veil-max selon --scroll-factor.
        À --scroll-factor 1, --veil atteint --veil-max : le haut devient aussi sombre
        que le bas, donc l'écran s'uniformise en sombre en bas de page. */
-    --veil-min: 15%;
-    --veil-max: 92%;
-    --veil: color-mix(in srgb,
+    --veil-min: 0%;
+    --veil-max: 75%;
+    --veil: color-mix(in oklab,
             var(--surface) calc(var(--veil-min) + (var(--veil-max) - var(--veil-min)) * var(--scroll-factor)),
             transparent);
     --surface: #0b0d10;
@@ -80,12 +80,12 @@
    var(--gradient--color) serait figé au rouge et hérité tel quel, donc le redéfinir
    plus bas (ex. --gradient--color: yellow sur un em) n'aurait aucun effet. En la
    déclarant sur *, elle est RECOMPOSÉE par élément avec ses propres sous-variables.
-   (color-mix exige un espace de couleur : « in srgb ».) */
+   (color-mix exige un espace de couleur : « in oklab ».) */
 * {
     --shining-gradient: linear-gradient(to bottom,
             var(--gradient--color),
-            color-mix(in srgb, var(--gradient--color), white var(--gradient--shine)) var(--gradient--center),
-            color-mix(in srgb, var(--gradient--color), black var(--gradient--shine)) var(--gradient--center),
+            color-mix(in oklab, var(--gradient--color), white var(--gradient--shine)) var(--gradient--center),
+            color-mix(in oklab, var(--gradient--color), black var(--gradient--shine)) var(--gradient--center),
             var(--gradient--color));
 }
 
@@ -115,7 +115,7 @@ html {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: color-mix(in srgb, var(--acc), white 15%);
+    background: color-mix(in oklab, var(--acc), white 15%);
     background-clip: padding-box;
 }
 
@@ -178,7 +178,7 @@ img {
 }
 
 /* Voile flouté sous l'en-tête : surface semi-transparente + flou d'arrière-plan,
-   estompé vers le bas par un masque dégradé. (color-mix exige « in srgb ».) */
+   estompé vers le bas par un masque dégradé. (color-mix exige « in oklab ».) */
 .header-nav::before {
     content: "";
     position: absolute;
@@ -186,7 +186,7 @@ img {
     left: 0;
     width: 110vw;
     height: 250%;
-    background-color: color-mix(in srgb, var(--surface) 80%, transparent);
+    background-color: color-mix(in oklab, var(--surface) 80%, transparent);
     backdrop-filter: blur(20px);
     mask-image: linear-gradient(0deg, transparent 5%, black 50%);
 }
@@ -242,8 +242,8 @@ img {
     gap: 2px;
     padding: 5px;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--surface) 60%, transparent);
-    border: 1px solid color-mix(in srgb, var(--txt) 8%, transparent);
+    background: color-mix(in oklab, var(--surface) 60%, transparent);
+    border: 1px solid color-mix(in oklab, var(--txt) 8%, transparent);
 }
 
 .site-nav a {
@@ -405,7 +405,7 @@ img {
    texte ET le contour passent au blanc (le fond reste un voile flou). */
 .button--secondary {
     border: 1px solid rgba(255, 255, 255, 0.42);
-    background: color-mix(in srgb, var(--surface) 28%, transparent);
+    background: color-mix(in oklab, var(--surface) 28%, transparent);
     backdrop-filter: blur(10px);
     color: var(--muted);
     box-shadow: none;
@@ -413,7 +413,7 @@ img {
 
 .button--secondary:hover {
     border-color: #fff;
-    background: color-mix(in srgb, var(--surface) 38%, transparent);
+    background: color-mix(in oklab, var(--surface) 38%, transparent);
     color: #fff;
 }
 
@@ -472,7 +472,7 @@ main::after {
     pointer-events: none;
     background: linear-gradient(to bottom,
             var(--veil) 0%,
-            color-mix(in srgb, var(--surface) var(--veil-max), transparent) 100%);
+            color-mix(in oklab, var(--surface) var(--veil-max), transparent) 100%);
 }
 
 /* En-tête de page (« héros texte »). Texte aligné à gauche, centré verticalement
@@ -724,7 +724,7 @@ main::after {
     border: 1px solid var(--line);
     border-top: 0;
     border-radius: 0 0 var(--radius-card) var(--radius-card);
-    background: color-mix(in srgb, var(--surface), transparent 50%);
+    background: color-mix(in oklab, var(--surface), transparent 50%);
     backdrop-filter: blur(100px);
 }
 
@@ -1188,7 +1188,7 @@ main::after {
     padding: 10px 16px;
     border: 1px solid rgba(255, 255, 255, 0.42);
     border-radius: var(--radius-card);
-    background: color-mix(in srgb, var(--surface) 38%, transparent);
+    background: color-mix(in oklab, var(--surface) 38%, transparent);
     backdrop-filter: blur(10px);
     color: #fff;
     cursor: pointer;
@@ -1401,7 +1401,7 @@ main::after {
     place-items: center;
     border-radius: 50%;
     background: radial-gradient(circle,
-            color-mix(in srgb, var(--red-primary) 13%, transparent),
+            color-mix(in oklab, var(--red-primary) 13%, transparent),
             transparent 68%);
 }
 
@@ -1421,14 +1421,14 @@ main::after {
 .radius-map__middle {
     width: 68%;
     height: 68%;
-    border: 1px dashed color-mix(in srgb, var(--red-primary) 60%, transparent);
+    border: 1px dashed color-mix(in oklab, var(--red-primary) 60%, transparent);
 }
 
 .radius-map__inner {
     width: 36%;
     height: 36%;
     border: 2px solid var(--acc);
-    background: color-mix(in srgb, var(--red-primary) 10%, transparent);
+    background: color-mix(in oklab, var(--red-primary) 10%, transparent);
 }
 
 .radius-map__center {
@@ -1601,9 +1601,9 @@ main::after {
     align-items: center;
     gap: 8px;
     padding: 11px;
-    border: 1px solid color-mix(in srgb, var(--red-primary) 40%, transparent);
+    border: 1px solid color-mix(in oklab, var(--red-primary) 40%, transparent);
     border-radius: var(--radius-card);
-    background: color-mix(in srgb, var(--red-primary) 12%, transparent);
+    background: color-mix(in oklab, var(--red-primary) 12%, transparent);
     font-size: 12px;
     font-weight: 800;
 }
@@ -1649,7 +1649,7 @@ main::after {
     padding: 32px;
     border: 2px solid var(--acc);
     border-radius: var(--radius-card);
-    background: linear-gradient(color-mix(in srgb, var(--red-primary) 32%, transparent),
+    background: linear-gradient(color-mix(in oklab, var(--red-primary) 32%, transparent),
             var(--surface));
 }
 
@@ -1934,7 +1934,7 @@ main::after {
     align-items: center;
     justify-content: center;
     aspect-ratio: 1;
-    color: color-mix(in srgb, var(--txt) 14%, transparent);
+    color: color-mix(in oklab, var(--txt) 14%, transparent);
     font-size: 13px;
     pointer-events: none;
 }
@@ -1983,7 +1983,7 @@ main::after {
     border-color: var(--acc);
     /* Texte en blanc : le rouge donnait l'impression d'un créneau non sélectionnable. */
     color: #fff;
-    background: color-mix(in srgb, var(--red-primary) 12%, transparent);
+    background: color-mix(in oklab, var(--red-primary) 12%, transparent);
 }
 
 /* Créneau pris (réservé/confirmé) : reste désactivé et barré, mais sur fond rouge.
@@ -2150,7 +2150,7 @@ main::after {
 .booking-form textarea:focus,
 .admin-auth input:focus {
     border-color: var(--acc);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--red-primary) 15%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--red-primary) 15%, transparent);
 }
 
 .booking-recap {
@@ -2181,7 +2181,7 @@ main::after {
 /* Calque givré UNIQUE (tabs + carte) : un seul backdrop-filter continu, sinon
    chaque bloc floute sa propre portion d'arrière-plan → jointure visible. */
 .booking-frost {
-    background: color-mix(in srgb, var(--surface), transparent 50%);
+    background: color-mix(in oklab, var(--surface), transparent 50%);
     backdrop-filter: blur(100px);
     border-radius: 0 0 var(--radius-card) var(--radius-card);
 }
@@ -2223,7 +2223,7 @@ main::after {
 .need-tab.is-selected {
     border-top-color: var(--acc);
     background: linear-gradient(to bottom,
-            color-mix(in srgb, var(--red-primary) 16%, transparent),
+            color-mix(in oklab, var(--red-primary) 16%, transparent),
             transparent 65%);
     color: var(--txt);
 }
@@ -2573,6 +2573,31 @@ main::after {
     }
 }
 
+/* Méca remisée (lavage complet) : liseré/lueur verts pour la repérer ; le prix
+   plein est barré (cf. le <s> dans le montant) et le prix net affiché à côté. */
+.formula-price.is-discounted {
+    border-color: #19c37d;
+    box-shadow: 0 0 0 1px #19c37d, 0 0 16px #19c37d;
+}
+
+.formula-price.is-discounted .formula-price__amount s {
+    opacity: 0.6;
+}
+
+/* Pastille de remise (« −50% ») dans le coin du bouton méca. */
+.formula-price__deal {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    padding: 1px 5px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #21d989, #11a368);
+    color: #000;
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1.4;
+}
+
 /* Prestations incluses, sous forme de pills. */
 .formula-pills {
     display: flex;
@@ -2588,10 +2613,10 @@ main::after {
     align-items: center;
     gap: 5px;
     padding: 5px 11px;
-    border: 1px solid color-mix(in srgb, var(--level-color, var(--acc)) 50%, var(--line));
+    border: 1px solid color-mix(in oklab, var(--level-color, var(--acc)) 50%, var(--line));
     border-radius: 999px;
-    background: color-mix(in srgb, var(--level-color, var(--acc)) 14%, transparent);
-    color: color-mix(in srgb, var(--level-color, var(--acc)) 55%, var(--txt));
+    background: color-mix(in oklab, var(--level-color, var(--acc)) 14%, transparent);
+    color: color-mix(in oklab, var(--level-color, var(--acc)) 55%, var(--txt));
     font-size: 10px;
     font-weight: 400;
     letter-spacing: 0.05em;
@@ -3243,7 +3268,7 @@ main::after {
         border: 0;
         border-radius: 0;
         /* Fond identique à la carte (givré, surface semi-transparente). */
-        background: color-mix(in srgb, var(--surface), transparent 50%);
+        background: color-mix(in oklab, var(--surface), transparent 50%);
         backdrop-filter: blur(100px);
         box-shadow: -12px 0 32px rgba(0, 0, 0, 0.35);
         /* Hors écran par défaut, glisse vers le centre à l'ouverture. */
