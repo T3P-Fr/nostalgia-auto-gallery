@@ -10,6 +10,7 @@ const {
     updateAppointment,
     updateRequest,
 } = require("./store.cjs");
+const { notifyAppointment, notifyRequest } = require("./mailer.cjs");
 
 // Version CommonJS (.cjs) pour Phusion Passenger (o2switch). Passenger charge le
 // fichier de démarrage en CommonJS ; un fichier ESM (.js avec "type":"module")
@@ -169,6 +170,9 @@ app.post("/api/appointments", async (request, response, next) => {
         }
         const appointment = await createAppointment(validation.data);
         response.status(201).json(appointment);
+        // Notifications email (client + gérant) en tâche de fond : on n'attend pas
+        // l'envoi pour répondre, et un échec d'email ne casse jamais la réservation.
+        notifyAppointment(appointment).catch(() => {});
     } catch (error) {
         if (error.code === "SLOT_CONFLICT") {
             response.status(409).json({ message: error.message });
@@ -187,6 +191,8 @@ app.post("/api/requests", async (request, response, next) => {
         }
         const created = await createRequest(validation.data);
         response.status(201).json(created);
+        // Notifications email (client + gérant) en tâche de fond (cf. /appointments).
+        notifyRequest(created).catch(() => {});
     } catch (error) {
         next(error);
     }

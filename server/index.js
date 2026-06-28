@@ -11,6 +11,7 @@ import {
     updateAppointment,
     updateRequest,
 } from "./store.js";
+import { notifyAppointment, notifyRequest } from "./mailer.js";
 
 const app = express();
 const port = Number(process.env.PORT) || 3001;
@@ -184,6 +185,9 @@ app.post("/api/appointments", async (request, response, next) => {
         }
         const appointment = await createAppointment(validation.data);
         response.status(201).json(appointment);
+        // Notifications email (client + gérant) en tâche de fond : on n'attend pas
+        // l'envoi pour répondre, et un échec d'email ne casse jamais la réservation.
+        notifyAppointment(appointment).catch(() => {});
     } catch (error) {
         if (error.code === "SLOT_CONFLICT") {
             response.status(409).json({ message: error.message });
@@ -202,6 +206,8 @@ app.post("/api/requests", async (request, response, next) => {
         }
         const created = await createRequest(validation.data);
         response.status(201).json(created);
+        // Notifications email (client + gérant) en tâche de fond (cf. /appointments).
+        notifyRequest(created).catch(() => {});
     } catch (error) {
         next(error);
     }
