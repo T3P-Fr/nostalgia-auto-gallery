@@ -113,6 +113,38 @@ async function sendEmail({ to, subject, html, replyTo }) {
 }
 
 /**
+ * État du mailer pour diagnostic (route de santé). N'expose aucun secret.
+ * @returns {Promise<object>} Statut détaillé du mailer.
+ */
+export async function verifyMailer() {
+    const status = {
+        nodemailerLoaded: Boolean(nodemailer),
+        configured: Boolean(SMTP_HOST && SMTP_USER && SMTP_PASS),
+        host: SMTP_HOST || null,
+        port: SMTP_PORT,
+        user: SMTP_USER || null,
+        from: MAIL_FROM || null,
+        owner: MAIL_TO_OWNER || null,
+        verified: false,
+        error: null,
+    };
+    const tx = getTransporter();
+    if (!tx) {
+        status.error = !nodemailer
+            ? "nodemailer non installé (npm install)"
+            : "configuration SMTP incomplète (SMTP_HOST/USER/PASS)";
+        return status;
+    }
+    try {
+        await tx.verify();
+        status.verified = true;
+    } catch (error) {
+        status.error = error.message;
+    }
+    return status;
+}
+
+/**
  * Notifie un nouveau rendez-vous : accusé au client (si email) + notif au gérant.
  * @param {object} appointment Rendez-vous créé.
  * @returns {Promise<void>} Aucune valeur de retour.

@@ -10,7 +10,7 @@ const {
     updateAppointment,
     updateRequest,
 } = require("./store.cjs");
-const { notifyAppointment, notifyRequest } = require("./mailer.cjs");
+const { notifyAppointment, notifyRequest, verifyMailer } = require("./mailer.cjs");
 
 // Version CommonJS (.cjs) pour Phusion Passenger (o2switch). Passenger charge le
 // fichier de démarrage en CommonJS ; un fichier ESM (.js avec "type":"module")
@@ -133,6 +133,16 @@ function validateRequest(body) {
 
 app.get("/api/health", (_request, response) => {
     response.json({ status: "ok" });
+});
+
+// Diagnostic du mailer (protégé par la clé admin) : indique si nodemailer est
+// chargé, si la config SMTP est présente et si la connexion SMTP fonctionne.
+app.get("/api/health/mail", requireAdmin, async (_request, response, next) => {
+    try {
+        response.json(await verifyMailer());
+    } catch (error) {
+        next(error);
+    }
 });
 
 app.get("/api/availability", async (request, response, next) => {

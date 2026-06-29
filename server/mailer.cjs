@@ -218,4 +218,37 @@ async function notifyRequest(request) {
     });
 }
 
-module.exports = { notifyAppointment, notifyRequest };
+/**
+ * État du mailer pour diagnostic (route de santé) : module chargé, configuration
+ * présente, et test de connexion SMTP. N'expose aucun secret (ni le mot de passe).
+ * @returns {Promise<object>} Statut détaillé du mailer.
+ */
+async function verifyMailer() {
+    const status = {
+        nodemailerLoaded: Boolean(nodemailer),
+        configured: Boolean(SMTP_HOST && SMTP_USER && SMTP_PASS),
+        host: SMTP_HOST || null,
+        port: SMTP_PORT,
+        user: SMTP_USER || null,
+        from: MAIL_FROM || null,
+        owner: MAIL_TO_OWNER || null,
+        verified: false,
+        error: null,
+    };
+    const tx = getTransporter();
+    if (!tx) {
+        status.error = !nodemailer
+            ? "nodemailer non installé (npm install)"
+            : "configuration SMTP incomplète (SMTP_HOST/USER/PASS)";
+        return status;
+    }
+    try {
+        await tx.verify();
+        status.verified = true;
+    } catch (error) {
+        status.error = error.message;
+    }
+    return status;
+}
+
+module.exports = { notifyAppointment, notifyRequest, verifyMailer };

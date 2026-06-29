@@ -11,7 +11,7 @@ import {
     updateAppointment,
     updateRequest,
 } from "./store.js";
-import { notifyAppointment, notifyRequest } from "./mailer.js";
+import { notifyAppointment, notifyRequest, verifyMailer } from "./mailer.js";
 
 const app = express();
 const port = Number(process.env.PORT) || 3001;
@@ -148,6 +148,16 @@ function validateRequest(body) {
 
 app.get("/api/health", (_request, response) => {
     response.json({ status: "ok" });
+});
+
+// Diagnostic du mailer (protégé par la clé admin) : indique si nodemailer est
+// chargé, si la config SMTP est présente et si la connexion SMTP fonctionne.
+app.get("/api/health/mail", requireAdmin, async (_request, response, next) => {
+    try {
+        response.json(await verifyMailer());
+    } catch (error) {
+        next(error);
+    }
 });
 
 app.get("/api/availability", async (request, response, next) => {
