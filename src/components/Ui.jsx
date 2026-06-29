@@ -277,10 +277,10 @@ function ZoneMap() {
         const circleOuter = L.circle(ZONE_CENTER, {
             radius: 25000,
             color: "#e11d2a",
-            weight: 1.5,
-            dashArray: "6 7",
+            weight: 2,
+            dashArray: "5 6",
             fill: false,
-            opacity: 0.7,
+            opacity: 0.9,
         }).addTo(map);
 
         // Marqueur central + libellé permanent.
@@ -311,7 +311,8 @@ function ZoneMap() {
         // puis décale Parignargues vers la DROITE (≈ 2/3 de la largeur).
         const frame = () => {
             map.fitBounds(circleOuter.getBounds(), { padding: [16, 16] });
-            map.panBy([-Math.round((container.clientWidth || 600) * 0.16), 0], {
+            // Parignargues poussé dans le tiers droit (≈ 75 % de la largeur).
+            map.panBy([-Math.round((container.clientWidth || 600) * 0.26), 0], {
                 animate: false,
             });
         };
