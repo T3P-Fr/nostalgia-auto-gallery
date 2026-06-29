@@ -267,8 +267,9 @@ function ZoneMap() {
         }).setView(ZONE_CENTER, 11);
         mapRef.current = map;
 
-        // Fond de carte sombre (CartoDB Dark Matter) pour s'accorder au thème du site.
-        L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        // Fond sombre SANS libellés (CartoDB Dark Matter « nolabels ») : on évite
+        // ainsi le doublon avec NOS communes (seuls nos marqueurs portent un nom).
+        L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png", {
             attribution: "© OpenStreetMap © CARTO",
             subdomains: "abcd",
             maxZoom: 19,
