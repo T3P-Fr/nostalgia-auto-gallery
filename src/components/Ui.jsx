@@ -234,10 +234,12 @@ function ZoneMap() {
             return undefined;
         }
 
+        // Vue initiale OBLIGATOIRE avant toute projection (circle.getBounds /
+        // fitBounds) : sans elle, Leaflet lève « layerPointToLatLng of undefined ».
         const map = L.map(container, {
             scrollWheelZoom: false,
             attributionControl: true,
-        });
+        }).setView(ZONE_CENTER, 11);
         mapRef.current = map;
 
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
