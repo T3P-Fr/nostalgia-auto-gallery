@@ -1,3 +1,7 @@
+// Charge le .env (déposé à la racine de l'app) AVANT tout le reste, pour que les
+// variables (SMTP_*, ADMIN_KEY…) soient lues par les modules requis ensuite.
+require("dotenv").config();
+
 const express = require("express");
 const path = require("node:path");
 const {

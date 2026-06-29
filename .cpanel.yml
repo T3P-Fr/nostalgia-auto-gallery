@@ -1,23 +1,18 @@
 ---
 # Déploiement o2switch (cPanel Git Version Control).
-# Lancé à chaque « Deploy HEAD Commit » après un git push.
+# Lancé à chaque « Deploy HEAD Commit » après mise à jour du dépôt.
 #
-# À ADAPTER :
-#   - UTILISATEUR : ton identifiant cPanel
-#   - APP         : le dossier de l'application Node (celui configuré dans
-#                   « Setup Node.js App » comme Application Root)
-#   - NODEVENV    : chemin de l'environnement Node créé par cPanel
-#                   (visible dans « Setup Node.js App » : la commande
-#                   « source /home/UTILISATEUR/nodevenv/APP/XX/bin/activate »)
+# Le dépôt est dans /home/tila8859/repositories/nostalgia-app ; l'application Node
+# tourne dans /home/tila8859/nostalgia-app (App Root de « Setup Node.js App »,
+# Node v22). On copie donc le code vers l'app, puis install + build + restart.
 #
-# NB : le .env n'est PAS versionné : dépose-le une fois dans le dossier APP
-#      (ou définis les variables dans l'UI « Setup Node.js App »).
+# Le .env (secrets) et node_modules ne sont PAS écrasés (exclus du rsync).
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/UTILISATEUR/APP
-    # 1) Copie le code du dépôt vers le dossier de l'app (sans écraser node_modules/.env).
+    - export DEPLOYPATH=/home/tila8859/nostalgia-app
+    # 1) Copie le code du dépôt vers le dossier de l'app (préserve .env et node_modules).
     - /usr/bin/rsync -a --delete --exclude node_modules --exclude .env --exclude .git ./ $DEPLOYPATH/
-    # 2) Active l'environnement Node de cPanel puis installe + build.
-    - source /home/UTILISATEUR/nodevenv/APP/22/bin/activate && cd $DEPLOYPATH && npm install --include=dev && npm run build
+    # 2) Active l'environnement Node de cPanel (v22) puis installe les deps + build le front.
+    - source /home/tila8859/nodevenv/nostalgia-app/22/bin/activate && cd $DEPLOYPATH && npm install --include=dev && npm run build
     # 3) Redémarre l'application (Passenger).
     - mkdir -p $DEPLOYPATH/tmp && touch $DEPLOYPATH/tmp/restart.txt

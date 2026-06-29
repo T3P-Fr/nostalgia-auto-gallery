@@ -1,3 +1,6 @@
+// Charge le .env AVANT les autres imports (évalués dans l'ordre) : les variables
+// d'environnement sont ainsi disponibles pour le mailer et le reste.
+import "dotenv/config";
 import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
