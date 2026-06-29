@@ -290,11 +290,11 @@ function ZoneMap() {
             fillOpacity: 0.1,
         }).addTo(map);
 
-        // Second cercle à 25 km (pointillé, sans remplissage) : limite étendue.
+        // Cercle central à 22,5 km (pointillé, sans remplissage), trait plus fin.
         const circleOuter = L.circle(ZONE_CENTER, {
-            radius: 25000,
+            radius: 22500,
             color: "#e11d2a",
-            weight: 2,
+            weight: 1.5,
             dashArray: "5 6",
             fill: false,
             opacity: 0.9,
