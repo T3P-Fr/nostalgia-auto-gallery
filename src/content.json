@@ -41,7 +41,7 @@
         },
         {
             "title": "Complète",
-            "description": "Intérieur et extérieur réunis dans une seule intervention : vous économisez sur le lavage et la révision de base est offerte.",
+            "description": "Intérieur et extérieur réunis dans une seule intervention : vous économisez sur le lavage et la révision de base est gratuite.",
             "from": "dès 125 €",
             "icon": "Wrench"
         }
@@ -145,7 +145,7 @@
                 "tiers": [
                     {
                         "tier": "Platine",
-                        "price": 99,
+                        "price": 79,
                         "duration": "≈ 1h45",
                         "features": [
                             "Aspiration de l’habitacle",
@@ -156,7 +156,7 @@
                     },
                     {
                         "tier": "Premium",
-                        "price": 149,
+                        "price": 129,
                         "duration": "≈ 2h15",
                         "includes": "Platine",
                         "features": [
@@ -167,7 +167,7 @@
                     },
                     {
                         "tier": "Deluxe",
-                        "price": 249,
+                        "price": 199,
                         "duration": "≈ 4h",
                         "includes": "Premium",
                         "features": [
@@ -191,7 +191,7 @@
                 "tiers": [
                     {
                         "tier": "Platine",
-                        "price": 89,
+                        "price": 75,
                         "duration": "≈ 1h45",
                         "features": [
                             "Roues & jantes",
@@ -203,7 +203,7 @@
                     },
                     {
                         "tier": "Premium",
-                        "price": 139,
+                        "price": 119,
                         "duration": "≈ 2h15",
                         "includes": "Platine",
                         "features": [
@@ -215,7 +215,7 @@
                     },
                     {
                         "tier": "Deluxe",
-                        "price": 239,
+                        "price": 189,
                         "duration": "≈ 4h",
                         "includes": "Premium",
                         "features": [
@@ -231,12 +231,12 @@
                 "key": "meca",
                 "title": "Révision de base",
                 "subtitle": "Complément · avec un lavage",
-                "condition": "Disponible uniquement avec un lavage. Remisée jusqu’à −70 % avec un lavage complet (intérieur + extérieur).",
+                "condition": "Disponible uniquement avec un lavage. Gratuite au niveau de votre lavage complet (intérieur + extérieur) ; au-delà, seule la différence est due.",
                 "bonusLabel": "Complément méca : à ajouter à un lavage",
                 "tiers": [
                     {
                         "tier": "Platine",
-                        "price": 19,
+                        "price": 29,
                         "discount": "-40%",
                         "duration": "≈ 20 min",
                         "features": [
@@ -260,7 +260,7 @@
                     },
                     {
                         "tier": "Deluxe",
-                        "price": 79,
+                        "price": 69,
                         "discount": "-60%",
                         "duration": "≈ 1h",
                         "includes": "Premium",

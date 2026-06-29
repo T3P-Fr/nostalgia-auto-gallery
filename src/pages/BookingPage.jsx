@@ -214,13 +214,10 @@ export default function BookingPage() {
             groups.push({ key: "lavages", title: "Lavages", items: washItems, total: washSubtotal });
         }
 
-        // Groupe RÉVISION : la méca seule. En lavage complet, on n'offre QUE le
-        // niveau offert (mecaEconomy) : une montée en gamme reste donc facturée à
-        // hauteur de sa différence. Le prix de ligne est toujours celui du niveau
-        // RÉELLEMENT sélectionné, pour rester cohérent avec le total.
+        // Groupe RÉVISION : la méca seule. En lavage complet, la méca du NIVEAU du
+        // lavage est offerte ; au-dessus, seule la différence est facturée. Ligne 1 :
+        // méca au prix plein ; ligne 2 : montant offert déduit. Sous-total = net.
         if (mecaCategory && formula.meca) {
-            // Ligne 1 : la méca à son prix plein. Ligne 2 (si lavage complet) : la
-            // remise du palier (−X %), déduite. Le sous-total = prix net.
             const revisionItems = [
                 {
                     key: "meca",
@@ -229,10 +226,10 @@ export default function BookingPage() {
                 },
             ];
             if (pricing.mecaEconomy > 0) {
-                const rate = Math.round((mecaCategory.tierDiscounts[formula.meca] || 0) * 100);
+                // Détail de la gratuité TOUJOURS chiffré (montant offert déduit).
                 revisionItems.push({
                     key: "meca-economy",
-                    label: `Remise révision −${rate} %`,
+                    label: `Révision ${mecaOfferedLevel} gratuite`,
                     value: `−${pricing.mecaEconomy} €`,
                     discount: true,
                 });
@@ -607,7 +604,7 @@ export default function BookingPage() {
                                                     id="panel-revision"
                                                     step={3}
                                                     title="Révision de base"
-                                                    aside="Jusqu’à −70 % avec un lavage complet."
+                                                    aside="Gratuite au niveau de votre lavage complet."
                                                 >
                                                     <div className={`formula-grid${hasWash ? "" : " is-disabled"}`}>
                                                         <FormulaCategory

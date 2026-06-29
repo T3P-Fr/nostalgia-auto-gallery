@@ -64,37 +64,44 @@ export default function FormulaCategory({
                             (mecaOfferedLevel &&
                                 formulaLevels.indexOf(level) <
                                     formulaLevels.indexOf(mecaOfferedLevel)));
-                    // Remise méca : en lavage complet, chaque palier sélectionnable est
-                    // remisé de son propre taux (−50/−60/−70 %). Le prix n'est plus offert.
-                    const discountRate =
-                        isMeca && isCompleteWash && !disabled
-                            ? category.tierDiscounts[level] || 0
+                    // Offre méca (lavage complet) : la méca du NIVEAU du lavage est
+                    // offerte ; au-dessus, on ne paie que la DIFFÉRENCE par rapport à
+                    // ce niveau. (Les niveaux inférieurs sont déjà non cliquables.)
+                    const offeredPrice =
+                        isMeca && isCompleteWash && mecaOfferedLevel && !disabled
+                            ? category.prices[mecaOfferedLevel]
                             : 0;
-                    const netPrice = Math.round(category.prices[level] * (1 - discountRate));
+                    const hasOffer = offeredPrice > 0;
+                    const netPrice = Math.max(0, category.prices[level] - offeredPrice);
+                    const fullyOffered = hasOffer && netPrice === 0;
                     return (
                         <button
                             type="button"
                             key={level}
                             disabled={disabled}
                             aria-pressed={selected}
-                            className={`formula-price ${level.toLowerCase()}${selected ? " is-selected" : ""}${discountRate > 0 ? " is-discounted" : ""}`}
+                            className={`formula-price ${level.toLowerCase()}${selected ? " is-selected" : ""}${hasOffer ? " is-discounted" : ""}`}
                             onClick={() => onToggle(category.key, level)}
                         >
-                            {/* Pastille de remise (méca en lavage complet). */}
-                            {discountRate > 0 && (
+                            {/* Pastille : montant offert déduit (le détail de la gratuité).
+                                « Gratuit » + le montant au niveau du lavage ; au-dessus, le
+                                même montant déduit, la différence restant due. */}
+                            {hasOffer && (
                                 <span className="formula-price__deal">
-                                    −{Math.round(discountRate * 100)}%
+                                    {fullyOffered ? `Gratuit · −${offeredPrice} €` : `−${offeredPrice} €`}
                                 </span>
                             )}
-                            {/* Icônes + qualité puis prix. En cas de remise, le prix plein
-                                est barré et le prix net affiché à côté. */}
                             <TierBadges tier={level} small />
                             <span className="formula-price__level">{level}</span>
                             <span className="formula-price__amount">
-                                {discountRate > 0 ? (
-                                    <>
-                                        <s>{category.prices[level]} €</s> {netPrice} €
-                                    </>
+                                {hasOffer ? (
+                                    fullyOffered ? (
+                                        <s>{category.prices[level]} €</s>
+                                    ) : (
+                                        <>
+                                            <s>{category.prices[level]} €</s> {netPrice} €
+                                        </>
+                                    )
                                 ) : (
                                     `${category.prices[level]} €`
                                 )}
