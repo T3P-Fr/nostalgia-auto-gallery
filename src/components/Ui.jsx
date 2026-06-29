@@ -242,9 +242,11 @@ function ZoneMap() {
         }).setView(ZONE_CENTER, 11);
         mapRef.current = map;
 
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: "© OpenStreetMap",
-            maxZoom: 18,
+        // Fond de carte sombre (CartoDB Dark Matter) pour s'accorder au thème du site.
+        L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+            attribution: "© OpenStreetMap © CARTO",
+            subdomains: "abcd",
+            maxZoom: 19,
         }).addTo(map);
 
         // Cercle des 15 km offerts, centré sur Parignargues.

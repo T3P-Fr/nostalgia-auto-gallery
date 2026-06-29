@@ -1451,6 +1451,12 @@ main::after {
     border-radius: var(--radius-card);
     overflow: hidden;
     z-index: 0;
+    /* Fond sombre sous les tuiles (évite le flash gris au chargement). */
+    background: var(--surface2);
+}
+
+.zone-map .leaflet-container {
+    background: var(--surface2);
 }
 
 /* Libellés (tooltips) Leaflet aux teintes du site. */
