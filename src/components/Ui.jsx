@@ -342,17 +342,21 @@ function ZoneMap() {
         // déprojette un centre décalé pour que Parignargues tombe à droite. Plus fiable
         // que panBy (qui dépendait d'une largeur parfois nulle au montage).
         const frame = () => {
-            const width = map.getSize().x || 600;
-            // RESPONSIVE : sur large écran, le texte est à gauche → on décale
-            // Parignargues à droite et on zoome un peu plus. Sur écran étroit (texte
-            // par-dessus), on garde Parignargues CENTRÉ et un cadrage qui montre les
-            // cercles entièrement (pas de décalage ni de sur-zoom).
+            const size = map.getSize();
+            const width = size.x || 600;
+            // RESPONSIVE, carte toujours en FOND. Large écran (texte à gauche) : on
+            // décale Parignargues vers la DROITE + léger sur-zoom. Écran étroit (texte
+            // en haut) : on le décale vers le BAS pour dégager le haut pour le texte.
             const wide = width >= 760;
             const zoom =
                 map.getBoundsZoom(circleOuter.getBounds(), false, [24, 24]) + (wide ? 0.4 : 0);
             const centerPoint = map.project(ZONE_CENTER, zoom);
-            const shift = wide ? width * 0.3 : 0;
-            const shiftedCenter = map.unproject([centerPoint.x - shift, centerPoint.y], zoom);
+            const dx = wide ? width * 0.3 : 0;
+            const dy = wide ? 0 : size.y * 0.2;
+            const shiftedCenter = map.unproject(
+                [centerPoint.x - dx, centerPoint.y - dy],
+                zoom,
+            );
             map.setView(shiftedCenter, zoom, { animate: false });
         };
         frame();

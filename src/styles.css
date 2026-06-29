@@ -1501,28 +1501,16 @@ main::after {
     margin-bottom: 20px;
 }
 
-/* Écran étroit : on EMPILE (texte au-dessus, carte en bloc dessous) au lieu de
-   superposer le texte sur la carte. Le cadrage JS garde alors Parignargues centré. */
+/* Écran étroit : carte TOUJOURS en fond (comme en horizontal), mais le texte se cale
+   EN HAUT (le cadrage JS pousse alors Parignargues vers le bas pour ne pas le couvrir). */
 @media (max-width: 760px) {
     .zone-panel {
-        flex-direction: column;
-        align-items: stretch;
-        min-height: 0;
-        gap: 20px;
+        align-items: flex-start;
+        min-height: 540px;
     }
 
     .zone-panel__content {
         max-width: none;
-        /* Texte sur fond plein (plus sur la carte) : ombre inutile. */
-        text-shadow: none;
-    }
-
-    .zone-map {
-        position: relative;
-        inset: auto;
-        height: 300px;
-        border: 1px solid var(--line);
-        border-radius: var(--radius-card);
     }
 }
 
