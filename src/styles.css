@@ -1515,6 +1515,10 @@ main::after {
     .zone-panel__content {
         max-width: none;
     }
+
+    .zone-panel .section-heading {
+        margin: 0;
+    }
 }
 
 /* ==========================================================================
@@ -3486,6 +3490,11 @@ main::after {
    ========================================================================== */
 
 @media (max-width: 620px) {
+
+    /* Mode téléphone : on ne garde que l'emblème, le logo texte est masqué. */
+    .brand__words {
+        display: none;
+    }
 
     .hero {
         min-height: 620px;
