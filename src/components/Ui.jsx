@@ -354,7 +354,7 @@ function ZoneMap() {
                 map.getBoundsZoom(circleOuter.getBounds(), false, [24, 24]) + (wide ? 0.4 : -0.2);
             const centerPoint = map.project(ZONE_CENTER, zoom);
             const dx = wide ? width * 0.3 : 0;
-            const dy = wide ? 0 : size.y * 0.3;
+            const dy = wide ? 0 : size.y * 0.26;
             const shiftedCenter = map.unproject(
                 [centerPoint.x - dx, centerPoint.y - dy],
                 zoom,
