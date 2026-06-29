@@ -227,11 +227,14 @@ function ZoneMap() {
     const mapRef = useRef(null);
 
     useEffect(() => {
-        if (mapRef.current || !containerRef.current) {
+        const container = containerRef.current;
+        // Garde anti double-initialisation : en dev (StrictMode), l'effet tourne deux
+        // fois ; on ne recrée pas la carte si le conteneur en porte déjà une.
+        if (mapRef.current || !container || container._leaflet_id) {
             return undefined;
         }
 
-        const map = L.map(containerRef.current, {
+        const map = L.map(container, {
             scrollWheelZoom: false,
             attributionControl: true,
         });
@@ -278,7 +281,12 @@ function ZoneMap() {
         // Cadre la vue sur le cercle des 15 km (avec une marge).
         map.fitBounds(circle.getBounds(), { padding: [20, 20] });
 
+        // Recale la taille une fois la mise en page stabilisée (sinon tuiles grises
+        // si le conteneur est dimensionné après l'init).
+        const sizeTimer = window.setTimeout(() => map.invalidateSize(), 0);
+
         return () => {
+            window.clearTimeout(sizeTimer);
             map.remove();
             mapRef.current = null;
         };
