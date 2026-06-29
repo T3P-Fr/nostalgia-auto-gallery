@@ -1506,7 +1506,10 @@ main::after {
 @media (max-width: 760px) {
     .zone-panel {
         align-items: flex-start;
-        min-height: 540px;
+        /* Carte plus haute + texte collé en haut → le bloc texte ne touche plus
+           les cercles (poussés vers le bas par le cadrage JS). */
+        min-height: 620px;
+        padding-top: 26px;
     }
 
     .zone-panel__content {

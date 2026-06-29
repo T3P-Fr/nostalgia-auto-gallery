@@ -348,11 +348,13 @@ function ZoneMap() {
             // décale Parignargues vers la DROITE + léger sur-zoom. Écran étroit (texte
             // en haut) : on le décale vers le BAS pour dégager le haut pour le texte.
             const wide = width >= 760;
+            // Étroit : léger dézoom (-0.2) pour de la marge, et on pousse Parignargues
+            // plus bas (0.3 de la hauteur) afin de dégager le haut pour le texte.
             const zoom =
-                map.getBoundsZoom(circleOuter.getBounds(), false, [24, 24]) + (wide ? 0.4 : 0);
+                map.getBoundsZoom(circleOuter.getBounds(), false, [24, 24]) + (wide ? 0.4 : -0.2);
             const centerPoint = map.project(ZONE_CENTER, zoom);
             const dx = wide ? width * 0.3 : 0;
-            const dy = wide ? 0 : size.y * 0.2;
+            const dy = wide ? 0 : size.y * 0.3;
             const shiftedCenter = map.unproject(
                 [centerPoint.x - dx, centerPoint.y - dy],
                 zoom,
