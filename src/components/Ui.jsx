@@ -307,14 +307,19 @@ function ZoneMap() {
                 .bindTooltip(town.name, { permanent: true, direction: "top" });
         });
 
-        // Cadre la vue sur le cercle EXTÉRIEUR (25 km) pour montrer les deux cercles,
-        // puis décale Parignargues vers la DROITE (≈ 2/3 de la largeur).
+        // Place Parignargues + ses cercles dans le tiers DROIT (~76 % de la largeur).
+        // Calcul géométrique : on choisit le zoom qui cadre le cercle 25 km, puis on
+        // déprojette un centre décalé pour que Parignargues tombe à droite. Plus fiable
+        // que panBy (qui dépendait d'une largeur parfois nulle au montage).
         const frame = () => {
-            map.fitBounds(circleOuter.getBounds(), { padding: [16, 16] });
-            // Parignargues poussé dans le tiers droit (≈ 75 % de la largeur).
-            map.panBy([-Math.round((container.clientWidth || 600) * 0.26), 0], {
-                animate: false,
-            });
+            const zoom = map.getBoundsZoom(circleOuter.getBounds(), false, [24, 24]);
+            const width = map.getSize().x || 600;
+            const centerPoint = map.project(ZONE_CENTER, zoom);
+            const shiftedCenter = map.unproject(
+                [centerPoint.x - width * 0.26, centerPoint.y],
+                zoom,
+            );
+            map.setView(shiftedCenter, zoom, { animate: false });
         };
         frame();
 
