@@ -1,5 +1,6 @@
-import { Sparkles } from "lucide-react";
-import { Fragment, useState } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { interventionTowns } from "../data.js";
 import { usePageBackgroundImage } from "./PageBackground.jsx";
@@ -201,18 +202,90 @@ export function BeforeAfterComparison({
  * Présente la zone d'intervention dans la page de rendez-vous.
  * @returns {JSX.Element} Le bloc de zone et ses communes.
  */
-// Communes positionnées sur la carte (cercles concentriques centrés sur
-// Parignargues). top/left en % : direction = position autour du centre (50/50),
-// distance = éloignement du centre. Proches dans la zone « 15 km offerts ».
-const zoneMarkers = [
-    { name: "Caveirac", top: 51, left: 66 },
-    { name: "Nîmes", top: 39, left: 80 },
-    { name: "Calvisson", top: 70, left: 41 },
-    { name: "Sommières", top: 81, left: 47 },
-    { name: "Saint-Gilles", top: 84, left: 78 },
-    { name: "Vauvert", top: 90, left: 52 },
-    { name: "Uzès", top: 9, left: 58 },
+// Base de l'activité : Parignargues (30730). Centre de la carte et du cercle 15 km.
+const ZONE_CENTER = [43.8175, 4.2192];
+const ZONE_RADIUS_M = 15000;
+
+// Communes desservies, en coordonnées réelles (placées logiquement sur la carte).
+const zoneTowns = [
+    { name: "Caveirac", coords: [43.8186, 4.2733] },
+    { name: "Nîmes", coords: [43.8367, 4.3601] },
+    { name: "Calvisson", coords: [43.7944, 4.1936] },
+    { name: "Sommières", coords: [43.7847, 4.0892] },
+    { name: "Vauvert", coords: [43.6944, 4.2767] },
+    { name: "Saint-Gilles", coords: [43.6772, 4.4319] },
+    { name: "Uzès", coords: [44.0122, 4.4197] },
 ];
+
+/**
+ * Carte Leaflet (OpenStreetMap) de la zone d'intervention : Parignargues au centre,
+ * cercle des 15 km offerts et communes desservies. Initialisée une fois au montage.
+ * @returns {JSX.Element} Le conteneur de la carte.
+ */
+function ZoneMap() {
+    const containerRef = useRef(null);
+    const mapRef = useRef(null);
+
+    useEffect(() => {
+        if (mapRef.current || !containerRef.current) {
+            return undefined;
+        }
+
+        const map = L.map(containerRef.current, {
+            scrollWheelZoom: false,
+            attributionControl: true,
+        });
+        mapRef.current = map;
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "© OpenStreetMap",
+            maxZoom: 18,
+        }).addTo(map);
+
+        // Cercle des 15 km offerts, centré sur Parignargues.
+        const circle = L.circle(ZONE_CENTER, {
+            radius: ZONE_RADIUS_M,
+            color: "#e11d2a",
+            weight: 2,
+            fillColor: "#e11d2a",
+            fillOpacity: 0.1,
+        }).addTo(map);
+
+        // Marqueur central + libellé permanent.
+        L.circleMarker(ZONE_CENTER, {
+            radius: 7,
+            color: "#fff",
+            weight: 2,
+            fillColor: "#e11d2a",
+            fillOpacity: 1,
+        })
+            .addTo(map)
+            .bindTooltip("Parignargues", { permanent: true, direction: "top" });
+
+        // Communes desservies (petits points + libellé au survol).
+        zoneTowns.forEach((town) => {
+            L.circleMarker(town.coords, {
+                radius: 4,
+                color: "#fff",
+                weight: 1,
+                fillColor: "#14181d",
+                fillOpacity: 0.9,
+            })
+                .addTo(map)
+                .bindTooltip(town.name, { direction: "top" });
+        });
+
+        // Cadre la vue sur le cercle des 15 km (avec une marge).
+        map.fitBounds(circle.getBounds(), { padding: [20, 20] });
+
+        return () => {
+            map.remove();
+            mapRef.current = null;
+        };
+    }, []);
+
+    return <div ref={containerRef} className="zone-map" aria-label="Carte de la zone d’intervention" />;
+}
 
 export function ZonePanel() {
     return (
@@ -229,28 +302,8 @@ export function ZonePanel() {
                     ))}
                 </div>
             </div>
-            <div className="radius-map">
-                <div className="radius-map__outer" />
-                <div className="radius-map__middle" />
-                <div className="radius-map__inner" />
-                <div className="radius-map__center">
-                    <Sparkles />
-                    <strong>Parignargues</strong>
-                    <span>Gard · 30730</span>
-                </div>
-                {/* Communes placées par direction/distance réelles depuis Parignargues :
-                    proches au centre (zone 15 km offerts), plus loin vers les bords. */}
-                {zoneMarkers.map((marker) => (
-                    <span
-                        key={marker.name}
-                        className="radius-map__town"
-                        style={{ top: `${marker.top}%`, left: `${marker.left}%` }}
-                    >
-                        {marker.name}
-                    </span>
-                ))}
-                <span className="radius-map__label">15 km offerts</span>
-            </div>
+            {/* Vraie carte (OpenStreetMap) avec le cercle des 15 km offerts. */}
+            <ZoneMap />
         </section>
     );
 }

@@ -1441,90 +1441,31 @@ main::after {
     font-size: 13px;
 }
 
-.radius-map {
-    position: relative;
-    display: grid;
+/* Carte Leaflet (OpenStreetMap) de la zone d'intervention. Hauteur explicite
+   requise par Leaflet ; coins arrondis et cadre comme les autres médias. */
+.zone-map {
+    width: 100%;
     aspect-ratio: 1;
-    place-items: center;
-    border-radius: 50%;
-    background: radial-gradient(circle,
-            color-mix(in oklab, var(--red-primary) 13%, transparent),
-            transparent 68%);
+    max-height: 420px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    z-index: 0;
 }
 
-/* Les trois cercles donnent une lecture visuelle du rayon autour de Parignargues. */
-.radius-map__outer,
-.radius-map__middle,
-.radius-map__inner {
-    position: absolute;
-    border-radius: 50%;
-}
-
-.radius-map__outer {
-    inset: 0;
-    border: 1px dashed var(--line);
-}
-
-.radius-map__middle {
-    width: 68%;
-    height: 68%;
-    border: 1px dashed color-mix(in oklab, var(--red-primary) 60%, transparent);
-}
-
-.radius-map__inner {
-    width: 36%;
-    height: 36%;
-    border: 2px solid var(--acc);
-    background: color-mix(in oklab, var(--red-primary) 10%, transparent);
-}
-
-.radius-map__center {
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.radius-map__center svg {
-    color: var(--acc);
-}
-
-.radius-map__center strong {
-    margin-top: 10px;
-    font-family: "DM Serif Display", serif;
-    font-size: 28px;
-    font-weight: 400;
-}
-
-.radius-map__center span,
-.radius-map__label {
-    color: var(--muted);
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-}
-
-.radius-map__label {
-    position: absolute;
-    top: 18%;
-    color: var(--acc);
-    font-weight: 800;
-}
-
-/* Communes placées sur la carte (positionnées en % via style inline). */
-.radius-map__town {
-    position: absolute;
-    z-index: 3;
-    transform: translate(-50%, -50%);
-    padding: 2px 8px;
+/* Libellés (tooltips) Leaflet aux teintes du site. */
+.zone-map .leaflet-tooltip {
+    padding: 2px 7px;
     border: 1px solid var(--line);
     border-radius: 999px;
-    background: color-mix(in oklab, var(--surface) 85%, transparent);
+    background: var(--surface);
     color: var(--txt);
-    font-size: 11px;
     font-weight: 700;
-    white-space: nowrap;
-    pointer-events: none;
+    box-shadow: none;
+}
+
+.zone-map .leaflet-tooltip::before {
+    display: none;
 }
 
 .zone-panel {
@@ -1544,9 +1485,8 @@ main::after {
     margin-bottom: 20px;
 }
 
-.zone-panel .radius-map {
-    width: 100%;
-    max-width: 430px;
+.zone-panel .zone-map {
+    max-width: 460px;
     margin-inline: auto;
 }
 
@@ -3495,7 +3435,7 @@ main::after {
         bottom: 12px;
     }
 
-    .radius-map {
+    .zone-map {
         max-width: 520px;
         width: 100%;
         margin: auto;
