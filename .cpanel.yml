@@ -1,0 +1,23 @@
+---
+# Déploiement o2switch (cPanel Git Version Control).
+# Lancé à chaque « Deploy HEAD Commit » après un git push.
+#
+# À ADAPTER :
+#   - UTILISATEUR : ton identifiant cPanel
+#   - APP         : le dossier de l'application Node (celui configuré dans
+#                   « Setup Node.js App » comme Application Root)
+#   - NODEVENV    : chemin de l'environnement Node créé par cPanel
+#                   (visible dans « Setup Node.js App » : la commande
+#                   « source /home/UTILISATEUR/nodevenv/APP/XX/bin/activate »)
+#
+# NB : le .env n'est PAS versionné : dépose-le une fois dans le dossier APP
+#      (ou définis les variables dans l'UI « Setup Node.js App »).
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/UTILISATEUR/APP
+    # 1) Copie le code du dépôt vers le dossier de l'app (sans écraser node_modules/.env).
+    - /usr/bin/rsync -a --delete --exclude node_modules --exclude .env --exclude .git ./ $DEPLOYPATH/
+    # 2) Active l'environnement Node de cPanel puis installe + build.
+    - source /home/UTILISATEUR/nodevenv/APP/22/bin/activate && cd $DEPLOYPATH && npm install --include=dev && npm run build
+    # 3) Redémarre l'application (Passenger).
+    - mkdir -p $DEPLOYPATH/tmp && touch $DEPLOYPATH/tmp/restart.txt
