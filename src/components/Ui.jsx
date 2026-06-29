@@ -234,10 +234,17 @@ function ZoneMap() {
             return undefined;
         }
 
-        // Vue initiale OBLIGATOIRE avant toute projection (circle.getBounds /
-        // fitBounds) : sans elle, Leaflet lève « layerPointToLatLng of undefined ».
+        // Carte décorative de fond : toutes les interactions sont désactivées (on ne
+        // doit pas pouvoir la déplacer/zoomer sous le texte). Vue initiale OBLIGATOIRE
+        // avant toute projection (sinon « layerPointToLatLng of undefined »).
         const map = L.map(container, {
             scrollWheelZoom: false,
+            dragging: false,
+            doubleClickZoom: false,
+            boxZoom: false,
+            keyboard: false,
+            touchZoom: false,
+            zoomControl: false,
             attributionControl: true,
         }).setView(ZONE_CENTER, 11);
         mapRef.current = map;
@@ -279,7 +286,7 @@ function ZoneMap() {
                 fillOpacity: 0.9,
             })
                 .addTo(map)
-                .bindTooltip(town.name, { direction: "top" });
+                .bindTooltip(town.name, { permanent: true, direction: "top" });
         });
 
         // Cadre la vue sur le cercle des 15 km (avec une marge).
@@ -302,7 +309,9 @@ function ZoneMap() {
 export function ZonePanel() {
     return (
         <section className="zone-panel container">
-            <div>
+            {/* Carte sombre en FOND de la card ; le contenu passe par-dessus un voile. */}
+            <ZoneMap />
+            <div className="zone-panel__content">
                 <SectionHeading
                     overline="Zone d’intervention"
                     title="je viens à vous"
@@ -314,8 +323,6 @@ export function ZonePanel() {
                     ))}
                 </div>
             </div>
-            {/* Vraie carte (OpenStreetMap) avec le cercle des 15 km offerts. */}
-            <ZoneMap />
         </section>
     );
 }

@@ -1441,17 +1441,13 @@ main::after {
     font-size: 13px;
 }
 
-/* Carte Leaflet (OpenStreetMap) de la zone d'intervention. Hauteur explicite
-   requise par Leaflet ; coins arrondis et cadre comme les autres médias. */
+/* Carte Leaflet sombre en FOND de la card de zone : occupe tout le bloc, derrière
+   le contenu et le voile. Fond sombre sous les tuiles (évite le flash gris). */
 .zone-map {
-    width: 100%;
-    aspect-ratio: 1;
-    max-height: 420px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-card);
-    overflow: hidden;
+    position: absolute;
+    inset: 0;
     z-index: 0;
-    /* Fond sombre sous les tuiles (évite le flash gris au chargement). */
+    border-radius: inherit;
     background: var(--surface2);
 }
 
@@ -1475,25 +1471,43 @@ main::after {
 }
 
 .zone-panel {
-    display: grid;
-    grid-template-columns: 1fr minmax(320px, 0.8fr);
+    position: relative;
+    display: flex;
     align-items: center;
-    gap: 64px;
+    overflow: hidden;
+    min-height: 460px;
     margin-bottom: 64px;
     padding: 42px;
     border: 1px solid var(--line);
     border-top: var(--nav-accent-height) solid var(--acc);
     border-radius: 0 0 var(--radius-card) var(--radius-card);
-    background: var(--surface);
+    /* Repli sombre sous la carte (le temps qu'elle charge). */
+    background: var(--surface2);
+}
+
+/* Voile de lisibilité au-dessus de la carte : opaque à gauche (sous le texte),
+   s'estompe vers la droite pour laisser voir la carte. */
+.zone-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(90deg,
+            color-mix(in oklab, var(--surface) 94%, transparent) 0%,
+            color-mix(in oklab, var(--surface) 72%, transparent) 42%,
+            color-mix(in oklab, var(--surface) 18%, transparent) 100%);
+}
+
+/* Contenu (titre + communes) au-dessus de la carte et du voile. */
+.zone-panel__content {
+    position: relative;
+    z-index: 2;
+    max-width: 560px;
 }
 
 .zone-panel .section-heading {
     margin-bottom: 20px;
-}
-
-.zone-panel .zone-map {
-    max-width: 460px;
-    margin-inline: auto;
 }
 
 /* ==========================================================================
@@ -3439,12 +3453,6 @@ main::after {
         margin-top: 20px;
         position: sticky;
         bottom: 12px;
-    }
-
-    .zone-map {
-        max-width: 520px;
-        width: 100%;
-        margin: auto;
     }
 
     .options-card {
