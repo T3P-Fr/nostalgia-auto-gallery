@@ -224,7 +224,13 @@ const zoneTowns = [
     { name: "Calvisson", coords: [43.7944, 4.1936], dir: "left" },
     { name: "Sommières", coords: [43.7847, 4.0892], dir: "left" },
     { name: "Vergèze", coords: [43.7428, 4.2261], dir: "bottom" },
-    // Entre 15 et 25 km.
+    // Nord (15–25 km).
+    { name: "Saint-Mamert-du-Gard", coords: [43.8783, 4.1933], dir: "left" },
+    { name: "Saint-Geniès-de-Malgoirès", coords: [43.9089, 4.2206], dir: "left" },
+    { name: "La Calmette", coords: [43.9131, 4.2622], dir: "top" },
+    { name: "Saint-Chaptes", coords: [43.9394, 4.305], dir: "right" },
+    { name: "Sauve", coords: [43.9375, 3.9469], dir: "left" },
+    // Est / sud (15–25 km).
     { name: "Uzès", coords: [44.0122, 4.4197], dir: "top" },
     { name: "Marguerittes", coords: [43.8489, 4.4308], dir: "right" },
     { name: "Saint-Gilles", coords: [43.6772, 4.4319], dir: "right" },
