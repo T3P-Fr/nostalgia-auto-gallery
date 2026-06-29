@@ -9,6 +9,7 @@
  * pour ne pas multiplier les props par champ.
  */
 
+import { AlertTriangle } from "lucide-react";
 import { delaiLevels } from "../../utils/bookingHelpers.js";
 import BookPanel from "./BookPanel.jsx";
 
@@ -45,6 +46,13 @@ export function ContactPanel({ form, isLavage, onUpdate }) {
                     <input className="field-full" value={form.city} onChange={(event) => onUpdate("city", event.target.value)} placeholder="Ville" />
                 )}
             </div>
+            {/* Mention discrète (lavage) : les utilitaires d'entreprise sont sur devis. */}
+            {isLavage && (
+                <p className="coord-note">
+                    <AlertTriangle className="coord-note__icon" aria-hidden="true" />
+                    Les véhicules type utilitaires d’entreprise sont sur devis uniquement.
+                </p>
+            )}
         </BookPanel>
     );
 }

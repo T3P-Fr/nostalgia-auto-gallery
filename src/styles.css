@@ -2470,6 +2470,24 @@ main::after {
     font-weight: 600;
 }
 
+/* Mention discrète sous les coordonnées (utilitaires sur devis). */
+.coord-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.coord-note__icon {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    color: var(--acc);
+}
+
 /* ----- Étape « 2. Formules » : grille de prix, prestations, options, total ----- */
 
 /* Pile de lignes. Chaque ligne (--line) partage la même grille : une colonne de
