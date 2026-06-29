@@ -254,6 +254,8 @@ function ZoneMap() {
             touchZoom: false,
             zoomControl: false,
             attributionControl: true,
+            // Autorise un zoom fractionnaire (sinon paliers entiers seulement).
+            zoomSnap: 0,
         }).setView(ZONE_CENTER, 11);
         mapRef.current = map;
 
@@ -312,7 +314,8 @@ function ZoneMap() {
         // déprojette un centre décalé pour que Parignargues tombe à droite. Plus fiable
         // que panBy (qui dépendait d'une largeur parfois nulle au montage).
         const frame = () => {
-            const zoom = map.getBoundsZoom(circleOuter.getBounds(), false, [24, 24]);
+            // +0.4 niveau de zoom ≈ +30 % d'échelle (« au moins 25 % de plus »).
+            const zoom = map.getBoundsZoom(circleOuter.getBounds(), false, [24, 24]) + 0.4;
             const width = map.getSize().x || 600;
             const centerPoint = map.project(ZONE_CENTER, zoom);
             const shiftedCenter = map.unproject(
