@@ -1457,11 +1457,12 @@ main::after {
 
 /* Libellés (tooltips) Leaflet aux teintes du site. */
 .zone-map .leaflet-tooltip {
-    padding: 2px 7px;
+    padding: 1px 6px;
     border: 1px solid var(--line);
     border-radius: 999px;
-    background: var(--surface);
+    background: color-mix(in oklab, var(--surface) 85%, transparent);
     color: var(--txt);
+    font-size: 10px;
     font-weight: 700;
     box-shadow: none;
 }
@@ -1494,9 +1495,10 @@ main::after {
     z-index: 1;
     pointer-events: none;
     background: linear-gradient(90deg,
-            color-mix(in oklab, var(--surface) 94%, transparent) 0%,
-            color-mix(in oklab, var(--surface) 72%, transparent) 42%,
-            color-mix(in oklab, var(--surface) 18%, transparent) 100%);
+            color-mix(in oklab, var(--surface) 95%, transparent) 0%,
+            color-mix(in oklab, var(--surface) 88%, transparent) 50%,
+            color-mix(in oklab, var(--surface) 55%, transparent) 66%,
+            color-mix(in oklab, var(--surface) 12%, transparent) 100%);
 }
 
 /* Contenu (titre + communes) au-dessus de la carte et du voile. */

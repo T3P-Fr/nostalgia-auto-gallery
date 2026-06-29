@@ -2,7 +2,6 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { interventionTowns } from "../data.js";
 import { usePageBackgroundImage } from "./PageBackground.jsx";
 
 /**
@@ -209,8 +208,17 @@ const ZONE_RADIUS_M = 15000;
 // Communes desservies, en coordonnées réelles (placées logiquement sur la carte).
 const zoneTowns = [
     { name: "Caveirac", coords: [43.8186, 4.2733] },
-    { name: "Nîmes", coords: [43.8367, 4.3601] },
+    { name: "Clarensac", coords: [43.8167, 4.2333] },
+    { name: "Langlade", coords: [43.805, 4.255] },
+    { name: "Nages-et-Solorgues", coords: [43.8014, 4.2236] },
+    { name: "Saint-Dionisy", coords: [43.8, 4.215] },
+    { name: "Boissières", coords: [43.8225, 4.1856] },
+    { name: "Saint-Mamert-du-Gard", coords: [43.8783, 4.1933] },
     { name: "Calvisson", coords: [43.7944, 4.1936] },
+    { name: "Milhaud", coords: [43.7858, 4.3061] },
+    { name: "Bernis", coords: [43.7642, 4.2828] },
+    { name: "Vergèze", coords: [43.7428, 4.2261] },
+    { name: "Nîmes", coords: [43.8367, 4.3601] },
     { name: "Sommières", coords: [43.7847, 4.0892] },
     { name: "Vauvert", coords: [43.6944, 4.2767] },
     { name: "Saint-Gilles", coords: [43.6772, 4.4319] },
@@ -289,12 +297,22 @@ function ZoneMap() {
                 .bindTooltip(town.name, { permanent: true, direction: "top" });
         });
 
-        // Cadre la vue sur le cercle des 15 km (avec une marge).
-        map.fitBounds(circle.getBounds(), { padding: [20, 20] });
+        // Cadre la vue sur le cercle des 15 km, puis décale le contenu vers la DROITE
+        // (≈ 2/3 texte · 1/3 carte) pour qu'il apparaisse dans le tiers droit clair.
+        const frame = () => {
+            map.fitBounds(circle.getBounds(), { padding: [20, 20] });
+            map.panBy([-Math.round((container.clientWidth || 600) * 0.22), 0], {
+                animate: false,
+            });
+        };
+        frame();
 
-        // Recale la taille une fois la mise en page stabilisée (sinon tuiles grises
-        // si le conteneur est dimensionné après l'init).
-        const sizeTimer = window.setTimeout(() => map.invalidateSize(), 0);
+        // Recale une fois la mise en page stabilisée (sinon tuiles grises / mauvais
+        // décalage si le conteneur est dimensionné après l'init).
+        const sizeTimer = window.setTimeout(() => {
+            map.invalidateSize();
+            frame();
+        }, 0);
 
         return () => {
             window.clearTimeout(sizeTimer);
@@ -317,11 +335,6 @@ export function ZonePanel() {
                     title="je viens à vous"
                     description="Basé à Parignargues (30730), je me déplace dans le Gard et selon le projet dans les départements voisins. Le déplacement est offert jusqu’à 15 km, puis un supplément carburant s’applique."
                 />
-                <div className="town-list">
-                    {interventionTowns.map((town) => (
-                        <span key={town}>{town}</span>
-                    ))}
-                </div>
             </div>
         </section>
     );
