@@ -50,7 +50,7 @@ export function ContactPanel({ form, isLavage, onUpdate }) {
             {isLavage && (
                 <p className="coord-note">
                     <AlertTriangle className="coord-note__icon" aria-hidden="true" />
-                    Les véhicules type utilitaires d’entreprise sont sur devis uniquement.
+                    Les véhicules type utilitaires sont sur devis uniquement.
                 </p>
             )}
         </BookPanel>

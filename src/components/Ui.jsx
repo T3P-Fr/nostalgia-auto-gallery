@@ -201,6 +201,19 @@ export function BeforeAfterComparison({
  * Présente la zone d'intervention dans la page de rendez-vous.
  * @returns {JSX.Element} Le bloc de zone et ses communes.
  */
+// Communes positionnées sur la carte (cercles concentriques centrés sur
+// Parignargues). top/left en % : direction = position autour du centre (50/50),
+// distance = éloignement du centre. Proches dans la zone « 15 km offerts ».
+const zoneMarkers = [
+    { name: "Caveirac", top: 51, left: 66 },
+    { name: "Nîmes", top: 39, left: 80 },
+    { name: "Calvisson", top: 70, left: 41 },
+    { name: "Sommières", top: 81, left: 47 },
+    { name: "Saint-Gilles", top: 84, left: 78 },
+    { name: "Vauvert", top: 90, left: 52 },
+    { name: "Uzès", top: 9, left: 58 },
+];
+
 export function ZonePanel() {
     return (
         <section className="zone-panel container">
@@ -225,6 +238,17 @@ export function ZonePanel() {
                     <strong>Parignargues</strong>
                     <span>Gard · 30730</span>
                 </div>
+                {/* Communes placées par direction/distance réelles depuis Parignargues :
+                    proches au centre (zone 15 km offerts), plus loin vers les bords. */}
+                {zoneMarkers.map((marker) => (
+                    <span
+                        key={marker.name}
+                        className="radius-map__town"
+                        style={{ top: `${marker.top}%`, left: `${marker.left}%` }}
+                    >
+                        {marker.name}
+                    </span>
+                ))}
                 <span className="radius-map__label">15 km offerts</span>
             </div>
         </section>
