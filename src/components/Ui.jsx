@@ -264,13 +264,23 @@ function ZoneMap() {
             maxZoom: 19,
         }).addTo(map);
 
-        // Cercle des 15 km offerts, centré sur Parignargues.
+        // Cercle des 15 km offerts (plein), centré sur Parignargues.
         const circle = L.circle(ZONE_CENTER, {
             radius: ZONE_RADIUS_M,
             color: "#e11d2a",
             weight: 2,
             fillColor: "#e11d2a",
             fillOpacity: 0.1,
+        }).addTo(map);
+
+        // Second cercle à 25 km (pointillé, sans remplissage) : limite étendue.
+        const circleOuter = L.circle(ZONE_CENTER, {
+            radius: 25000,
+            color: "#e11d2a",
+            weight: 1.5,
+            dashArray: "6 7",
+            fill: false,
+            opacity: 0.7,
         }).addTo(map);
 
         // Marqueur central + libellé permanent.
@@ -297,11 +307,11 @@ function ZoneMap() {
                 .bindTooltip(town.name, { permanent: true, direction: "top" });
         });
 
-        // Cadre la vue sur le cercle des 15 km, puis décale le contenu vers la DROITE
-        // (≈ 2/3 texte · 1/3 carte) pour qu'il apparaisse dans le tiers droit clair.
+        // Cadre la vue sur le cercle EXTÉRIEUR (25 km) pour montrer les deux cercles,
+        // puis décale Parignargues vers la DROITE (≈ 2/3 de la largeur).
         const frame = () => {
-            map.fitBounds(circle.getBounds(), { padding: [20, 20] });
-            map.panBy([-Math.round((container.clientWidth || 600) * 0.22), 0], {
+            map.fitBounds(circleOuter.getBounds(), { padding: [16, 16] });
+            map.panBy([-Math.round((container.clientWidth || 600) * 0.16), 0], {
                 animate: false,
             });
         };
