@@ -18,7 +18,17 @@
  * dans mailer.js. Toute modification ici doit y être répliquée.
  */
 
-const nodemailer = require("nodemailer");
+// Chargement défensif : si nodemailer n'est pas (encore) installé sur le serveur,
+// l'envoi d'email devient un no-op au lieu de faire planter TOUTE l'API au démarrage.
+let nodemailer = null;
+try {
+    nodemailer = require("nodemailer");
+} catch (error) {
+    console.error(
+        "[mailer] nodemailer introuvable — emails désactivés. Lancez `npm install`.",
+        error.message,
+    );
+}
 
 const SMTP_HOST = process.env.SMTP_HOST || "";
 const SMTP_PORT = Number(process.env.SMTP_PORT) || 465;
@@ -35,7 +45,7 @@ let transporter = null;
  * @returns {import("nodemailer").Transporter|null} Transporteur réutilisable, ou null.
  */
 function getTransporter() {
-    if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+    if (!nodemailer || !SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
         return null;
     }
     if (!transporter) {

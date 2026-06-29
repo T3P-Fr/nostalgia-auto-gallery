@@ -8,7 +8,16 @@
  * domaine. No-op silencieux si la configuration SMTP est absente.
  */
 
-import nodemailer from "nodemailer";
+// Chargement défensif : un module manquant ne doit pas faire planter toute l'API.
+let nodemailer = null;
+try {
+    nodemailer = (await import("nodemailer")).default;
+} catch (error) {
+    console.error(
+        "[mailer] nodemailer introuvable — emails désactivés. Lancez `npm install`.",
+        error.message,
+    );
+}
 
 const SMTP_HOST = process.env.SMTP_HOST || "";
 const SMTP_PORT = Number(process.env.SMTP_PORT) || 465;
@@ -24,7 +33,7 @@ let transporter = null;
  * @returns {import("nodemailer").Transporter|null} Transporteur réutilisable, ou null.
  */
 function getTransporter() {
-    if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+    if (!nodemailer || !SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
         return null;
     }
     if (!transporter) {
