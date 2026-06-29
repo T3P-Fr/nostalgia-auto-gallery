@@ -1,9 +1,11 @@
-// Charge le .env (déposé à la racine de l'app) AVANT tout le reste, pour que les
-// variables (SMTP_*, ADMIN_KEY…) soient lues par les modules requis ensuite.
-require("dotenv").config();
+// Charge le .env AVANT tout le reste, pour que les variables (SMTP_*, ADMIN_KEY…)
+// soient lues par les modules requis ensuite. On vise EXPLICITEMENT la racine de
+// l'app (parent de server/) : sous Passenger le cwd n'est pas garanti, donc un
+// dotenv.config() sans chemin pourrait ne pas trouver le fichier.
+const path = require("node:path");
+require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
 const express = require("express");
-const path = require("node:path");
 const {
     createAppointment,
     createRequest,
@@ -306,6 +308,15 @@ app.use((error, _request, response, _next) => {
     console.error(error);
     response.status(500).json({ message: "Une erreur interne est survenue." });
 });
+
+// Log de démarrage utile au diagnostic (sans secret) : indique si la config email
+// a bien été chargée depuis le .env / l'environnement.
+console.log(
+    "[boot] SMTP configuré :",
+    Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS),
+    "| MAIL_TO_OWNER :",
+    Boolean(process.env.MAIL_TO_OWNER),
+);
 
 // Phusion Passenger intercepte l'appel à listen() (reverse port binding).
 if (typeof PhusionPassenger !== "undefined") {
