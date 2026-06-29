@@ -189,9 +189,39 @@ img {
 
 /* En-tête collant. Le voile flouté est porté par ::before (ci-dessous) afin de
    déborder légèrement et de s'estomper vers le bas via un masque. */
-.header-nav {
+/* Bandeau d'avis permanent (site en finalisation) : collé tout en haut, au-dessus
+   de l'en-tête. Hauteur exposée en --notice-h pour décaler l'en-tête en dessous. */
+:root {
+    --notice-h: 40px;
+}
+
+.site-notice {
     position: sticky;
     top: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--notice-h);
+    padding: 8px 16px;
+    background: var(--red-primary);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-align: center;
+}
+
+.site-notice a {
+    color: #fff;
+    text-decoration: underline;
+    white-space: nowrap;
+}
+
+.header-nav {
+    position: sticky;
+    /* Calé juste sous le bandeau d'avis pour rester visible en défilement. */
+    top: var(--notice-h);
     z-index: 50;
     display: flex;
     align-items: center;
@@ -3344,9 +3374,16 @@ main::after {
         width: min(100% - 32px, 1180px);
     }
 
+    /* Mobile : le bandeau (hauteur variable selon le retour à la ligne) passe en
+       flux normal et l'en-tête se recolle en haut, pour éviter tout chevauchement. */
+    .site-notice {
+        position: static;
+    }
+
     .header-nav {
         flex-wrap: wrap;
         padding: 10px 16px;
+        top: 0;
     }
 
     /* Logo (gauche) et bouton menu (droite) restent au-dessus du voile plein écran. */

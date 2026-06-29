@@ -89,6 +89,15 @@ export default function Layout() {
 
     return (
         <>
+            {/* Bandeau d'avis permanent (toutes pages) : site en finalisation. Collé en
+                haut ; l'en-tête se cale juste en dessous (cf. --notice-h). */}
+            <div className="site-notice" role="alert">
+                <span>
+                    🚧 Site en cours de finalisation — pour les informations et tarifs
+                    exacts, contactez Corentin au{" "}
+                    <a href="tel:+33636372210">06&nbsp;36&nbsp;37&nbsp;22&nbsp;10</a>.
+                </span>
+            </div>
             <HeaderPage />
             <MainPage />
             <FooterPage />
