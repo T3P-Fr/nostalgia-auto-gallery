@@ -342,17 +342,27 @@ function ZoneMap() {
         // déprojette un centre décalé pour que Parignargues tombe à droite. Plus fiable
         // que panBy (qui dépendait d'une largeur parfois nulle au montage).
         const frame = () => {
-            // +0.4 niveau de zoom ≈ +30 % d'échelle (« au moins 25 % de plus »).
-            const zoom = map.getBoundsZoom(circleOuter.getBounds(), false, [24, 24]) + 0.4;
             const width = map.getSize().x || 600;
+            // RESPONSIVE : sur large écran, le texte est à gauche → on décale
+            // Parignargues à droite et on zoome un peu plus. Sur écran étroit (texte
+            // par-dessus), on garde Parignargues CENTRÉ et un cadrage qui montre les
+            // cercles entièrement (pas de décalage ni de sur-zoom).
+            const wide = width >= 760;
+            const zoom =
+                map.getBoundsZoom(circleOuter.getBounds(), false, [24, 24]) + (wide ? 0.4 : 0);
             const centerPoint = map.project(ZONE_CENTER, zoom);
-            const shiftedCenter = map.unproject(
-                [centerPoint.x - width * 0.3, centerPoint.y],
-                zoom,
-            );
+            const shift = wide ? width * 0.3 : 0;
+            const shiftedCenter = map.unproject([centerPoint.x - shift, centerPoint.y], zoom);
             map.setView(shiftedCenter, zoom, { animate: false });
         };
         frame();
+
+        // Re-cadre au redimensionnement / changement d'orientation (responsive).
+        const onResize = () => {
+            map.invalidateSize();
+            frame();
+        };
+        window.addEventListener("resize", onResize);
 
         // Recale une fois la mise en page stabilisée (sinon tuiles grises / mauvais
         // décalage si le conteneur est dimensionné après l'init).
@@ -363,6 +373,7 @@ function ZoneMap() {
 
         return () => {
             window.clearTimeout(sizeTimer);
+            window.removeEventListener("resize", onResize);
             map.remove();
             mapRef.current = null;
         };

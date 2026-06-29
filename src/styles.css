@@ -1493,6 +1493,8 @@ main::after {
     z-index: 2;
     width: 100%;
     max-width: 440px;
+    /* Lisibilité du texte posé sur la carte (pas de voile) : ombre portée. */
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
 }
 
 .zone-panel .section-heading {
