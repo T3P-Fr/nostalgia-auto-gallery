@@ -1,17 +1,42 @@
 /*
  * mailer.js — Miroir ESM de mailer.cjs (cf. ce dernier pour la doc complète).
  *
- * La PROD tourne en CommonJS (.cjs) via Phusion Passenger ; ce fichier ESM est
- * une copie cohérente. Toute modification doit être répliquée dans mailer.cjs.
+ * La PROD tourne en CommonJS (.cjs) via Phusion Passenger ; ce fichier ESM est une
+ * copie cohérente. Toute modification doit être répliquée dans mailer.cjs.
  *
- * Envoi d'emails transactionnels via l'API HTTP de Resend, sans dépendance npm
- * (`fetch` natif, Node 18+). No-op silencieux si RESEND_API_KEY est absent.
+ * Envoi d'emails transactionnels via SMTP (Nodemailer), depuis le compte mail du
+ * domaine. No-op silencieux si la configuration SMTP est absente.
  */
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
-const MAIL_FROM =
-    process.env.MAIL_FROM || "Nostalgia Gallery Auto <onboarding@resend.dev>";
+import nodemailer from "nodemailer";
+
+const SMTP_HOST = process.env.SMTP_HOST || "";
+const SMTP_PORT = Number(process.env.SMTP_PORT) || 465;
+const SMTP_USER = process.env.SMTP_USER || "";
+const SMTP_PASS = process.env.SMTP_PASS || "";
+const MAIL_FROM = process.env.MAIL_FROM || SMTP_USER;
 const MAIL_TO_OWNER = process.env.MAIL_TO_OWNER || "";
+
+let transporter = null;
+
+/**
+ * Retourne le transporteur SMTP, ou null si la configuration est incomplète.
+ * @returns {import("nodemailer").Transporter|null} Transporteur réutilisable, ou null.
+ */
+function getTransporter() {
+    if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+        return null;
+    }
+    if (!transporter) {
+        transporter = nodemailer.createTransport({
+            host: SMTP_HOST,
+            port: SMTP_PORT,
+            secure: SMTP_PORT === 465,
+            auth: { user: SMTP_USER, pass: SMTP_PASS },
+        });
+    }
+    return transporter;
+}
 
 /**
  * Échappe les caractères HTML d'une valeur utilisateur.
@@ -56,44 +81,24 @@ function buildTable(rows) {
 }
 
 /**
- * Envoie un email via Resend. No-op si non configuré ; ne lève jamais d'exception.
+ * Envoie un email via SMTP. No-op si non configuré ; ne lève jamais d'exception.
  * @param {object} params Paramètres.
  * @param {string} params.to Destinataire.
  * @param {string} params.subject Sujet.
  * @param {string} params.html Corps HTML.
  * @param {string} [params.replyTo] Adresse de réponse.
- * @returns {Promise<boolean>} Vrai si accepté par Resend.
+ * @returns {Promise<boolean>} Vrai si l'envoi a réussi.
  */
 async function sendEmail({ to, subject, html, replyTo }) {
-    if (!RESEND_API_KEY || !to || typeof fetch !== "function") {
+    const tx = getTransporter();
+    if (!tx || !to) {
         return false;
     }
     try {
-        const response = await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${RESEND_API_KEY}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                from: MAIL_FROM,
-                to,
-                subject,
-                html,
-                reply_to: replyTo || undefined,
-            }),
-        });
-        if (!response.ok) {
-            console.error(
-                "[mailer] Resend a refusé l'envoi :",
-                response.status,
-                await response.text(),
-            );
-            return false;
-        }
+        await tx.sendMail({ from: MAIL_FROM, to, subject, html, replyTo });
         return true;
     } catch (error) {
-        console.error("[mailer] Échec de l'envoi via Resend :", error);
+        console.error("[mailer] Échec de l'envoi SMTP :", error);
         return false;
     }
 }
