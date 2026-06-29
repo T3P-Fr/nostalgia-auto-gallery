@@ -205,24 +205,32 @@ export function BeforeAfterComparison({
 const ZONE_CENTER = [43.8175, 4.2192];
 const ZONE_RADIUS_M = 15000;
 
-// Communes desservies, en coordonnées réelles (placées logiquement sur la carte).
+// Léger décalage du libellé selon son côté, pour l'écarter du point et des voisins.
+const TOOLTIP_OFFSETS = {
+    top: [0, -5],
+    bottom: [0, 5],
+    left: [-5, 0],
+    right: [5, 0],
+};
+
+// Communes desservies (villes notables réparties dans les 15 & 25 km), en
+// coordonnées réelles. `dir` = côté du libellé, choisi pour éviter qu'ils se
+// chevauchent (on pousse chaque étiquette vers l'extérieur).
 const zoneTowns = [
-    { name: "Caveirac", coords: [43.8186, 4.2733] },
-    { name: "Clarensac", coords: [43.8167, 4.2333] },
-    { name: "Langlade", coords: [43.805, 4.255] },
-    { name: "Nages-et-Solorgues", coords: [43.8014, 4.2236] },
-    { name: "Saint-Dionisy", coords: [43.8, 4.215] },
-    { name: "Boissières", coords: [43.8225, 4.1856] },
-    { name: "Saint-Mamert-du-Gard", coords: [43.8783, 4.1933] },
-    { name: "Calvisson", coords: [43.7944, 4.1936] },
-    { name: "Milhaud", coords: [43.7858, 4.3061] },
-    { name: "Bernis", coords: [43.7642, 4.2828] },
-    { name: "Vergèze", coords: [43.7428, 4.2261] },
-    { name: "Nîmes", coords: [43.8367, 4.3601] },
-    { name: "Sommières", coords: [43.7847, 4.0892] },
-    { name: "Vauvert", coords: [43.6944, 4.2767] },
-    { name: "Saint-Gilles", coords: [43.6772, 4.4319] },
-    { name: "Uzès", coords: [44.0122, 4.4197] },
+    // Dans les 15 km.
+    { name: "Nîmes", coords: [43.8367, 4.3601], dir: "right" },
+    { name: "Caveirac", coords: [43.8186, 4.2733], dir: "top" },
+    { name: "Milhaud", coords: [43.7858, 4.3061], dir: "right" },
+    { name: "Calvisson", coords: [43.7944, 4.1936], dir: "left" },
+    { name: "Sommières", coords: [43.7847, 4.0892], dir: "left" },
+    { name: "Vergèze", coords: [43.7428, 4.2261], dir: "bottom" },
+    // Entre 15 et 25 km.
+    { name: "Uzès", coords: [44.0122, 4.4197], dir: "top" },
+    { name: "Marguerittes", coords: [43.8489, 4.4308], dir: "right" },
+    { name: "Saint-Gilles", coords: [43.6772, 4.4319], dir: "right" },
+    { name: "Vauvert", coords: [43.6944, 4.2767], dir: "bottom" },
+    { name: "Aimargues", coords: [43.69, 4.2058], dir: "bottom" },
+    { name: "Lunel", coords: [43.6772, 4.1372], dir: "left" },
 ];
 
 /**
@@ -306,7 +314,11 @@ function ZoneMap() {
                 fillOpacity: 0.9,
             })
                 .addTo(map)
-                .bindTooltip(town.name, { permanent: true, direction: "top" });
+                .bindTooltip(town.name, {
+                    permanent: true,
+                    direction: town.dir || "top",
+                    offset: TOOLTIP_OFFSETS[town.dir || "top"],
+                });
         });
 
         // Place Parignargues + ses cercles dans le tiers DROIT (~76 % de la largeur).
