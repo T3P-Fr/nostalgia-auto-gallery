@@ -300,6 +300,15 @@ function ZoneMap() {
             opacity: 0.9,
         }).addTo(map);
 
+        // Troisième cercle à 30 km : trait fin, rouge foncé, limite maximale.
+        L.circle(ZONE_CENTER, {
+            radius: 30000,
+            color: "#7a0f15",
+            weight: 1,
+            fill: false,
+            opacity: 0.9,
+        }).addTo(map);
+
         // Marqueur central + libellé permanent.
         L.circleMarker(ZONE_CENTER, {
             radius: 7,
@@ -338,7 +347,7 @@ function ZoneMap() {
             const width = map.getSize().x || 600;
             const centerPoint = map.project(ZONE_CENTER, zoom);
             const shiftedCenter = map.unproject(
-                [centerPoint.x - width * 0.26, centerPoint.y],
+                [centerPoint.x - width * 0.3, centerPoint.y],
                 zoom,
             );
             map.setView(shiftedCenter, zoom, { animate: false });

@@ -1486,26 +1486,13 @@ main::after {
     background: var(--surface2);
 }
 
-/* Voile de lisibilité au-dessus de la carte : opaque à gauche (sous le texte),
-   s'estompe vers la droite pour laisser voir la carte. */
-.zone-panel::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background: linear-gradient(90deg,
-            color-mix(in oklab, var(--surface) 95%, transparent) 0%,
-            color-mix(in oklab, var(--surface) 88%, transparent) 50%,
-            color-mix(in oklab, var(--surface) 55%, transparent) 66%,
-            color-mix(in oklab, var(--surface) 12%, transparent) 100%);
-}
-
-/* Contenu (titre + communes) au-dessus de la carte et du voile. */
+/* Contenu (titre + texte) au-dessus de la carte, calé à GAUCHE et limité en largeur
+   pour ne pas déborder sur les cercles (qui sont poussés à droite). */
 .zone-panel__content {
     position: relative;
     z-index: 2;
-    max-width: 560px;
+    width: 100%;
+    max-width: 440px;
 }
 
 .zone-panel .section-heading {
