@@ -40,7 +40,7 @@
             var(--surface) calc(var(--veil-min) + (var(--veil-max) - var(--veil-min)) * var(--scroll-factor)),
             transparent);
     --surface: #0b0d10;
-    --surface2: #0d1b29;
+    --surface2: #0e151c;
     --txt: #f5f7fa;
     --muted: #9ba8b7;
     --subtle: #687789;
@@ -207,7 +207,7 @@ img {
     position: absolute;
     z-index: -1;
     left: 0;
-    width: 110vw;
+    width: 99vw;
     height: 250%;
     background-color: color-mix(in oklab, var(--surface) 80%, transparent);
     backdrop-filter: blur(20px);
@@ -3285,6 +3285,9 @@ main::after {
     position: relative;
     z-index: 1;
     border-top: 1px solid var(--line);
+    /**/
+    --gradient-top: color-mix(in oklab, var(--surface) 75%, transparent);
+    --gradient-bottom: color-mix(in oklab, var(--surface2) 50%, transparent);
 }
 
 .footer-grid {

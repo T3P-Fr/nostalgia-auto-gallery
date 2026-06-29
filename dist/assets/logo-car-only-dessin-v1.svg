@@ -1,0 +1,194 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 430" role="img" aria-labelledby="title description">
+  <title id="title">Voiture sportive rouge des années 1990</title>
+  <description id="description">Illustration vectorielle dessinée à la main d'une voiture rouge vue de trois quarts arrière.</description>
+
+  <defs>
+    <linearGradient id="bodyRed" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff4b45"/>
+      <stop offset="0.34" stop-color="#df1517"/>
+      <stop offset="0.72" stop-color="#a6050b"/>
+      <stop offset="1" stop-color="#650006"/>
+    </linearGradient>
+    <linearGradient id="upperRed" x1="0" y1="0" x2="1" y2="0.8">
+      <stop offset="0" stop-color="#7b0007"/>
+      <stop offset="0.36" stop-color="#e21b20"/>
+      <stop offset="0.74" stop-color="#ff6259"/>
+      <stop offset="1" stop-color="#c20a11"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#263038"/>
+      <stop offset="0.52" stop-color="#0b1116"/>
+      <stop offset="1" stop-color="#020406"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f0f0ed"/>
+      <stop offset="0.45" stop-color="#a9aaab"/>
+      <stop offset="0.72" stop-color="#f8f8f4"/>
+      <stop offset="1" stop-color="#66686a"/>
+    </linearGradient>
+    <radialGradient id="tire" cx="48%" cy="42%" r="60%">
+      <stop offset="0.52" stop-color="#26282a"/>
+      <stop offset="0.82" stop-color="#111214"/>
+      <stop offset="1" stop-color="#020303"/>
+    </radialGradient>
+    <radialGradient id="lamp" cx="38%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#ff7063"/>
+      <stop offset="0.42" stop-color="#ec171b"/>
+      <stop offset="1" stop-color="#850007"/>
+    </radialGradient>
+    <filter id="softShadow" x="-20%" y="-40%" width="140%" height="180%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+  </defs>
+
+  <!-- L'ombre légère ancre la voiture sans ajouter de décor au logo. -->
+  <ellipse cx="620" cy="385" rx="480" ry="24" fill="#050505" opacity="0.22" filter="url(#softShadow)"/>
+
+  <!-- Roue arrière. -->
+  <g transform="translate(574 319)">
+    <circle r="91" fill="url(#tire)" stroke="#08090a" stroke-width="7"/>
+    <circle r="67" fill="#27292b" stroke="#777b7e" stroke-width="5"/>
+    <circle r="57" fill="url(#metal)" stroke="#17191a" stroke-width="5"/>
+    <g fill="#242628" stroke="#111" stroke-width="2">
+      <path d="M-8-11-20-52 1-57 10-18Z"/>
+      <path d="m12-7 38-24 10 19-39 19Z"/>
+      <path d="m15 13 30 35-18 13-27-38Z"/>
+      <path d="m-7 18-10 45-21-7 16-42Z"/>
+      <path d="m-19 3-44-2 1-22 44 9Z"/>
+    </g>
+    <circle r="17" fill="#bfc1c2" stroke="#151617" stroke-width="5"/>
+    <circle r="7" fill="#222426"/>
+    <g fill="#202224">
+      <circle cx="0" cy="-31" r="4"/>
+      <circle cx="29" cy="-10" r="4"/>
+      <circle cx="18" cy="25" r="4"/>
+      <circle cx="-18" cy="25" r="4"/>
+      <circle cx="-29" cy="-10" r="4"/>
+    </g>
+  </g>
+
+  <!-- Roue avant. -->
+  <g transform="translate(1032 302)">
+    <circle r="76" fill="url(#tire)" stroke="#08090a" stroke-width="7"/>
+    <circle r="56" fill="#292b2d" stroke="#777b7e" stroke-width="4"/>
+    <circle r="47" fill="url(#metal)" stroke="#17191a" stroke-width="4"/>
+    <g fill="#242628" stroke="#111" stroke-width="2">
+      <path d="M-7-9-17-43 1-47 8-15Z"/>
+      <path d="m10-6 31-20 9 16-33 16Z"/>
+      <path d="m12 11 25 29-15 11-23-32Z"/>
+      <path d="m-6 15-8 37-18-6 14-35Z"/>
+      <path d="m-16 3-36-2 1-18 36 8Z"/>
+    </g>
+    <circle r="14" fill="#bfc1c2" stroke="#151617" stroke-width="4"/>
+    <circle r="6" fill="#222426"/>
+  </g>
+
+  <!-- Silhouette principale : une forme continue évite les coutures et artefacts du traçage automatique. -->
+  <path
+    d="M55 335
+       43 316 47 281
+       61 256 81 244
+       97 191 134 170
+       244 151 344 145
+       448 74 556 41
+       727 21 874 45
+       962 60 1039 100
+       1109 137 1145 184
+       1164 211 1170 250
+       1189 258 1197 276
+       1197 315 1177 338
+       1110 349 1096 351
+       1082 277 1037 236
+       978 230 946 281
+       939 341 931 357
+       678 374 649 375
+       645 292 608 249
+       549 237 509 279
+       497 361 486 376
+       193 376 125 365
+       78 353 55 335Z"
+    fill="url(#bodyRed)"
+    stroke="#171313"
+    stroke-width="8"
+    stroke-linejoin="round"
+  />
+
+  <!-- Partie haute de carrosserie, dessinée séparément pour une lumière maîtrisée. -->
+  <path
+    d="M99 190
+       134 168 346 143
+       449 75 555 42
+       723 22 870 45
+       958 60 1036 101
+       1104 137 1146 184
+       1000 173 893 166
+       725 157 565 152
+       400 149 246 158
+       99 190Z"
+    fill="url(#upperRed)"
+    stroke="#171313"
+    stroke-width="7"
+    stroke-linejoin="round"
+  />
+
+  <!-- Vitrages dessinés en grands aplats sombres, sans zones blanches parasites. -->
+  <path d="M367 139 468 80 561 50 684 40 612 142Z" fill="url(#glass)" stroke="#0a0b0c" stroke-width="7"/>
+  <path d="M630 142 704 41 851 56 947 104 986 150Z" fill="url(#glass)" stroke="#0a0b0c" stroke-width="7"/>
+  <path d="M486 91 560 61 644 49 608 71 532 120 429 135Z" fill="#657078" opacity="0.28"/>
+  <path d="M722 54 843 67 917 104 750 91Z" fill="#879198" opacity="0.23"/>
+  <path d="M621 144 702 40" fill="none" stroke="#b7b8b7" stroke-width="7"/>
+
+  <!-- Aileron arrière. -->
+  <path d="M74 163 119 145 340 139 376 151 348 164 128 176Z" fill="#a9000b" stroke="#171313" stroke-width="7"/>
+  <path d="M103 173 99 203 128 199 137 170Z" fill="#760008" stroke="#171313" stroke-width="5"/>
+  <path d="M334 157 352 189 373 184 361 152Z" fill="#760008" stroke="#171313" stroke-width="5"/>
+
+  <!-- Panneau arrière et feux. -->
+  <path d="M65 203 357 190 401 208 405 267 367 283 58 282 54 237Z" fill="#161719" stroke="#151313" stroke-width="7"/>
+  <path d="M128 211 283 204 305 260 115 266Z" fill="url(#metal)" stroke="#111315" stroke-width="5"/>
+  <g>
+    <circle cx="81" cy="237" r="22" fill="url(#lamp)" stroke="#050505" stroke-width="7"/>
+    <circle cx="352" cy="230" r="29" fill="url(#lamp)" stroke="#050505" stroke-width="8"/>
+    <circle cx="292" cy="232" r="28" fill="url(#lamp)" stroke="#050505" stroke-width="8"/>
+    <circle cx="81" cy="237" r="12" fill="none" stroke="#ff6a61" stroke-width="3" opacity="0.7"/>
+    <circle cx="352" cy="230" r="17" fill="none" stroke="#ff6a61" stroke-width="3" opacity="0.65"/>
+    <circle cx="292" cy="232" r="17" fill="none" stroke="#ff6a61" stroke-width="3" opacity="0.65"/>
+  </g>
+  <rect x="147" y="215" width="38" height="20" rx="3" fill="#d7d8d6" stroke="#1b1b1b" stroke-width="4"/>
+  <rect x="234" y="210" width="39" height="20" rx="3" fill="#d7d8d6" stroke="#1b1b1b" stroke-width="4"/>
+
+  <!-- Pare-chocs et bas de caisse. -->
+  <path d="M49 286 395 280 420 300 401 326 82 330 49 316Z" fill="#c20b12" stroke="#171313" stroke-width="7"/>
+  <path d="M111 337 477 343 488 375 184 375 126 364Z" fill="#710009" opacity="0.78"/>
+  <path d="M660 346 939 333 932 357 676 374Z" fill="#720007" opacity="0.72"/>
+  <path d="M64 306 367 305" fill="none" stroke="#ff7770" stroke-width="5" opacity="0.8"/>
+  <path d="M420 334 940 313" fill="none" stroke="#ff5d59" stroke-width="4" opacity="0.8"/>
+
+  <!-- Plaque et échappement. -->
+  <path d="M137 313 225 313 235 365 142 364Z" fill="#b9bbba" stroke="#151617" stroke-width="7"/>
+  <path d="M145 320 218 320 225 358 149 357Z" fill="#d8d9d7"/>
+  <g transform="translate(73 367)">
+    <ellipse rx="30" ry="20" fill="#202224" stroke="#090a0b" stroke-width="5"/>
+    <ellipse rx="18" ry="14" fill="#aeb0af" stroke="#f0f0ed" stroke-width="4"/>
+    <ellipse rx="10" ry="9" fill="#141516"/>
+    <path d="M24-8 48-4 47 10 24 11Z" fill="#777a7a" stroke="#171819" stroke-width="4"/>
+  </g>
+
+  <!-- Lignes de panneaux et poignées, volontairement sobres pour rester lisibles en petit. -->
+  <path d="M714 158 744 335" fill="none" stroke="#2c0b0d" stroke-width="5"/>
+  <path d="M959 160 952 303" fill="none" stroke="#2c0b0d" stroke-width="5"/>
+  <path d="M419 169 415 338" fill="none" stroke="#471014" stroke-width="4" opacity="0.8"/>
+  <rect x="475" y="205" width="48" height="52" rx="12" fill="none" stroke="#321013" stroke-width="6"/>
+  <rect x="779" y="191" width="53" height="28" rx="12" fill="#bd0a10" stroke="#270d0f" stroke-width="6"/>
+  <path d="M791 201h24" stroke="#ff6962" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Rétroviseur et répétiteur. -->
+  <path d="M928 119q30-23 49 1l-5 33-37 2-17-19Z" fill="#d61318" stroke="#171313" stroke-width="7"/>
+  <path d="M940 124q17-10 25 2l-4 20-22 2Z" fill="#aeb3b5" stroke="#222426" stroke-width="4"/>
+  <rect x="1123" y="231" width="23" height="12" rx="3" fill="#ff9c24" stroke="#39100b" stroke-width="4"/>
+
+  <!-- Reflets peints à la main : peu nombreux, continus et jamais blancs purs. -->
+  <path d="M421 164q194-18 384 3" fill="none" stroke="#ff8c84" stroke-width="7" stroke-linecap="round" opacity="0.62"/>
+  <path d="M818 169q140 3 243 24" fill="none" stroke="#ff8a82" stroke-width="5" stroke-linecap="round" opacity="0.52"/>
+  <path d="M447 288q174 20 437-4" fill="none" stroke="#ef393b" stroke-width="5" stroke-linecap="round" opacity="0.58"/>
+</svg>

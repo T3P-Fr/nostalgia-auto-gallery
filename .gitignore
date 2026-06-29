@@ -1,5 +1,6 @@
 node_modules/
-dist/
+# dist/ est VERSIONNÉ pour le déploiement o2switch (build fait en local, pas sur
+# le serveur mutualisé). Rebuilder avant chaque déploiement : npm run build.
 dist.zip
 .next/
 .env

@@ -12,7 +12,8 @@ deployment:
     - export DEPLOYPATH=/home/tila8859/nostalgia-app
     # 1) Copie le code du dépôt vers le dossier de l'app (préserve .env et node_modules).
     - /usr/bin/rsync -a --delete --exclude node_modules --exclude .env --exclude .git ./ $DEPLOYPATH/
-    # 2) Active l'environnement Node de cPanel (v22) puis installe les deps + build le front.
-    - source /home/tila8859/nodevenv/nostalgia-app/22/bin/activate && cd $DEPLOYPATH && npm install --include=dev && npm run build
+    # 2) Installe UNIQUEMENT les deps runtime (express, nodemailer, dotenv). Le front
+    #    (dist/) est déjà buildé en local et versionné → pas de build lourd ici.
+    - source /home/tila8859/nodevenv/nostalgia-app/22/bin/activate && cd $DEPLOYPATH && npm install --omit=dev
     # 3) Redémarre l'application (Passenger).
     - mkdir -p $DEPLOYPATH/tmp && touch $DEPLOYPATH/tmp/restart.txt
