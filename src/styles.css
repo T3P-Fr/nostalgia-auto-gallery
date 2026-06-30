@@ -4502,15 +4502,17 @@ a.gallery-card__video {
     align-items: center;
     justify-content: center;
     padding: 24px;
-    /* Fond assombri + flou de l'arrière-plan. */
-    background: rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    /* Arrière-plan : flou marqué (30px) et voile légèrement foncé. */
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
 }
 
 .modal {
-    width: 100%;
-    max-width: 780px;
+    /* Taille = 90% de la plus grande dimension du viewport (vmax),
+       bornée pour ne jamais dépasser l'écran. */
+    width: 90vmax;
+    max-width: 90vw;
     max-height: 90vh;
     overflow: auto;
     border: 1px solid var(--line);
@@ -4519,16 +4521,17 @@ a.gallery-card__video {
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
 }
 
-/* Rappel d'image (1fr) à gauche, formulaire (3fr) à droite.
-   align-items: start évite que l'aperçu s'étire en hauteur avec le formulaire. */
+/* Aperçu (carré) à gauche, formulaire à droite. En flex avec align-items:stretch,
+   l'aperçu prend toute la hauteur de la modale et sa largeur se déduit de sa
+   hauteur (aspect-ratio 1/1) : un vrai carré plein, sans zone vide. */
 .modal__layout {
-    display: grid;
-    grid-template-columns: 1fr 3fr;
-    align-items: start;
+    display: flex;
+    align-items: stretch;
 }
 
-/* Aperçu carré : le média remplit entièrement le cadre (plus de bandes noires). */
+/* Aperçu carré : largeur calculée depuis la hauteur étirée ; média plein cadre. */
 .modal__preview {
+    flex: 0 0 auto;
     aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
@@ -4554,6 +4557,8 @@ a.gallery-card__video {
 }
 
 .modal__form {
+    flex: 1 1 auto;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -4610,9 +4615,13 @@ a.gallery-card__video {
         grid-template-columns: 1fr;
     }
 
-    /* Modale empilée : image au-dessus du formulaire. */
+    /* Modale empilée : image carrée (pleine largeur) au-dessus du formulaire. */
     .modal__layout {
-        grid-template-columns: 1fr;
+        flex-direction: column;
+    }
+
+    .modal__preview {
+        width: 100%;
     }
 
     .dashboard-sidebar {
