@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, Film, ImagePlus, Pencil, Play, RotateCcw, Trash2, Video } from "lucide-react";
 import { apiFetch, assetUrl, uploadFileWithProgress } from "../directusClient.js";
 import BeforeAfterSlider from "../BeforeAfterSlider.jsx";
@@ -85,10 +85,13 @@ export default function GallerySection() {
     const [videoOpen, setVideoOpen] = useState(false);
     const [videoForm, setVideoForm] = useState({ ...EMPTY_META, video_url: "" });
 
-    // Index de la carte actuellement glissée (null si aucun glissement en cours).
+    // Index de la carte glissée (halo rouge) et index survolé (carte fantôme).
     const [draggingIndex, setDraggingIndex] = useState(null);
-    // Réf vers la liste « active » à jour : lue à la fin du drag pour persister
-    // l'ordre sans dépendre d'une fermeture potentiellement périmée.
+    const [overIndex, setOverIndex] = useState(null);
+    // Réfs lues en fin de drag (évitent les fermetures périmées) : origine, cible,
+    // et liste « active » à jour pour persister l'ordre.
+    const dragFromRef = useRef(null);
+    const dragOverRef = useRef(null);
     const activeRef = useRef(active);
     activeRef.current = active;
     // Input fichier caché de la carte d'ajout.
@@ -168,38 +171,58 @@ export default function GallerySection() {
     }
 
     /**
-     * Tri vivant : pendant le glissement, dès qu'on survole une autre carte, la
-     * carte tirée vient s'insérer à cette position (réordonnancement en temps réel).
-     * Utilise des mises à jour fonctionnelles pour éviter les fermetures périmées.
-     * @param {number} targetIndex Index de la carte survolée.
+     * Démarre le glissement d'une carte : mémorise son index (halo rouge) et
+     * initialise le transfert (sans quoi le drag ne se déclenche pas de façon fiable).
+     * @param {React.DragEvent} event Événement dragstart.
+     * @param {number} index Index de la carte glissée.
      * @returns {void} Aucune valeur de retour.
      */
-    function liveMove(targetIndex) {
-        setDraggingIndex((fromIndex) => {
-            // Aucun déplacement si on n'est pas en train de glisser, ou déjà au bon endroit.
-            if (fromIndex === null || fromIndex === targetIndex) {
-                return fromIndex;
-            }
-            // Déplace l'élément tiré de fromIndex vers targetIndex dans la liste.
-            setActive((current) => {
-                const next = [...current];
-                const [moved] = next.splice(fromIndex, 1);
-                next.splice(targetIndex, 0, moved);
-                return next;
-            });
-            // La carte tirée occupe désormais la position cible.
-            return targetIndex;
-        });
+    function startDrag(event, index) {
+        dragFromRef.current = index;
+        setDraggingIndex(index);
+        event.dataTransfer.effectAllowed = "move";
+        try {
+            event.dataTransfer.setData("text/plain", String(index));
+        } catch (error) {
+            /* certains navigateurs restreignent setData : sans effet bloquant */
+        }
     }
 
     /**
-     * Fin du glissement : on persiste l'ordre courant (lu via une réf à jour) et
-     * on réinitialise l'état de glissement.
+     * Survol d'une carte pendant le glissement : place la carte fantôme (zone de
+     * dépôt) juste avant cette carte.
+     * @param {number} index Index de la carte survolée.
+     * @returns {void} Aucune valeur de retour.
+     */
+    function dragOverCard(index) {
+        dragOverRef.current = index;
+        setOverIndex(index);
+    }
+
+    /**
+     * Fin du glissement : déplace la carte d'origine à l'emplacement de la fantôme,
+     * persiste le nouvel ordre, puis réinitialise l'état.
      * @returns {Promise<void>} Aucune valeur de retour.
      */
     async function endDrag() {
+        const from = dragFromRef.current;
+        const to = dragOverRef.current;
+        dragFromRef.current = null;
+        dragOverRef.current = null;
         setDraggingIndex(null);
-        await persistOrder(activeRef.current);
+        setOverIndex(null);
+        // Rien à faire hors d'une cible valide ou si on relâche au même endroit.
+        if (from === null || to === null || from === to) {
+            return;
+        }
+        const list = [...activeRef.current];
+        const [moved] = list.splice(from, 1);
+        // La fantôme s'affiche AVANT la carte d'index `to` : si l'élément venait
+        // d'avant cette position, la suppression décale la cible d'un cran.
+        const target = from < to ? to - 1 : to;
+        list.splice(target, 0, moved);
+        setActive(list);
+        await persistOrder(list);
     }
 
     /* -------------------------------- Ajout photo ------------------------------- */
@@ -552,21 +575,16 @@ export default function GallerySection() {
             {view === "gallery" && (
             <div className="gallery-grid">
                 {active.map((item, index) => (
+                    <Fragment key={item.id}>
+                        {/* Carte fantôme : zone de dépôt, affichée avant la carte survolée. */}
+                        {draggingIndex !== null && overIndex === index && draggingIndex !== index && (
+                            <div className="gallery-ghost" aria-hidden="true">Déposer ici</div>
+                        )}
                         <article
                             className={`gallery-card${draggingIndex === index ? " is-dragging" : ""}`}
-                            key={item.id}
                             draggable
-                            onDragStart={(event) => {
-                                setDraggingIndex(index);
-                                event.dataTransfer.effectAllowed = "move";
-                                // setData est requis pour initier le drag de façon fiable.
-                                try {
-                                    event.dataTransfer.setData("text/plain", String(index));
-                                } catch (error) {
-                                    /* certains navigateurs restreignent setData : sans effet bloquant */
-                                }
-                            }}
-                            onDragEnter={() => liveMove(index)}
+                            onDragStart={(event) => startDrag(event, index)}
+                            onDragEnter={() => dragOverCard(index)}
                             onDragOver={(event) => {
                                 // preventDefault autorise le dépôt ; dropEffect ajuste le curseur.
                                 event.preventDefault();
@@ -591,6 +609,7 @@ export default function GallerySection() {
                             </div>
                         </div>
                         </article>
+                    </Fragment>
                 ))}
 
                 {/* Carte d'ajout : clic ou glisser-déposer de 1 à 2 photos. */}

@@ -4298,9 +4298,12 @@ a.gallery-card__video {
     text-decoration: none;
 }
 
-/* Carte en cours de glissement : estompée pour distinguer l'original. */
+/* Carte en cours de glissement : halo rouge pour repérer d'un coup d'œil
+   laquelle est tirée (l'image reste visible). */
 .gallery-card.is-dragging {
-    opacity: 0.35;
+    outline: 2px solid var(--red-primary);
+    outline-offset: -2px;
+    box-shadow: 0 0 0 4px color-mix(in oklch, var(--red-primary) 35%, transparent);
 }
 
 /* Carte fantôme : emplacement de dépôt prévisualisé pendant le drag&drop. */
