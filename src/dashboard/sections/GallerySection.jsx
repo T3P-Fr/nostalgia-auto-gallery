@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import { Film, ImagePlus, Pencil, Play, RotateCcw, Trash2, Video } from "lucide-react";
+import { ArrowLeft, Film, ImagePlus, Pencil, Play, RotateCcw, Trash2, Video } from "lucide-react";
 import { apiFetch, assetUrl, uploadFileWithProgress } from "../directusClient.js";
 import BeforeAfterSlider from "../BeforeAfterSlider.jsx";
 
@@ -60,6 +60,8 @@ export default function GallerySection() {
     // Suivi des téléversements en cours : [{ name, progress }].
     const [uploads, setUploads] = useState([]);
     const [feedback, setFeedback] = useState("");
+    // Sous-vue affichée dans la section : "gallery" (grille) ou "trash" (corbeille).
+    const [view, setView] = useState("gallery");
 
     // Édition des métadonnées d'une entrée existante (id en cours, ou null).
     const [editingId, setEditingId] = useState(null);
@@ -282,6 +284,23 @@ export default function GallerySection() {
         }
     }
 
+    /**
+     * Supprime définitivement une seule entrée de la corbeille (après confirmation).
+     * @param {object} item Entrée à supprimer définitivement.
+     * @returns {Promise<void>} Aucune valeur de retour.
+     */
+    async function deletePermanently(item) {
+        if (!window.confirm(`Supprimer définitivement « ${item.title || "cette entrée"} » ? Cette action est irréversible.`)) {
+            return;
+        }
+        try {
+            await apiFetch(`/items/gallery_items/${item.id}`, { method: "DELETE" });
+            await loadItems();
+        } catch (error) {
+            setFeedback(error.message || "Suppression impossible.");
+        }
+    }
+
     /* ------------------------------ Métadonnées --------------------------------- */
 
     /**
@@ -408,22 +427,47 @@ export default function GallerySection() {
 
     return (
         <div className="dashboard-section">
-            <div className="dashboard-section__head">
-                <div>
-                    <h2>Galerie</h2>
-                    <p className="dashboard-section__subtitle">
-                        Glissez les cartes pour les réordonner. Déposez une photo, ou deux pour un avant/après.
-                    </p>
+            {/* En-tête : vue Galerie (titre + actions) ou vue Corbeille (fil d'Ariane). */}
+            {view === "gallery" ? (
+                <div className="dashboard-section__head">
+                    <div>
+                        <h2>Galerie</h2>
+                        <p className="dashboard-section__subtitle">
+                            Glissez les cartes pour les réordonner. Déposez une photo, ou deux pour un avant/après.
+                        </p>
+                    </div>
+                    <div className="dashboard-section__actions">
+                        <button className="button button--ghost" onClick={() => setVideoOpen((open) => !open)} title="Ajouter une vidéo (lien YouTube ou Vimeo)">
+                            <Video /> Ajouter une vidéo
+                        </button>
+                        {/* Corbeille en icône, avec le nombre d'éléments s'il y en a. */}
+                        <button className="trash-toggle" onClick={() => setView("trash")} title="Ouvrir la corbeille" aria-label="Ouvrir la corbeille">
+                            <Trash2 />
+                            {trash.length > 0 && <span className="trash-toggle__count">{trash.length}</span>}
+                        </button>
+                    </div>
                 </div>
-                <button className="button button--ghost" onClick={() => setVideoOpen((open) => !open)} title="Ajouter une vidéo (lien YouTube ou Vimeo)">
-                    <Video /> Ajouter une vidéo
-                </button>
-            </div>
+            ) : (
+                <div className="dashboard-section__head">
+                    {/* Le titre devient un fil d'Ariane cliquable pour revenir à la galerie. */}
+                    <button className="dashboard-breadcrumb" onClick={() => setView("gallery")} title="Revenir à la galerie">
+                        <ArrowLeft />
+                        <span>Galerie</span>
+                        <span className="dashboard-breadcrumb__sep">/</span>
+                        <strong>Corbeille</strong>
+                    </button>
+                    {trash.length > 0 && (
+                        <button className="button button--ghost" onClick={emptyTrash} title="Supprimer définitivement tous les éléments de la corbeille">
+                            <Trash2 /> Vider la corbeille
+                        </button>
+                    )}
+                </div>
+            )}
 
             {feedback && <p className="dashboard-feedback">{feedback}</p>}
 
-            {/* Formulaire d'ajout de vidéo (replié par défaut). */}
-            {videoOpen && (
+            {/* Formulaire d'ajout de vidéo (replié par défaut, vue Galerie seulement). */}
+            {view === "gallery" && videoOpen && (
                 <div className="realisation-form">
                     <label className="dashboard-field dashboard-field--wide" title="Collez le lien d’une vidéo YouTube ou Vimeo">
                         <span>Lien vidéo</span>
@@ -446,7 +490,8 @@ export default function GallerySection() {
                 </div>
             )}
 
-            {/* Grille : cartes réordonnables par glisser-déposer + carte d'ajout. */}
+            {/* Grille (vue Galerie) : cartes réordonnables + carte d'ajout. */}
+            {view === "gallery" && (
             <div className="gallery-grid">
                 {active.map((item, index) => (
                     <Fragment key={item.id}>
@@ -522,24 +567,30 @@ export default function GallerySection() {
                     />
                 </div>
             </div>
+            )}
 
-            {/* Corbeille : entrées en attente de restauration ou de purge manuelle. */}
-            {trash.length > 0 && (
-                <div className="gallery-trash">
-                    <div className="gallery-trash__head">
-                        <h3><Trash2 /> Corbeille ({trash.length})</h3>
-                        <button className="button button--ghost" onClick={emptyTrash} title="Supprimer définitivement tous les éléments de la corbeille">
-                            Vider la corbeille
-                        </button>
-                    </div>
-                    <div className="gallery-trash__list">
-                        {trash.map((item) => (
-                            <div className="trash-item" key={item.id}>
-                                <span>{item.title || MEDIA_TYPE_LABELS[item.media_type || "image"]}</span>
-                                <button className="icon-button" onClick={() => restoreItem(item)} aria-label="Restaurer" title="Restaurer dans la galerie"><RotateCcw /></button>
+            {/* Contenu de la corbeille (vue Corbeille) : mêmes cartes 16:9, avec
+                restauration et suppression définitive par élément. */}
+            {view === "trash" && (
+                <div className="gallery-grid">
+                    {trash.map((item) => (
+                        <article className="gallery-card" key={item.id}>
+                            <div className="gallery-card__image">{renderMedia(item)}</div>
+                            <div className="gallery-card__body">
+                                <div className="gallery-card__text">
+                                    <strong>{item.title || "Sans titre"}</strong>
+                                    <span>{[MEDIA_TYPE_LABELS[item.media_type || "image"], item.caption].filter(Boolean).join(" · ")}</span>
+                                </div>
+                                <div className="gallery-card__actions">
+                                    <button className="icon-button icon-button--sm" onClick={() => restoreItem(item)} aria-label="Restaurer" title="Restaurer dans la galerie"><RotateCcw /></button>
+                                    <button className="icon-button icon-button--sm" onClick={() => deletePermanently(item)} aria-label="Supprimer définitivement" title="Supprimer définitivement (irréversible)"><Trash2 /></button>
+                                </div>
                             </div>
-                        ))}
-                    </div>
+                        </article>
+                    ))}
+                    {trash.length === 0 && (
+                        <div className="empty-state">La corbeille est vide.</div>
+                    )}
                 </div>
             )}
 

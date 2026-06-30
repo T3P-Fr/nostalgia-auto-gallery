@@ -3849,6 +3849,87 @@ main::after {
     color: var(--txt);
 }
 
+/* Groupe d'actions à droite de l'en-tête de section. */
+.dashboard-section__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Corbeille en icône, avec pastille du nombre d'éléments. */
+.trash-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.trash-toggle:hover {
+    color: var(--acc);
+    border-color: var(--acc);
+}
+
+.trash-toggle svg {
+    width: 18px;
+    height: 18px;
+}
+
+.trash-toggle__count {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 9px;
+    background: var(--acc);
+    color: #fff;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Fil d'Ariane « Galerie / Corbeille » servant de bouton retour. */
+.dashboard-breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.dashboard-breadcrumb:hover {
+    color: var(--txt);
+}
+
+.dashboard-breadcrumb strong {
+    color: var(--txt);
+}
+
+.dashboard-breadcrumb__sep {
+    color: var(--muted);
+}
+
+.dashboard-breadcrumb svg {
+    width: 18px;
+    height: 18px;
+}
+
 /* --- Formulaire de réalisation (avant/après) --- */
 .realisation-form {
     display: flex;
