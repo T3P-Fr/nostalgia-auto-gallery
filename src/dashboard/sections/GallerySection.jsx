@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import { Film, ImagePlus, Pencil, RotateCcw, Trash2, Video } from "lucide-react";
+import { Film, ImagePlus, Pencil, Play, RotateCcw, Trash2, Video } from "lucide-react";
 import { apiFetch, assetUrl, uploadFileWithProgress } from "../directusClient.js";
 import BeforeAfterSlider from "../BeforeAfterSlider.jsx";
 
@@ -29,6 +29,21 @@ const MEDIA_TYPE_LABELS = {
 
 // Formulaire vierge de métadonnées (édition et création de vidéo).
 const EMPTY_META = { title: "", caption: "", alt_text: "", category: "" };
+
+/**
+ * Extrait l'URL de la miniature d'une vidéo YouTube à partir de son lien.
+ * Gère les formats youtu.be/ID, youtube.com/watch?v=ID et /embed/ID.
+ * @param {string} url Lien de la vidéo.
+ * @returns {string} L'URL de la miniature, ou une chaîne vide si non reconnu.
+ */
+function youtubeThumbnail(url) {
+    if (!url) {
+        return "";
+    }
+    // Recherche d'un identifiant YouTube de 11 caractères dans les formats courants.
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([\w-]{11})/);
+    return match ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg` : "";
+}
 
 /**
  * Section « Galerie » du Dashboard. Gère des photos, des avant/après (curseur en
@@ -216,6 +231,10 @@ export default function GallerySection() {
      * @returns {Promise<void>} Aucune valeur de retour.
      */
     async function trashItem(item) {
+        // Confirmation systématique avant tout retrait (même réversible).
+        if (!window.confirm(`Mettre « ${item.title || "cette entrée"} » à la corbeille ?`)) {
+            return;
+        }
         try {
             await apiFetch(`/items/gallery_items/${item.id}`, {
                 method: "PATCH",
@@ -447,7 +466,12 @@ export default function GallerySection() {
 
                             {item.media_type === "video" && (
                                 <a className="gallery-card__video" href={item.video_url || "#"} target="_blank" rel="noreferrer" title="Ouvrir la vidéo">
-                                    <Film /> Vidéo
+                                    {/* Aperçu : miniature YouTube si disponible, sinon repli icône film. */}
+                                    {youtubeThumbnail(item.video_url)
+                                        ? <img src={youtubeThumbnail(item.video_url)} alt={altOf(item)} draggable={false} />
+                                        : <span className="gallery-card__video-fallback"><Film /></span>}
+                                    {/* Bouton Play superposé au centre de l'aperçu. */}
+                                    <span className="gallery-card__play"><Play /></span>
                                 </a>
                             )}
                         </div>

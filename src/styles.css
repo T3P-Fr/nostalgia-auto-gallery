@@ -4104,16 +4104,58 @@ main::after {
     display: block;
 }
 
-/* Placeholder pour une entrée vidéo dans la grille. */
+/* Aperçu d'une entrée vidéo : miniature plein cadre + bouton Play centré. */
 .gallery-card__video {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: color-mix(in oklch, black 80%, var(--surface));
+}
+
+.gallery-card__video img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Repli (vidéo non-YouTube ou fichier téléversé) : grande icône film centrée. */
+.gallery-card__video-fallback {
+    position: absolute;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    aspect-ratio: 4 / 3;
-    background: color-mix(in oklch, var(--acc) 14%, var(--bg));
-    color: var(--txt);
-    font-weight: 600;
+    color: var(--muted);
+}
+
+.gallery-card__video-fallback svg {
+    width: 40px;
+    height: 40px;
+}
+
+/* Bouton Play superposé au centre de l'aperçu. */
+.gallery-card__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    pointer-events: none;
+    transition: background 0.15s, transform 0.15s;
+}
+
+.gallery-card__video:hover .gallery-card__play {
+    background: var(--acc);
+    transform: translate(-50%, -50%) scale(1.08);
 }
 
 /* Bloc de saisie vidéo (lien externe ou téléversement de fichier). */
