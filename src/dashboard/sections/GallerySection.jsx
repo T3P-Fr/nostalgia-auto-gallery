@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, Film, ImagePlus, Pencil, Play, RotateCcw, Trash2, Video } from "lucide-react";
 import { apiFetch, assetUrl, uploadFileWithProgress } from "../directusClient.js";
 import BeforeAfterSlider from "../BeforeAfterSlider.jsx";
@@ -87,8 +87,10 @@ export default function GallerySection() {
 
     // Index de la carte actuellement glissée (null si aucun glissement en cours).
     const [draggingIndex, setDraggingIndex] = useState(null);
-    // Index survolé pendant le glissement : emplacement où la carte fantôme s'affiche.
-    const [overIndex, setOverIndex] = useState(null);
+    // Réf vers la liste « active » à jour : lue à la fin du drag pour persister
+    // l'ordre sans dépendre d'une fermeture potentiellement périmée.
+    const activeRef = useRef(active);
+    activeRef.current = active;
     // Input fichier caché de la carte d'ajout.
     const addInputRef = useRef(null);
     // Référence du formulaire de la modale d'édition + taille mesurée de l'aperçu.
@@ -166,33 +168,38 @@ export default function GallerySection() {
     }
 
     /**
-     * Réinitialise l'état de glissement (fin ou annulation du drag).
+     * Tri vivant : pendant le glissement, dès qu'on survole une autre carte, la
+     * carte tirée vient s'insérer à cette position (réordonnancement en temps réel).
+     * Utilise des mises à jour fonctionnelles pour éviter les fermetures périmées.
+     * @param {number} targetIndex Index de la carte survolée.
      * @returns {void} Aucune valeur de retour.
      */
-    function resetDrag() {
-        setDraggingIndex(null);
-        setOverIndex(null);
+    function liveMove(targetIndex) {
+        setDraggingIndex((fromIndex) => {
+            // Aucun déplacement si on n'est pas en train de glisser, ou déjà au bon endroit.
+            if (fromIndex === null || fromIndex === targetIndex) {
+                return fromIndex;
+            }
+            // Déplace l'élément tiré de fromIndex vers targetIndex dans la liste.
+            setActive((current) => {
+                const next = [...current];
+                const [moved] = next.splice(fromIndex, 1);
+                next.splice(targetIndex, 0, moved);
+                return next;
+            });
+            // La carte tirée occupe désormais la position cible.
+            return targetIndex;
+        });
     }
 
     /**
-     * Termine un glisser-déposer : déplace la carte tirée à la position cible.
-     * @param {number} targetIndex Position de dépôt.
+     * Fin du glissement : on persiste l'ordre courant (lu via une réf à jour) et
+     * on réinitialise l'état de glissement.
      * @returns {Promise<void>} Aucune valeur de retour.
      */
-    async function handleDrop(targetIndex) {
-        // On capture l'origine avant de réinitialiser l'état visuel du drag.
-        const fromIndex = draggingIndex;
-        resetDrag();
-        // Rien à faire si on relâche au même endroit ou hors d'une carte.
-        if (fromIndex === null || fromIndex === targetIndex) {
-            return;
-        }
-        // Réinsertion de l'élément tiré à la position cible (affichage optimiste).
-        const reordered = [...active];
-        const [moved] = reordered.splice(fromIndex, 1);
-        reordered.splice(targetIndex, 0, moved);
-        setActive(reordered);
-        await persistOrder(reordered);
+    async function endDrag() {
+        setDraggingIndex(null);
+        await persistOrder(activeRef.current);
     }
 
     /* -------------------------------- Ajout photo ------------------------------- */
@@ -458,7 +465,7 @@ export default function GallerySection() {
         // Vidéo : miniature YouTube (ou repli icône film) + bouton Play centré.
         if (type === "video") {
             return (
-                <a className="gallery-card__video" href={item.video_url || "#"} target="_blank" rel="noreferrer" title="Ouvrir la vidéo">
+                <a className="gallery-card__video" href={item.video_url || "#"} target="_blank" rel="noreferrer" title="Ouvrir la vidéo" draggable={false}>
                     {youtubeThumbnail(item.video_url)
                         ? <img src={youtubeThumbnail(item.video_url)} alt={altOf(item)} draggable={false} />
                         : <span className="gallery-card__video-fallback"><Film /></span>}
@@ -545,19 +552,28 @@ export default function GallerySection() {
             {view === "gallery" && (
             <div className="gallery-grid">
                 {active.map((item, index) => (
-                    <Fragment key={item.id}>
-                        {/* Carte fantôme : aperçu de l'emplacement de dépôt pendant le glissement. */}
-                        {draggingIndex !== null && overIndex === index && draggingIndex !== index && (
-                            <div className="gallery-ghost" aria-hidden="true">Déposer ici</div>
-                        )}
                         <article
                             className={`gallery-card${draggingIndex === index ? " is-dragging" : ""}`}
+                            key={item.id}
                             draggable
-                            onDragStart={() => setDraggingIndex(index)}
-                            onDragEnter={() => setOverIndex(index)}
-                            onDragOver={(event) => event.preventDefault()}
-                            onDrop={() => handleDrop(index)}
-                            onDragEnd={resetDrag}
+                            onDragStart={(event) => {
+                                setDraggingIndex(index);
+                                event.dataTransfer.effectAllowed = "move";
+                                // setData est requis pour initier le drag de façon fiable.
+                                try {
+                                    event.dataTransfer.setData("text/plain", String(index));
+                                } catch (error) {
+                                    /* certains navigateurs restreignent setData : sans effet bloquant */
+                                }
+                            }}
+                            onDragEnter={() => liveMove(index)}
+                            onDragOver={(event) => {
+                                // preventDefault autorise le dépôt ; dropEffect ajuste le curseur.
+                                event.preventDefault();
+                                event.dataTransfer.dropEffect = "move";
+                            }}
+                            onDrop={(event) => event.preventDefault()}
+                            onDragEnd={endDrag}
                             title="Glissez pour réordonner"
                         >
                         {/* Aperçu 16:9 (mutualisé avec la modale d'édition). */}
@@ -575,7 +591,6 @@ export default function GallerySection() {
                             </div>
                         </div>
                         </article>
-                    </Fragment>
                 ))}
 
                 {/* Carte d'ajout : clic ou glisser-déposer de 1 à 2 photos. */}
