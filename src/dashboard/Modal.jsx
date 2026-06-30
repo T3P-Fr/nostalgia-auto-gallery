@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { X } from "lucide-react";
 
 /**
  * Modale générique réutilisable : fond assombri/flouté, fermeture au clic sur le
@@ -31,6 +32,10 @@ export default function Modal({ onClose, className = "", children }) {
                 aria-modal="true"
                 onClick={(event) => event.stopPropagation()}
             >
+                {/* Croix de fermeture commune à toutes les modales (rouge, blanche au survol). */}
+                <button type="button" className="modal__close" onClick={onClose} aria-label="Fermer" title="Fermer">
+                    <X />
+                </button>
                 {children}
             </div>
         </div>

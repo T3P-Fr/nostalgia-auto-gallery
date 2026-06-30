@@ -4509,6 +4509,8 @@ a.gallery-card__video {
 }
 
 .modal {
+    /* position:relative pour ancrer la croix de fermeture en haut à droite. */
+    position: relative;
     /* Largeur tenant dans la page, mais assez large pour loger le formulaire
        à gauche + l'aperçu carré à droite. */
     width: 100%;
@@ -4525,6 +4527,34 @@ a.gallery-card__video {
    premier dans le DOM, est rejeté à droite ; le formulaire occupe la gauche).
    align-items:stretch → l'aperçu prend toute la hauteur de la modale et sa
    largeur se déduit de sa hauteur (aspect-ratio 1/1) : un carré plein. */
+/* Croix de fermeture, en haut à droite de toute modale : rouge, blanche au survol. */
+.modal__close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--red-primary);
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.modal__close:hover {
+    color: #fff;
+}
+
+.modal__close svg {
+    width: 20px;
+    height: 20px;
+}
+
 .modal__layout {
     display: flex;
     flex-direction: row;
