@@ -4527,7 +4527,7 @@ a.gallery-card__video {
    largeur se déduit de sa hauteur (aspect-ratio 1/1) : un carré plein. */
 .modal__layout {
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
     align-items: stretch;
 }
 
