@@ -12,3 +12,4 @@ tmp/
 cms/
 Thumbs.db
 **/Thumbs.db
+.client

@@ -127,9 +127,9 @@
             "Deluxe"
         ],
         "comboDiscounts": {
-            "Platine": 5,
-            "Premium": 10,
-            "Deluxe": 15
+            "Platine": 10,
+            "Premium": 20,
+            "Deluxe": 30
         },
         "groups": [
             {
@@ -138,9 +138,9 @@
                 "subtitle": "Habitacle",
                 "bonusLabel": "Prenez aussi un extérieur et économisez",
                 "discounts": {
-                    "Platine": 5,
-                    "Premium": 10,
-                    "Deluxe": 15
+                    "Platine": 10,
+                    "Premium": 20,
+                    "Deluxe": 30
                 },
                 "tiers": [
                     {
@@ -162,7 +162,7 @@
                         "features": [
                             "Shampoing complet des sièges",
                             "Nettoyage à la vapeur",
-                            "Coffre & logement roue de secours"
+                            "Nettoyage du coffre & logement roue de secours"
                         ]
                     },
                     {
@@ -172,8 +172,8 @@
                         "includes": "Premium",
                         "features": [
                             "Nettoyage des ceintures",
-                            "Rails de sièges",
-                            "Ciel de toit"
+                            "Nettoyage des rails de sièges",
+                            "Nettoyage du ciel de toit"
                         ]
                     }
                 ]
@@ -191,7 +191,7 @@
                 "tiers": [
                     {
                         "tier": "Platine",
-                        "price": 75,
+                        "price": 69,
                         "duration": "≈ 1h45",
                         "features": [
                             "Roues & jantes",
@@ -236,7 +236,7 @@
                 "tiers": [
                     {
                         "tier": "Platine",
-                        "price": 29,
+                        "price": 19,
                         "discount": "-40%",
                         "duration": "≈ 20 min",
                         "features": [
@@ -247,7 +247,7 @@
                     },
                     {
                         "tier": "Premium",
-                        "price": 49,
+                        "price": 29,
                         "discount": "-50%",
                         "duration": "≈ 40 min",
                         "includes": "Platine",
@@ -260,7 +260,7 @@
                     },
                     {
                         "tier": "Deluxe",
-                        "price": 69,
+                        "price": 39,
                         "discount": "-60%",
                         "duration": "≈ 1h",
                         "includes": "Premium",
