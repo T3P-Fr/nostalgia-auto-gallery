@@ -4509,10 +4509,9 @@ a.gallery-card__video {
 }
 
 .modal {
-    /* Taille = 90% de la plus grande dimension du viewport (vmax),
-       bornée pour ne jamais dépasser l'écran. */
-    width: 90vmax;
-    max-width: 90vw;
+    /* Taille compacte qui tient dans la page (bornée à 780px de large). */
+    width: 100%;
+    max-width: 780px;
     max-height: 90vh;
     overflow: auto;
     border: 1px solid var(--line);
