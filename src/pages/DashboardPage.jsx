@@ -3,13 +3,14 @@ import { CalendarClock, Images, LayoutGrid, LogOut, Sparkles, Tag } from "lucide
 import { isAuthenticated, logout } from "../dashboard/directusClient.js";
 import DashboardLogin from "../dashboard/DashboardLogin.jsx";
 import RealisationsSection from "../dashboard/sections/RealisationsSection.jsx";
+import GallerySection from "../dashboard/sections/GallerySection.jsx";
 
 // Définition du menu latéral : une entrée par section gérable. `key` identifie la
 // section active ; `icon` est un composant lucide ; `available` indique si la
 // section est déjà implémentée (sinon on affiche un message « à venir »).
 const SECTIONS = [
     { key: "realisations", label: "Réalisations", icon: Sparkles, available: true },
-    { key: "gallery", label: "Galerie", icon: Images, available: false },
+    { key: "gallery", label: "Galerie", icon: Images, available: true },
     { key: "forfaits", label: "Forfaits", icon: Tag, available: false },
     { key: "disponibilites", label: "Disponibilités", icon: CalendarClock, available: false },
 ];
@@ -79,8 +80,11 @@ export default function DashboardPage() {
 
             {/* Zone principale : la section choisie. */}
             <main className="dashboard-main">
-                {/* Section Réalisations (avant/après) : la seule implémentée à ce stade. */}
+                {/* Section Réalisations (avant/après). */}
                 {activeSection === "realisations" && <RealisationsSection />}
+
+                {/* Section Galerie (photos mises en avant). */}
+                {activeSection === "gallery" && <GallerySection />}
 
                 {/* Sections à venir : message d'attente pour les briques suivantes. */}
                 {currentSection && !currentSection.available && (
