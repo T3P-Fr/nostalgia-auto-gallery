@@ -4147,6 +4147,26 @@ a.gallery-card__video {
     text-decoration: none;
 }
 
+/* Carte en cours de glissement : estompée pour distinguer l'original. */
+.gallery-card.is-dragging {
+    opacity: 0.35;
+}
+
+/* Carte fantôme : emplacement de dépôt prévisualisé pendant le drag&drop. */
+.gallery-ghost {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    border: 2px dashed var(--acc);
+    border-radius: var(--radius-card);
+    background: color-mix(in oklch, var(--acc) 12%, transparent);
+    color: var(--acc);
+    font-weight: 600;
+    /* Le fantôme ne doit pas capturer les événements de drag (ils passent à la carte). */
+    pointer-events: none;
+}
+
 /* --- Carte d'ajout (clic ou dépôt de 1 à 2 photos) --- */
 .gallery-add {
     display: flex;

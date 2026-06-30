@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { Film, ImagePlus, Pencil, RotateCcw, Trash2, Video } from "lucide-react";
 import { apiFetch, assetUrl, uploadFileWithProgress } from "../directusClient.js";
 import BeforeAfterSlider from "../BeforeAfterSlider.jsx";
@@ -54,8 +54,10 @@ export default function GallerySection() {
     const [videoOpen, setVideoOpen] = useState(false);
     const [videoForm, setVideoForm] = useState({ ...EMPTY_META, video_url: "" });
 
-    // Index de la carte en cours de glissement (pour le réordonnancement).
-    const dragIndex = useRef(null);
+    // Index de la carte actuellement glissée (null si aucun glissement en cours).
+    const [draggingIndex, setDraggingIndex] = useState(null);
+    // Index survolé pendant le glissement : emplacement où la carte fantôme s'affiche.
+    const [overIndex, setOverIndex] = useState(null);
     // Input fichier caché de la carte d'ajout.
     const addInputRef = useRef(null);
 
@@ -110,13 +112,23 @@ export default function GallerySection() {
     }
 
     /**
+     * Réinitialise l'état de glissement (fin ou annulation du drag).
+     * @returns {void} Aucune valeur de retour.
+     */
+    function resetDrag() {
+        setDraggingIndex(null);
+        setOverIndex(null);
+    }
+
+    /**
      * Termine un glisser-déposer : déplace la carte tirée à la position cible.
      * @param {number} targetIndex Position de dépôt.
      * @returns {Promise<void>} Aucune valeur de retour.
      */
     async function handleDrop(targetIndex) {
-        const fromIndex = dragIndex.current;
-        dragIndex.current = null;
+        // On capture l'origine avant de réinitialiser l'état visuel du drag.
+        const fromIndex = draggingIndex;
+        resetDrag();
         // Rien à faire si on relâche au même endroit ou hors d'une carte.
         if (fromIndex === null || fromIndex === targetIndex) {
             return;
@@ -403,15 +415,21 @@ export default function GallerySection() {
             {/* Grille : cartes réordonnables par glisser-déposer + carte d'ajout. */}
             <div className="gallery-grid">
                 {active.map((item, index) => (
-                    <article
-                        className="gallery-card"
-                        key={item.id}
-                        draggable
-                        onDragStart={() => { dragIndex.current = index; }}
-                        onDragOver={(event) => event.preventDefault()}
-                        onDrop={() => handleDrop(index)}
-                        title="Glissez pour réordonner"
-                    >
+                    <Fragment key={item.id}>
+                        {/* Carte fantôme : aperçu de l'emplacement de dépôt pendant le glissement. */}
+                        {draggingIndex !== null && overIndex === index && draggingIndex !== index && (
+                            <div className="gallery-ghost" aria-hidden="true">Déposer ici</div>
+                        )}
+                        <article
+                            className={`gallery-card${draggingIndex === index ? " is-dragging" : ""}`}
+                            draggable
+                            onDragStart={() => setDraggingIndex(index)}
+                            onDragEnter={() => setOverIndex(index)}
+                            onDragOver={(event) => event.preventDefault()}
+                            onDrop={() => handleDrop(index)}
+                            onDragEnd={resetDrag}
+                            title="Glissez pour réordonner"
+                        >
                         <div className="gallery-card__image">
                             {/* Aperçu adapté au type de média (avant/après en direct). */}
                             {(item.media_type || "image") === "image" && (item.image
@@ -441,7 +459,8 @@ export default function GallerySection() {
                             <button className="icon-button" onClick={() => startEdit(item)} aria-label="Modifier" title="Modifier le titre, la légende et le texte alternatif"><Pencil /></button>
                             <button className="icon-button" onClick={() => trashItem(item)} aria-label="Mettre à la corbeille" title="Mettre à la corbeille (réversible)"><Trash2 /></button>
                         </div>
-                    </article>
+                        </article>
+                    </Fragment>
                 ))}
 
                 {/* Carte d'ajout : clic ou glisser-déposer de 1 à 2 photos. */}
