@@ -4519,13 +4519,17 @@ a.gallery-card__video {
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
 }
 
-/* Rappel d'image (1fr) à gauche, formulaire (3fr) à droite. */
+/* Rappel d'image (1fr) à gauche, formulaire (3fr) à droite.
+   align-items: start évite que l'aperçu s'étire en hauteur avec le formulaire. */
 .modal__layout {
     display: grid;
     grid-template-columns: 1fr 3fr;
+    align-items: start;
 }
 
+/* Aperçu carré : le média remplit entièrement le cadre (plus de bandes noires). */
 .modal__preview {
+    aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -4540,6 +4544,15 @@ a.gallery-card__video {
     display: block;
 }
 
+/* Dans l'aperçu carré, l'avant/après et la vidéo épousent le carré
+   (on neutralise leur ratio 16:9 par défaut). */
+.modal__preview .ba-slider,
+.modal__preview .gallery-card__video {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+}
+
 .modal__form {
     display: flex;
     flex-direction: column;
@@ -4549,6 +4562,42 @@ a.gallery-card__video {
 
 .modal__form h3 {
     margin: 0 0 4px;
+}
+
+/* Boîte de confirmation (plus étroite que la modale d'édition). */
+.modal--confirm {
+    max-width: 440px;
+}
+
+.confirm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px;
+}
+
+.confirm h3 {
+    margin: 0;
+}
+
+.confirm p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+.confirm__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+/* Bouton d'action destructive (suppression définitive, vider la corbeille). */
+.button--danger {
+    background: var(--red-primary);
+    border: none;
+    color: #fff;
 }
 
 /* --- Responsive : menu latéral replié au-dessus du contenu sur petit écran. --- */

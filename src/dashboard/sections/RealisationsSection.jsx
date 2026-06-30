@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { apiFetch, assetUrl } from "../directusClient.js";
 import ImageDropField from "../ImageDropField.jsx";
+import ConfirmDialog from "../ConfirmDialog.jsx";
 
 // Champs textes récupérés/enregistrés pour une réalisation. On liste explicitement
 // les champs demandés à Directus pour ne transférer que l'utile (et inclure les
@@ -52,6 +53,8 @@ export default function RealisationsSection() {
     const [form, setForm] = useState(EMPTY_FORM);
     const [feedback, setFeedback] = useState("");
     const [saving, setSaving] = useState(false);
+    // Demande de confirmation en cours (null = aucune). Alimente la ConfirmDialog.
+    const [confirmState, setConfirmState] = useState(null);
 
     /**
      * Recharge la liste des réalisations depuis Directus (triées par `sort`).
@@ -186,16 +189,22 @@ export default function RealisationsSection() {
      * @param {object} realisation Réalisation à supprimer.
      * @returns {Promise<void>} Aucune valeur de retour.
      */
-    async function deleteRealisation(realisation) {
-        if (!window.confirm(`Supprimer définitivement « ${realisation.title || "cette réalisation"} » ?`)) {
-            return;
-        }
-        try {
-            await apiFetch(`/items/realisations/${realisation.id}`, { method: "DELETE" });
-            await loadRealisations();
-        } catch (error) {
-            setFeedback(error.message || "Suppression impossible.");
-        }
+    function deleteRealisation(realisation) {
+        // Confirmation via une modale (cohérence avec le reste du Dashboard).
+        setConfirmState({
+            title: "Supprimer définitivement",
+            message: `Supprimer définitivement « ${realisation.title || "cette réalisation"} » ? Cette action est irréversible.`,
+            confirmLabel: "Supprimer",
+            danger: true,
+            onConfirm: async () => {
+                try {
+                    await apiFetch(`/items/realisations/${realisation.id}`, { method: "DELETE" });
+                    await loadRealisations();
+                } catch (error) {
+                    setFeedback(error.message || "Suppression impossible.");
+                }
+            },
+        });
     }
 
     return (
@@ -310,6 +319,24 @@ export default function RealisationsSection() {
                     <div className="empty-state">Aucune réalisation pour le moment. Cliquez sur « Ajouter ».</div>
                 )}
             </div>
+
+            {/* Boîte de confirmation (suppression) — même composant que la Galerie. */}
+            {confirmState && (
+                <ConfirmDialog
+                    title={confirmState.title}
+                    message={confirmState.message}
+                    confirmLabel={confirmState.confirmLabel}
+                    danger={confirmState.danger}
+                    onConfirm={async () => {
+                        const action = confirmState.onConfirm;
+                        setConfirmState(null);
+                        if (action) {
+                            await action();
+                        }
+                    }}
+                    onCancel={() => setConfirmState(null)}
+                />
+            )}
         </div>
     );
 }

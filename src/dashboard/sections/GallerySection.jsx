@@ -2,6 +2,8 @@ import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, Film, ImagePlus, Pencil, Play, RotateCcw, Trash2, Video } from "lucide-react";
 import { apiFetch, assetUrl, uploadFileWithProgress } from "../directusClient.js";
 import BeforeAfterSlider from "../BeforeAfterSlider.jsx";
+import Modal from "../Modal.jsx";
+import ConfirmDialog from "../ConfirmDialog.jsx";
 
 // Champs récupérés/enregistrés pour une entrée de galerie.
 const GALLERY_FIELDS = [
@@ -62,6 +64,18 @@ export default function GallerySection() {
     const [feedback, setFeedback] = useState("");
     // Sous-vue affichée dans la section : "gallery" (grille) ou "trash" (corbeille).
     const [view, setView] = useState("gallery");
+    // Demande de confirmation en cours (null = aucune). Remplace window.confirm.
+    const [confirmState, setConfirmState] = useState(null);
+
+    /**
+     * Ouvre une boîte de confirmation. La fonction onConfirm fournie est exécutée
+     * si l'utilisateur valide.
+     * @param {object} config Paramètres (title, message, confirmLabel, danger, onConfirm).
+     * @returns {void} Aucune valeur de retour.
+     */
+    function askConfirm(config) {
+        setConfirmState(config);
+    }
 
     // Édition des métadonnées d'une entrée existante (id en cours, ou null).
     const [editingId, setEditingId] = useState(null);
@@ -232,20 +246,24 @@ export default function GallerySection() {
      * @param {object} item Entrée à mettre à la corbeille.
      * @returns {Promise<void>} Aucune valeur de retour.
      */
-    async function trashItem(item) {
+    function trashItem(item) {
         // Confirmation systématique avant tout retrait (même réversible).
-        if (!window.confirm(`Mettre « ${item.title || "cette entrée"} » à la corbeille ?`)) {
-            return;
-        }
-        try {
-            await apiFetch(`/items/gallery_items/${item.id}`, {
-                method: "PATCH",
-                body: JSON.stringify({ trashed: true }),
-            });
-            await loadItems();
-        } catch (error) {
-            setFeedback(error.message || "Mise à la corbeille impossible.");
-        }
+        askConfirm({
+            title: "Mettre à la corbeille",
+            message: `Mettre « ${item.title || "cette entrée"} » à la corbeille ? Vous pourrez la restaurer ensuite.`,
+            confirmLabel: "Mettre à la corbeille",
+            onConfirm: async () => {
+                try {
+                    await apiFetch(`/items/gallery_items/${item.id}`, {
+                        method: "PATCH",
+                        body: JSON.stringify({ trashed: true }),
+                    });
+                    await loadItems();
+                } catch (error) {
+                    setFeedback(error.message || "Mise à la corbeille impossible.");
+                }
+            },
+        });
     }
 
     /**
@@ -269,19 +287,24 @@ export default function GallerySection() {
      * Vide définitivement la corbeille (suppression réelle des entrées).
      * @returns {Promise<void>} Aucune valeur de retour.
      */
-    async function emptyTrash() {
-        if (!window.confirm(`Vider la corbeille ? ${trash.length} élément(s) seront supprimés définitivement.`)) {
-            return;
-        }
-        try {
-            await Promise.all(
-                trash.map((item) => apiFetch(`/items/gallery_items/${item.id}`, { method: "DELETE" })),
-            );
-            await loadItems();
-            setFeedback("Corbeille vidée.");
-        } catch (error) {
-            setFeedback(error.message || "Impossible de vider la corbeille.");
-        }
+    function emptyTrash() {
+        askConfirm({
+            title: "Vider la corbeille",
+            message: `${trash.length} élément(s) seront supprimés définitivement. Cette action est irréversible.`,
+            confirmLabel: "Vider la corbeille",
+            danger: true,
+            onConfirm: async () => {
+                try {
+                    await Promise.all(
+                        trash.map((item) => apiFetch(`/items/gallery_items/${item.id}`, { method: "DELETE" })),
+                    );
+                    await loadItems();
+                    setFeedback("Corbeille vidée.");
+                } catch (error) {
+                    setFeedback(error.message || "Impossible de vider la corbeille.");
+                }
+            },
+        });
     }
 
     /**
@@ -289,16 +312,21 @@ export default function GallerySection() {
      * @param {object} item Entrée à supprimer définitivement.
      * @returns {Promise<void>} Aucune valeur de retour.
      */
-    async function deletePermanently(item) {
-        if (!window.confirm(`Supprimer définitivement « ${item.title || "cette entrée"} » ? Cette action est irréversible.`)) {
-            return;
-        }
-        try {
-            await apiFetch(`/items/gallery_items/${item.id}`, { method: "DELETE" });
-            await loadItems();
-        } catch (error) {
-            setFeedback(error.message || "Suppression impossible.");
-        }
+    function deletePermanently(item) {
+        askConfirm({
+            title: "Supprimer définitivement",
+            message: `Supprimer définitivement « ${item.title || "cette entrée"} » ? Cette action est irréversible.`,
+            confirmLabel: "Supprimer",
+            danger: true,
+            onConfirm: async () => {
+                try {
+                    await apiFetch(`/items/gallery_items/${item.id}`, { method: "DELETE" });
+                    await loadItems();
+                } catch (error) {
+                    setFeedback(error.message || "Suppression impossible.");
+                }
+            },
+        });
     }
 
     /* ------------------------------ Métadonnées --------------------------------- */
@@ -597,14 +625,8 @@ export default function GallerySection() {
             {/* Modale d'édition des métadonnées : fond flouté, rappel de l'image à
                 gauche (1fr) et formulaire à droite (3fr). Un clic sur le fond ferme. */}
             {editingId !== null && editingItem && (
-                <div className="modal-backdrop" onClick={() => setEditingId(null)}>
-                    <div
-                        className="modal"
-                        role="dialog"
-                        aria-modal="true"
-                        onClick={(event) => event.stopPropagation()}
-                    >
-                        <div className="modal__layout">
+                <Modal onClose={() => setEditingId(null)}>
+                    <div className="modal__layout">
                             {/* Rappel visuel de l'entrée en cours d'édition. */}
                             <div className="modal__preview">{renderMedia(editingItem)}</div>
 
@@ -633,8 +655,27 @@ export default function GallerySection() {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                </Modal>
+            )}
+
+            {/* Boîte de confirmation réutilisable (mise à la corbeille, purge,
+                suppression définitive). Remplace window.confirm partout ici. */}
+            {confirmState && (
+                <ConfirmDialog
+                    title={confirmState.title}
+                    message={confirmState.message}
+                    confirmLabel={confirmState.confirmLabel}
+                    danger={confirmState.danger}
+                    onConfirm={async () => {
+                        // On ferme la boîte puis on exécute l'action confirmée.
+                        const action = confirmState.onConfirm;
+                        setConfirmState(null);
+                        if (action) {
+                            await action();
+                        }
+                    }}
+                    onCancel={() => setConfirmState(null)}
+                />
             )}
         </div>
     );
