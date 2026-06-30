@@ -4298,12 +4298,31 @@ a.gallery-card__video {
     text-decoration: none;
 }
 
-/* Carte en cours de glissement : halo rouge pour repérer d'un coup d'œil
-   laquelle est tirée (l'image reste visible). */
-.gallery-card.is-dragging {
-    outline: 2px solid var(--red-primary);
-    outline-offset: -2px;
-    box-shadow: 0 0 0 4px color-mix(in oklch, var(--red-primary) 35%, transparent);
+/* Emplacement d'origine de la carte tirée : laissé vide (contenu masqué),
+   sans halo, juste un cadre pointillé discret. */
+.gallery-card--placeholder {
+    border: 2px dashed var(--line);
+    background: var(--bg);
+}
+
+.gallery-card--placeholder > * {
+    visibility: hidden;
+}
+
+/* Clone flottant qui suit le curseur : soulevé (110 %, légère rotation, ombre
+   portée), opacité pleine. Ne capte pas les événements (hit-test des cartes dessous). */
+.drag-clone {
+    position: fixed;
+    z-index: 1000;
+    pointer-events: none;
+    transform: scale(1.1) rotate(3deg);
+    transform-origin: center;
+    filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.45));
+    opacity: 1;
+}
+
+.drag-clone .gallery-card {
+    margin: 0;
 }
 
 /* Carte fantôme : emplacement de dépôt prévisualisé pendant le drag&drop. */
