@@ -4520,11 +4520,13 @@ a.gallery-card__video {
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
 }
 
-/* Aperçu (carré) à gauche, formulaire à droite. En flex avec align-items:stretch,
-   l'aperçu prend toute la hauteur de la modale et sa largeur se déduit de sa
-   hauteur (aspect-ratio 1/1) : un vrai carré plein, sans zone vide. */
+/* Formulaire à gauche (~70%), aperçu carré à droite (row-reverse : l'aperçu,
+   premier dans le DOM, est rejeté à droite ; le formulaire occupe la gauche).
+   align-items:stretch → l'aperçu prend toute la hauteur de la modale et sa
+   largeur se déduit de sa hauteur (aspect-ratio 1/1) : un carré plein. */
 .modal__layout {
     display: flex;
+    flex-direction: row-reverse;
     align-items: stretch;
 }
 
