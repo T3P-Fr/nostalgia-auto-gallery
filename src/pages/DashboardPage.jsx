@@ -65,6 +65,7 @@ export default function DashboardPage() {
                                 type="button"
                                 className={`dashboard-nav__item${section.key === activeSection ? " is-active" : ""}`}
                                 onClick={() => setActiveSection(section.key)}
+                                title={section.available ? `Gérer : ${section.label}` : `${section.label} — bientôt disponible`}
                             >
                                 <Icon />
                                 {section.label}
@@ -73,7 +74,7 @@ export default function DashboardPage() {
                     })}
                 </nav>
 
-                <button type="button" className="dashboard-nav__logout" onClick={handleLogout}>
+                <button type="button" className="dashboard-nav__logout" onClick={handleLogout} title="Fermer votre session et revenir à l’écran de connexion">
                     <LogOut /> Déconnexion
                 </button>
             </aside>

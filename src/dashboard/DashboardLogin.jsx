@@ -74,7 +74,7 @@ export default function DashboardLogin({ onAuthenticated }) {
 
                 {error && <p className="form-error">{error}</p>}
 
-                <button className="button" type="submit" disabled={submitting}>
+                <button className="button" type="submit" disabled={submitting} title="Se connecter avec votre email et mot de passe">
                     {submitting ? "Connexion…" : "Se connecter"}
                 </button>
             </form>

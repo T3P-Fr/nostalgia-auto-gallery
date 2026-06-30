@@ -65,6 +65,7 @@ export default function ImageDropField({ label, fileId, onChange }) {
             {/* Zone cliquable + cible de glisser-déposer. */}
             <div
                 className={`image-drop__zone${dragActive ? " is-drag" : ""}${fileId ? " has-image" : ""}`}
+                title="Cliquez pour choisir une image, ou glissez-déposez un fichier ici"
                 onClick={() => inputRef.current?.click()}
                 onDragOver={(event) => {
                     // Indispensable pour autoriser le drop sur la zone.
@@ -92,6 +93,7 @@ export default function ImageDropField({ label, fileId, onChange }) {
                     type="button"
                     className="image-drop__remove"
                     onClick={() => onChange(null)}
+                    title="Retirer cette image"
                 >
                     <X /> Retirer
                 </button>

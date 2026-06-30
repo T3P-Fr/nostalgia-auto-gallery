@@ -207,7 +207,7 @@ export default function RealisationsSection() {
                 </div>
                 {/* Bouton d'ajout masqué quand un formulaire est déjà ouvert. */}
                 {editingId === null && (
-                    <button className="button" onClick={startNew}><Plus /> Ajouter</button>
+                    <button className="button" onClick={startNew} title="Créer une nouvelle réalisation avant/après"><Plus /> Ajouter</button>
                 )}
             </div>
 
@@ -269,8 +269,8 @@ export default function RealisationsSection() {
                     </div>
 
                     <div className="realisation-form__actions">
-                        <button className="button button--ghost" onClick={cancelEdit} disabled={saving}>Annuler</button>
-                        <button className="button" onClick={saveRealisation} disabled={saving}>
+                        <button className="button button--ghost" onClick={cancelEdit} disabled={saving} title="Fermer sans enregistrer">Annuler</button>
+                        <button className="button" onClick={saveRealisation} disabled={saving} title="Enregistrer cette réalisation">
                             {saving ? "Enregistrement…" : "Enregistrer"}
                         </button>
                     </div>
@@ -301,8 +301,8 @@ export default function RealisationsSection() {
                             <p>{[realisation.vehicle, realisation.formula].filter(Boolean).join(" · ") || "—"}</p>
                         </div>
                         <div className="realisation-card__actions">
-                            <button className="icon-button" onClick={() => startEdit(realisation)} aria-label="Modifier"><Pencil /></button>
-                            <button className="icon-button" onClick={() => deleteRealisation(realisation)} aria-label="Supprimer"><Trash2 /></button>
+                            <button className="icon-button" onClick={() => startEdit(realisation)} aria-label="Modifier" title="Modifier cette réalisation"><Pencil /></button>
+                            <button className="icon-button" onClick={() => deleteRealisation(realisation)} aria-label="Supprimer" title="Supprimer définitivement cette réalisation"><Trash2 /></button>
                         </div>
                     </article>
                 ))}

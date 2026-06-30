@@ -4090,6 +4090,49 @@ main::after {
     padding: 0 12px 12px;
 }
 
+/* Vignette avant/après dans la grille : deux images côte à côte. */
+.gallery-card__beforeafter {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+}
+
+.gallery-card__beforeafter img {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    display: block;
+}
+
+/* Placeholder pour une entrée vidéo dans la grille. */
+.gallery-card__video {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    aspect-ratio: 4 / 3;
+    background: color-mix(in oklch, var(--acc) 14%, var(--bg));
+    color: var(--txt);
+    font-weight: 600;
+}
+
+/* Bloc de saisie vidéo (lien externe ou téléversement de fichier). */
+.video-field {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.video-field .dashboard-field {
+    width: 100%;
+}
+
+.video-field__or {
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
 /* --- Responsive : menu latéral replié au-dessus du contenu sur petit écran. --- */
 @media (max-width: 720px) {
     .dashboard {
