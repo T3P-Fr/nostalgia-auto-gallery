@@ -4067,27 +4067,55 @@ main::after {
 
 .gallery-card__image img {
     width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 9;
     object-fit: cover;
     display: block;
 }
 
 .gallery-card__body {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
     padding: 10px 12px;
 }
 
-.gallery-card__body span {
+/* Bloc texte (titre + sous-titre empilés), tronqué si trop long. */
+.gallery-card__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.gallery-card__text strong,
+.gallery-card__text span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.gallery-card__text span {
     color: var(--muted);
     font-size: 0.85rem;
 }
 
+/* Petites icônes Modifier/Supprimer, en bout de ligne du titre. */
 .gallery-card__actions {
     display: flex;
-    gap: 4px;
-    padding: 0 12px 12px;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.gallery-card__actions .icon-button {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+}
+
+.gallery-card__actions .icon-button svg {
+    width: 15px;
+    height: 15px;
 }
 
 /* Vignette avant/après dans la grille : deux images côte à côte. */
@@ -4108,7 +4136,7 @@ main::after {
 .gallery-card__video {
     position: relative;
     display: block;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 9;
     overflow: hidden;
     background: color-mix(in oklch, black 80%, var(--surface));
 }
@@ -4288,7 +4316,7 @@ a.gallery-card__video {
 .ba-slider {
     position: relative;
     width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 9;
     overflow: hidden;
     user-select: none;
 }
@@ -4384,6 +4412,64 @@ a.gallery-card__video {
     color: var(--muted);
 }
 
+/* --- Modale d'édition (fond flouté + rappel d'image) --- */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    /* Fond assombri + flou de l'arrière-plan. */
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.modal {
+    width: 100%;
+    max-width: 780px;
+    max-height: 90vh;
+    overflow: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+/* Rappel d'image (1fr) à gauche, formulaire (3fr) à droite. */
+.modal__layout {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+}
+
+.modal__preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--bg);
+}
+
+.modal__preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.modal__form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 22px;
+}
+
+.modal__form h3 {
+    margin: 0 0 4px;
+}
+
 /* --- Responsive : menu latéral replié au-dessus du contenu sur petit écran. --- */
 @media (max-width: 720px) {
     .dashboard {
@@ -4391,6 +4477,11 @@ a.gallery-card__video {
     }
 
     .gallery-form__layout {
+        grid-template-columns: 1fr;
+    }
+
+    /* Modale empilée : image au-dessus du formulaire. */
+    .modal__layout {
         grid-template-columns: 1fr;
     }
 

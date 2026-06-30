@@ -363,6 +363,49 @@ export default function GallerySection() {
         return item.alt_text || item.title || "Photo de la galerie";
     }
 
+    /**
+     * Rend l'aperçu média d'une entrée (photo, avant/après en direct ou vidéo).
+     * Mutualisé entre les cartes de la grille et le rappel d'image de la modale.
+     * Les images sont demandées en 16:9 (480×270) pour un cadrage homogène.
+     * @param {object} item Entrée de galerie à illustrer.
+     * @returns {JSX.Element} L'aperçu correspondant au type de média.
+     */
+    function renderMedia(item) {
+        const type = item.media_type || "image";
+
+        // Avant/après : curseur comparatif en direct.
+        if (type === "before_after" && item.before_image && item.after_image) {
+            return (
+                <BeforeAfterSlider
+                    beforeUrl={assetUrl(item.before_image, { width: 480, height: 270, fit: "cover" })}
+                    afterUrl={assetUrl(item.after_image, { width: 480, height: 270, fit: "cover" })}
+                    beforeAlt={`Avant — ${altOf(item)}`}
+                    afterAlt={`Après — ${altOf(item)}`}
+                />
+            );
+        }
+
+        // Vidéo : miniature YouTube (ou repli icône film) + bouton Play centré.
+        if (type === "video") {
+            return (
+                <a className="gallery-card__video" href={item.video_url || "#"} target="_blank" rel="noreferrer" title="Ouvrir la vidéo">
+                    {youtubeThumbnail(item.video_url)
+                        ? <img src={youtubeThumbnail(item.video_url)} alt={altOf(item)} draggable={false} />
+                        : <span className="gallery-card__video-fallback"><Film /></span>}
+                    <span className="gallery-card__play"><Play /></span>
+                </a>
+            );
+        }
+
+        // Photo simple (ou repli si l'image manque).
+        return item.image
+            ? <img src={assetUrl(item.image, { width: 480, height: 270, fit: "cover" })} alt={altOf(item)} draggable={false} />
+            : <div className="realisation-card__empty">—</div>;
+    }
+
+    // Entrée actuellement éditée (pour le rappel d'image dans la modale).
+    const editingItem = active.find((item) => item.id === editingId) || null;
+
     return (
         <div className="dashboard-section">
             <div className="dashboard-section__head">
@@ -403,34 +446,6 @@ export default function GallerySection() {
                 </div>
             )}
 
-            {/* Panneau d'édition des métadonnées (titre, légende, alt, catégorie). */}
-            {editingId !== null && (
-                <div className="realisation-form">
-                    <div className="realisation-form__fields">
-                        <label className="dashboard-field dashboard-field--wide" title="Titre affiché sous le média">
-                            <span>Titre</span>
-                            <input value={editForm.title} onChange={(event) => setEditForm((current) => ({ ...current, title: event.target.value }))} />
-                        </label>
-                        <label className="dashboard-field dashboard-field--wide" title="Courte description affichée sous le titre">
-                            <span>Légende</span>
-                            <input value={editForm.caption} onChange={(event) => setEditForm((current) => ({ ...current, caption: event.target.value }))} />
-                        </label>
-                        <label className="dashboard-field dashboard-field--wide" title="Texte alternatif : décrit l’image pour l’accessibilité et le référencement">
-                            <span>Texte alternatif (alt)</span>
-                            <input value={editForm.alt_text} onChange={(event) => setEditForm((current) => ({ ...current, alt_text: event.target.value }))} placeholder="Peugeot 205 GTI rouge après lustrage" />
-                        </label>
-                        <label className="dashboard-field dashboard-field--wide" title="Catégorie pour regrouper/filtrer les médias">
-                            <span>Catégorie</span>
-                            <input value={editForm.category} onChange={(event) => setEditForm((current) => ({ ...current, category: event.target.value }))} />
-                        </label>
-                    </div>
-                    <div className="realisation-form__actions">
-                        <button className="button button--ghost" onClick={() => setEditingId(null)} title="Fermer sans enregistrer">Annuler</button>
-                        <button className="button" onClick={saveEdit} title="Enregistrer les modifications">Enregistrer</button>
-                    </div>
-                </div>
-            )}
-
             {/* Grille : cartes réordonnables par glisser-déposer + carte d'ajout. */}
             <div className="gallery-grid">
                 {active.map((item, index) => (
@@ -449,39 +464,19 @@ export default function GallerySection() {
                             onDragEnd={resetDrag}
                             title="Glissez pour réordonner"
                         >
-                        <div className="gallery-card__image">
-                            {/* Aperçu adapté au type de média (avant/après en direct). */}
-                            {(item.media_type || "image") === "image" && (item.image
-                                ? <img src={assetUrl(item.image, { width: 400, height: 300, fit: "cover" })} alt={altOf(item)} draggable={false} />
-                                : <div className="realisation-card__empty">—</div>)}
-
-                            {item.media_type === "before_after" && item.before_image && item.after_image && (
-                                <BeforeAfterSlider
-                                    beforeUrl={assetUrl(item.before_image, { width: 400, height: 300, fit: "cover" })}
-                                    afterUrl={assetUrl(item.after_image, { width: 400, height: 300, fit: "cover" })}
-                                    beforeAlt={`Avant — ${altOf(item)}`}
-                                    afterAlt={`Après — ${altOf(item)}`}
-                                />
-                            )}
-
-                            {item.media_type === "video" && (
-                                <a className="gallery-card__video" href={item.video_url || "#"} target="_blank" rel="noreferrer" title="Ouvrir la vidéo">
-                                    {/* Aperçu : miniature YouTube si disponible, sinon repli icône film. */}
-                                    {youtubeThumbnail(item.video_url)
-                                        ? <img src={youtubeThumbnail(item.video_url)} alt={altOf(item)} draggable={false} />
-                                        : <span className="gallery-card__video-fallback"><Film /></span>}
-                                    {/* Bouton Play superposé au centre de l'aperçu. */}
-                                    <span className="gallery-card__play"><Play /></span>
-                                </a>
-                            )}
-                        </div>
+                        {/* Aperçu 16:9 (mutualisé avec la modale d'édition). */}
+                        <div className="gallery-card__image">{renderMedia(item)}</div>
                         <div className="gallery-card__body">
-                            <strong>{item.title || "Sans titre"}</strong>
-                            <span>{[MEDIA_TYPE_LABELS[item.media_type || "image"], item.caption].filter(Boolean).join(" · ")}</span>
-                        </div>
-                        <div className="gallery-card__actions">
-                            <button className="icon-button" onClick={() => startEdit(item)} aria-label="Modifier" title="Modifier le titre, la légende et le texte alternatif"><Pencil /></button>
-                            <button className="icon-button" onClick={() => trashItem(item)} aria-label="Mettre à la corbeille" title="Mettre à la corbeille (réversible)"><Trash2 /></button>
+                            {/* Titre + sous-titre empilés, sur une seule colonne. */}
+                            <div className="gallery-card__text">
+                                <strong>{item.title || "Sans titre"}</strong>
+                                <span>{[MEDIA_TYPE_LABELS[item.media_type || "image"], item.caption].filter(Boolean).join(" · ")}</span>
+                            </div>
+                            {/* Petites icônes en bout de ligne du titre/sous-titre. */}
+                            <div className="gallery-card__actions">
+                                <button className="icon-button icon-button--sm" onClick={() => startEdit(item)} aria-label="Modifier" title="Modifier le titre, la légende et le texte alternatif"><Pencil /></button>
+                                <button className="icon-button icon-button--sm" onClick={() => trashItem(item)} aria-label="Mettre à la corbeille" title="Mettre à la corbeille (réversible)"><Trash2 /></button>
+                            </div>
                         </div>
                         </article>
                     </Fragment>
@@ -544,6 +539,49 @@ export default function GallerySection() {
                                 <button className="icon-button" onClick={() => restoreItem(item)} aria-label="Restaurer" title="Restaurer dans la galerie"><RotateCcw /></button>
                             </div>
                         ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Modale d'édition des métadonnées : fond flouté, rappel de l'image à
+                gauche (1fr) et formulaire à droite (3fr). Un clic sur le fond ferme. */}
+            {editingId !== null && editingItem && (
+                <div className="modal-backdrop" onClick={() => setEditingId(null)}>
+                    <div
+                        className="modal"
+                        role="dialog"
+                        aria-modal="true"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <div className="modal__layout">
+                            {/* Rappel visuel de l'entrée en cours d'édition. */}
+                            <div className="modal__preview">{renderMedia(editingItem)}</div>
+
+                            {/* Formulaire des métadonnées. */}
+                            <div className="modal__form">
+                                <h3>Modifier l’entrée</h3>
+                                <label className="dashboard-field" title="Titre affiché sous le média">
+                                    <span>Titre</span>
+                                    <input value={editForm.title} onChange={(event) => setEditForm((current) => ({ ...current, title: event.target.value }))} />
+                                </label>
+                                <label className="dashboard-field" title="Courte description affichée sous le titre">
+                                    <span>Légende</span>
+                                    <input value={editForm.caption} onChange={(event) => setEditForm((current) => ({ ...current, caption: event.target.value }))} />
+                                </label>
+                                <label className="dashboard-field" title="Texte alternatif : décrit l’image pour l’accessibilité et le référencement">
+                                    <span>Texte alternatif (alt)</span>
+                                    <input value={editForm.alt_text} onChange={(event) => setEditForm((current) => ({ ...current, alt_text: event.target.value }))} placeholder="Peugeot 205 GTI rouge après lustrage" />
+                                </label>
+                                <label className="dashboard-field" title="Catégorie pour regrouper/filtrer les médias">
+                                    <span>Catégorie</span>
+                                    <input value={editForm.category} onChange={(event) => setEditForm((current) => ({ ...current, category: event.target.value }))} />
+                                </label>
+                                <div className="realisation-form__actions">
+                                    <button className="button button--ghost" onClick={() => setEditingId(null)} title="Fermer sans enregistrer">Annuler</button>
+                                    <button className="button" onClick={saveEdit} title="Enregistrer les modifications">Enregistrer</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
