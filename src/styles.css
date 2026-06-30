@@ -36,7 +36,7 @@
        que le bas, donc l'écran s'uniformise en sombre en bas de page. */
     --veil-min: 0%;
     --veil-max: 75%;
-    --veil: color-mix(in oklab,
+    --veil: color-mix(in oklch,
             var(--surface) calc(var(--veil-min) + (var(--veil-max) - var(--veil-min)) * var(--scroll-factor)),
             transparent);
     --surface: #0b0d10;
@@ -71,7 +71,7 @@
     --radius-card: calc(var(--radius) * 1.5);
 
     /* Gradient d'accentuation */
-    --acc-gradient: linear-gradient(color-mix(in oklab, var(--red-primary) 32%, transparent), var(--surface));
+    --acc-gradient: linear-gradient(color-mix(in oklch, var(--red-primary) 32%, transparent), var(--surface));
 }
 
 /* Cible tout élément ayant une classe qui COMMENCE par « bluredBackground »
@@ -85,13 +85,13 @@
 }
 
 .bluredBackground--features {
-    --gradient-top: color-mix(in oklab, var(--red-primary) 75%, transparent);
-    --gradient-bottom: color-mix(in oklab, var(--surface) 25%, transparent);
+    --gradient-top: color-mix(in oklch, var(--red-primary) 75%, transparent);
+    --gradient-bottom: color-mix(in oklch, var(--surface) 25%, transparent);
 }
 
 .bluredBackground--card {
-    --gradient-top: color-mix(in oklab, var(--surface2) 75%, transparent);
-    --gradient-bottom: color-mix(in oklab, var(--surface) 25%, transparent);
+    --gradient-top: color-mix(in oklch, var(--surface2) 75%, transparent);
+    --gradient-bottom: color-mix(in oklch, var(--surface) 25%, transparent);
 }
 
 * {
@@ -103,12 +103,12 @@
    var(--gradient--color) serait figé au rouge et hérité tel quel, donc le redéfinir
    plus bas (ex. --gradient--color: yellow sur un em) n'aurait aucun effet. En la
    déclarant sur *, elle est RECOMPOSÉE par élément avec ses propres sous-variables.
-   (color-mix exige un espace de couleur : « in oklab ».) */
+   (color-mix exige un espace de couleur : « in oklch ».) */
 * {
     --shining-gradient: linear-gradient(to bottom,
             var(--gradient--color),
-            color-mix(in oklab, var(--gradient--color), white var(--gradient--shine)) var(--gradient--center),
-            color-mix(in oklab, var(--gradient--color), black var(--gradient--shine)) var(--gradient--center),
+            color-mix(in oklch, var(--gradient--color), white var(--gradient--shine)) var(--gradient--center),
+            color-mix(in oklch, var(--gradient--color), black var(--gradient--shine)) var(--gradient--center),
             var(--gradient--color));
 }
 
@@ -141,7 +141,7 @@ html {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: color-mix(in oklab, var(--acc), white 15%);
+    background: color-mix(in oklch, var(--acc), white 15%);
     background-clip: padding-box;
 }
 
@@ -207,7 +207,7 @@ img {
 }
 
 /* Voile flouté sous l'en-tête : surface semi-transparente + flou d'arrière-plan,
-   estompé vers le bas par un masque dégradé. (color-mix exige « in oklab ».) */
+   estompé vers le bas par un masque dégradé. (color-mix exige « in oklch ».) */
 .header-nav::before {
     content: "";
     position: absolute;
@@ -215,7 +215,7 @@ img {
     left: 0;
     width: 99vw;
     height: 250%;
-    background-color: color-mix(in oklab, var(--surface) 80%, transparent);
+    background-color: color-mix(in oklch, var(--surface) 80%, transparent);
     backdrop-filter: blur(20px);
     mask-image: linear-gradient(0deg, transparent 5%, black 50%);
     pointer-events: none;
@@ -279,8 +279,8 @@ img {
     gap: 2px;
     padding: 5px;
     border-radius: 999px;
-    background: color-mix(in oklab, var(--surface) 60%, transparent);
-    border: 1px solid color-mix(in oklab, var(--txt) 8%, transparent);
+    background: color-mix(in oklch, var(--surface) 60%, transparent);
+    border: 1px solid color-mix(in oklch, var(--txt) 8%, transparent);
 }
 
 .site-nav a {
@@ -447,7 +447,7 @@ img {
    texte ET le contour passent au blanc (le fond reste un voile flou). */
 .button--secondary {
     border: 1px solid rgba(255, 255, 255, 0.42);
-    background: color-mix(in oklab, var(--surface) 28%, transparent);
+    background: color-mix(in oklch, var(--surface) 28%, transparent);
     backdrop-filter: blur(10px);
     color: var(--muted);
     box-shadow: none;
@@ -455,7 +455,7 @@ img {
 
 .button--secondary:hover {
     border-color: #fff;
-    background: color-mix(in oklab, var(--surface) 38%, transparent);
+    background: color-mix(in oklch, var(--surface) 38%, transparent);
     color: #fff;
 }
 
@@ -514,7 +514,7 @@ main::after {
     pointer-events: none;
     background: linear-gradient(to bottom,
             var(--veil) 0%,
-            color-mix(in oklab, var(--surface) var(--veil-max), transparent) 100%);
+            color-mix(in oklch, var(--surface) var(--veil-max), transparent) 100%);
 }
 
 /* En-tête de page (« héros texte »). Texte aligné à gauche, centré verticalement
@@ -1224,7 +1224,7 @@ main::after {
     padding: 10px 16px;
     border: 1px solid rgba(255, 255, 255, 0.42);
     border-radius: var(--radius-card);
-    background: color-mix(in oklab, var(--surface) 38%, transparent);
+    background: color-mix(in oklch, var(--surface) 38%, transparent);
     backdrop-filter: blur(10px);
     color: #fff;
     cursor: pointer;
@@ -1460,7 +1460,7 @@ main::after {
     padding: 1px 6px;
     border: 1px solid var(--line);
     border-radius: 999px;
-    background: color-mix(in oklab, var(--surface) 85%, transparent);
+    background: color-mix(in oklch, var(--surface) 85%, transparent);
     color: var(--txt);
     font-size: 10px;
     font-weight: 700;
@@ -1635,9 +1635,9 @@ main::after {
     align-items: center;
     gap: 8px;
     padding: 11px;
-    border: 1px solid color-mix(in oklab, var(--red-primary) 40%, transparent);
+    border: 1px solid color-mix(in oklch, var(--red-primary) 40%, transparent);
     border-radius: var(--radius-card);
-    background: color-mix(in oklab, var(--red-primary) 12%, transparent);
+    background: color-mix(in oklch, var(--red-primary) 12%, transparent);
     font-size: 12px;
     font-weight: 800;
 }
@@ -1683,7 +1683,7 @@ main::after {
     padding: 32px;
     border: 2px solid var(--acc);
     border-radius: var(--radius-card);
-    background: linear-gradient(color-mix(in oklab, var(--red-primary) 32%, transparent),
+    background: linear-gradient(color-mix(in oklch, var(--red-primary) 32%, transparent),
             var(--surface));
 }
 
@@ -1968,7 +1968,7 @@ main::after {
     align-items: center;
     justify-content: center;
     aspect-ratio: 1;
-    color: color-mix(in oklab, var(--txt) 14%, transparent);
+    color: color-mix(in oklch, var(--txt) 14%, transparent);
     font-size: 13px;
     pointer-events: none;
 }
@@ -2017,7 +2017,7 @@ main::after {
     border-color: var(--acc);
     /* Texte en blanc : le rouge donnait l'impression d'un créneau non sélectionnable. */
     color: #fff;
-    background: color-mix(in oklab, var(--red-primary) 12%, transparent);
+    background: color-mix(in oklch, var(--red-primary) 12%, transparent);
 }
 
 /* Créneau pris (réservé/confirmé) : reste désactivé et barré, mais sur fond rouge.
@@ -2193,7 +2193,7 @@ main::after {
 .booking-form textarea:focus,
 .admin-auth input:focus {
     border-color: var(--acc);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--red-primary) 15%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--red-primary) 15%, transparent);
 }
 
 .booking-recap {
@@ -2224,7 +2224,7 @@ main::after {
 /* Calque givré UNIQUE (tabs + carte) : un seul backdrop-filter continu, sinon
    chaque bloc floute sa propre portion d'arrière-plan → jointure visible. */
 .booking-frost {
-    background: color-mix(in oklab, var(--surface), transparent 50%);
+    background: color-mix(in oklch, var(--surface), transparent 50%);
     backdrop-filter: blur(100px);
     border-radius: 0 0 var(--radius-card) var(--radius-card);
 }
@@ -2266,7 +2266,7 @@ main::after {
 .need-tab.is-selected {
     border-top-color: var(--acc);
     background: linear-gradient(to bottom,
-            color-mix(in oklab, var(--red-primary) 16%, transparent),
+            color-mix(in oklch, var(--red-primary) 16%, transparent),
             transparent 65%);
     color: var(--txt);
 }
@@ -2742,10 +2742,10 @@ main::after {
     align-items: center;
     gap: 5px;
     padding: 5px 11px;
-    border: 1px solid color-mix(in oklab, var(--level-color, var(--acc)) 50%, var(--line));
+    border: 1px solid color-mix(in oklch, var(--level-color, var(--acc)) 50%, var(--line));
     border-radius: 999px;
-    background: color-mix(in oklab, var(--level-color, var(--acc)) 14%, transparent);
-    color: color-mix(in oklab, var(--level-color, var(--acc)) 55%, var(--txt));
+    background: color-mix(in oklch, var(--level-color, var(--acc)) 14%, transparent);
+    color: color-mix(in oklch, var(--level-color, var(--acc)) 55%, var(--txt));
     font-size: 10px;
     font-weight: 400;
     letter-spacing: 0.05em;
@@ -3201,6 +3201,85 @@ main::after {
     color: var(--muted);
 }
 
+/* --- Onglet « Disponibilités » : éditeur des jours/créneaux/fermetures. --- */
+
+/* Conteneur vertical des trois blocs de réglage + bouton d'enregistrement. */
+.availability-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* Chaque bloc (jours, créneaux, fermetures) est un fieldset encadré. */
+.availability-block {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+    padding: 18px 20px;
+}
+
+.availability-block legend {
+    padding: 0 8px;
+    font-weight: 700;
+    color: var(--txt);
+}
+
+/* Petite note explicative sous le titre de chaque bloc. */
+.availability-hint {
+    margin: 0 0 14px;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+/* Grille auto-ajustée pour les cases jours/créneaux (responsive sans media query). */
+.availability-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+}
+
+/* Case à cocher + libellé alignés horizontalement. */
+.availability-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Ligne d'ajout d'une date de fermeture (champ date + bouton). */
+.availability-add-date {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+/* Liste des fermetures programmées (une date par ligne avec bouton retirer). */
+.availability-closed-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.availability-closed-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: var(--surface);
+}
+
+/* Bouton d'enregistrement aligné à droite. */
+.availability-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
 .appointment-list {
     display: flex;
     flex-direction: column;
@@ -3297,8 +3376,8 @@ main::after {
     z-index: 1;
     border-top: 1px solid var(--line);
     /**/
-    --gradient-top: color-mix(in oklab, var(--surface) 75%, transparent);
-    --gradient-bottom: color-mix(in oklab, var(--surface2) 50%, transparent);
+    --gradient-top: color-mix(in oklch, var(--surface) 75%, transparent);
+    --gradient-bottom: color-mix(in oklch, var(--surface2) 50%, transparent);
 }
 
 .footer-grid {
@@ -3416,7 +3495,7 @@ main::after {
         border: 0;
         border-radius: 0;
         /* Fond identique à la carte (givré, surface semi-transparente). */
-        background: color-mix(in oklab, var(--surface), transparent 50%);
+        background: color-mix(in oklch, var(--surface), transparent 50%);
         backdrop-filter: blur(100px);
         box-shadow: -12px 0 32px rgba(0, 0, 0, 0.35);
         /* Hors écran par défaut, glisse vers le centre à l'ouverture. */
@@ -3584,5 +3663,408 @@ main::after {
     *::after {
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
+    }
+}
+
+/* ==========================================================================
+   17. DASHBOARD GÉRANT (espace /dashboard)
+   Espace séparé du site public : login, menu latéral, sections de gestion.
+   Réutilise les tokens du site (--acc, --surface, --line, --txt, --muted).
+   ========================================================================== */
+
+/* --- Écran de connexion --- */
+.dashboard-login {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: var(--bg);
+}
+
+.dashboard-login__card {
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 32px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+}
+
+.dashboard-login__intro {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+}
+
+/* --- Champ de formulaire générique du dashboard --- */
+.dashboard-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dashboard-field > span {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.dashboard-field input,
+.dashboard-field textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: var(--bg);
+    color: var(--txt);
+    font: inherit;
+}
+
+.dashboard-field textarea {
+    resize: vertical;
+}
+
+/* --- Coque : menu latéral + zone principale --- */
+.dashboard {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--txt);
+}
+
+.dashboard-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 24px 18px;
+    border-right: 1px solid var(--line);
+    background: var(--surface);
+}
+
+.dashboard-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dashboard-brand__mark {
+    color: var(--acc);
+    width: 28px;
+    height: 28px;
+}
+
+.dashboard-brand strong {
+    display: block;
+    line-height: 1.1;
+}
+
+.dashboard-brand span {
+    font-size: 0.78rem;
+    color: var(--muted);
+}
+
+/* Navigation : une entrée par section. */
+.dashboard-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.dashboard-nav__item,
+.dashboard-nav__logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: none;
+    border-radius: var(--radius-button);
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.dashboard-nav__item svg,
+.dashboard-nav__logout svg {
+    width: 18px;
+    height: 18px;
+}
+
+.dashboard-nav__item:hover {
+    color: var(--txt);
+    background: color-mix(in oklch, var(--acc) 10%, transparent);
+}
+
+.dashboard-nav__item.is-active {
+    color: var(--txt);
+    background: color-mix(in oklch, var(--acc) 18%, transparent);
+}
+
+.dashboard-nav__logout {
+    color: var(--muted);
+}
+
+.dashboard-nav__logout:hover {
+    color: var(--txt);
+}
+
+.dashboard-main {
+    padding: 32px;
+    overflow-y: auto;
+}
+
+/* --- Section de gestion (en-tête + contenu) --- */
+.dashboard-section__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.dashboard-section__head h2 {
+    margin: 0;
+}
+
+.dashboard-section__subtitle {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.dashboard-feedback {
+    margin: 0 0 16px;
+    padding: 10px 14px;
+    border-radius: var(--radius-button);
+    background: color-mix(in oklch, var(--acc) 14%, transparent);
+    color: var(--txt);
+}
+
+/* --- Formulaire de réalisation (avant/après) --- */
+.realisation-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 22px;
+    margin-bottom: 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+}
+
+/* Les deux zones d'image avant/après, côte à côte. */
+.realisation-form__images {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* Grille des champs textes (2 colonnes ; certains champs occupent toute la largeur). */
+.realisation-form__fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.dashboard-field--wide {
+    grid-column: 1 / -1;
+}
+
+.realisation-form__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Variante « fantôme » du bouton (annuler). */
+.button--ghost {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--txt);
+}
+
+/* --- Zone de dépôt d'image --- */
+.image-drop {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.image-drop__label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.image-drop__zone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    border: 2px dashed var(--line);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.image-drop__zone.is-drag {
+    border-color: var(--acc);
+    background: color-mix(in oklch, var(--acc) 10%, transparent);
+}
+
+.image-drop__zone.has-image {
+    border-style: solid;
+}
+
+.image-drop__zone img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-drop__hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.image-drop__remove {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    padding: 4px 8px;
+    border: none;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    cursor: pointer;
+}
+
+.image-drop__remove:hover {
+    color: var(--acc);
+}
+
+/* Petite animation de rotation pour l'indicateur de chargement. */
+.spin {
+    animation: dashboard-spin 0.9s linear infinite;
+}
+
+@keyframes dashboard-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- Liste des réalisations --- */
+.realisation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.realisation-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 18px;
+    align-items: center;
+    padding: 14px 18px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+}
+
+.realisation-card__images {
+    display: flex;
+    gap: 10px;
+}
+
+.realisation-card__thumb {
+    position: relative;
+    width: 120px;
+}
+
+.realisation-card__thumb > span {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: color-mix(in oklch, black 55%, transparent);
+    color: white;
+    font-size: 0.7rem;
+}
+
+.realisation-card__thumb img,
+.realisation-card__empty {
+    width: 120px;
+    height: 84px;
+    border-radius: var(--radius-button);
+    object-fit: cover;
+}
+
+.realisation-card__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    color: var(--muted);
+}
+
+.realisation-card__body h3 {
+    margin: 0 0 4px;
+}
+
+.realisation-card__body p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.realisation-card__actions {
+    display: flex;
+    gap: 6px;
+}
+
+/* --- Responsive : menu latéral replié au-dessus du contenu sur petit écran. --- */
+@media (max-width: 720px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-sidebar {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .dashboard-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        flex: 1 1 100%;
+    }
+
+    .realisation-form__images,
+    .realisation-form__fields {
+        grid-template-columns: 1fr;
+    }
+
+    .realisation-card {
+        grid-template-columns: 1fr;
     }
 }

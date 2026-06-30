@@ -15,6 +15,8 @@ const AboutPage = lazy(() => import("./pages/AboutPage.jsx"));
 const BookingPage = lazy(() => import("./pages/BookingPage.jsx"));
 const InformationsPage = lazy(() => import("./pages/InformationsPage.jsx"));
 const AdminPage = lazy(() => import("./pages/AdminPage.jsx"));
+// Dashboard du gérant : espace séparé (sans en-tête/pied de page du site public).
+const DashboardPage = lazy(() => import("./pages/DashboardPage.jsx"));
 
 /**
  * Point de suspension partagé par toutes les pages chargées paresseusement.
@@ -35,6 +37,16 @@ function SuspendedOutlet() {
 export default function App() {
     return (
         <Routes>
+            {/* Dashboard du gérant : route à part, EN DEHORS du Layout public,
+                pour offrir un espace plein écran à sa propre identité visuelle. */}
+            <Route
+                path="dashboard"
+                element={
+                    <Suspense fallback={<div className="route-loading" aria-busy="true" />}>
+                        <DashboardPage />
+                    </Suspense>
+                }
+            />
             <Route element={<Layout />}>
                 <Route element={<SuspendedOutlet />}>
                     <Route index element={<HomePage />} />

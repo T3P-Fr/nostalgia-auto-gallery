@@ -17,6 +17,15 @@ const {
     updateRequest,
 } = require("./store.cjs");
 const { notifyAppointment, notifyRequest, verifyMailer } = require("./mailer.cjs");
+// Module de disponibilités : remplace les créneaux codés en dur par une règle
+// modifiable par le gérant depuis l'admin (jours ouverts + fermetures).
+const {
+    SLOT_CATALOG,
+    getOpenSlotsForDate,
+    readAvailabilityConfig,
+    writeAvailabilityConfig,
+    normalizeAvailabilityConfig,
+} = require("./availability.cjs");
 
 // Version CommonJS (.cjs) pour Phusion Passenger (o2switch). Passenger charge le
 // fichier de démarrage en CommonJS ; un fichier ESM (.js avec "type":"module")
@@ -25,19 +34,6 @@ const { notifyAppointment, notifyRequest, verifyMailer } = require("./mailer.cjs
 const app = express();
 const port = Number(process.env.PORT) || 3001;
 const adminKey = process.env.ADMIN_KEY || "nostalgia-admin";
-// Un créneau toutes les heures, de 08:00 à 18:00 inclus.
-const allowedSlots = [
-    "08:00",
-    "09:00",
-    "10:00",
-    "11:00",
-    "13:00",
-    "14:00",
-    "15:00",
-    "16:00",
-    "17:00",
-    "18:00",
-];
 const allowedStatuses = ["pending", "confirmed", "completed", "cancelled"];
 // Types de demandes sans créneau et cycle de vie côté admin (à rappeler → traité).
 const allowedRequestTypes = ["achat-vente", "pieces"];
@@ -75,7 +71,11 @@ function validateAppointment(body) {
     if (!data.name || !data.phone || !data.service || !data.date || !data.slot) {
         return { error: "Nom, téléphone, prestation, date et créneau sont requis." };
     }
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(data.date) || !allowedSlots.includes(data.slot)) {
+    // On vérifie ici que le créneau appartient au CATALOGUE (format/horaire
+    // connu). La disponibilité réelle ce jour-là (jour ouvert, créneau proposé,
+    // hors fermeture) est contrôlée séparément côté serveur, car elle dépend de
+    // la config et nécessite un accès asynchrone au stockage.
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(data.date) || !SLOT_CATALOG.includes(data.slot)) {
         return { error: "La date ou le créneau est invalide." };
     }
     if (new Date(`${data.date}T${data.slot}:00`) < new Date()) {
@@ -151,6 +151,36 @@ app.get("/api/health/mail", requireAdmin, async (_request, response, next) => {
     }
 });
 
+/**
+ * Lit la configuration de disponibilité (jours ouverts, créneaux, fermetures).
+ * Protégé par la clé admin : seule l'interface de gestion l'utilise.
+ */
+app.get("/api/availability-config", requireAdmin, async (_request, response, next) => {
+    try {
+        // On renvoie aussi le catalogue complet des créneaux pour que l'admin
+        // puisse proposer les cases à cocher correspondantes.
+        const config = await readAvailabilityConfig();
+        response.json({ ...config, slotCatalog: SLOT_CATALOG });
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
+ * Enregistre une nouvelle configuration de disponibilité envoyée par l'admin.
+ * Les données sont normalisées (jamais de confiance aveugle) avant écriture.
+ */
+app.put("/api/availability-config", requireAdmin, async (request, response, next) => {
+    try {
+        // Nettoyage/validation puis persistance atomique de la config.
+        const config = normalizeAvailabilityConfig(request.body);
+        await writeAvailabilityConfig(config);
+        response.json({ ...config, slotCatalog: SLOT_CATALOG });
+    } catch (error) {
+        next(error);
+    }
+});
+
 app.get("/api/availability", async (request, response, next) => {
     try {
         const date = cleanString(request.query.date, 10);
@@ -158,7 +188,12 @@ app.get("/api/availability", async (request, response, next) => {
             response.status(400).json({ message: "Date invalide." });
             return;
         }
+        // Créneaux ouverts ce jour-là selon la règle du gérant (jour fermé →
+        // tableau vide → le front affiche « indisponible »).
+        const openSlots = await getOpenSlotsForDate(date);
         const appointments = await readAppointments();
+        // Créneaux déjà réservés (hors annulés) : ils restent affichés mais
+        // marqués indisponibles.
         const takenSlots = appointments
             .filter(
                 (appointment) =>
@@ -167,7 +202,8 @@ app.get("/api/availability", async (request, response, next) => {
             .map((appointment) => appointment.slot);
         response.json({
             date,
-            slots: allowedSlots.map((time) => ({
+            // Un créneau est disponible s'il est ouvert ce jour ET pas déjà pris.
+            slots: openSlots.map((time) => ({
                 time,
                 available: !takenSlots.includes(time),
             })),
@@ -182,6 +218,16 @@ app.post("/api/appointments", async (request, response, next) => {
         const validation = validateAppointment(request.body);
         if (validation.error) {
             response.status(400).json({ message: validation.error });
+            return;
+        }
+        // Garde-fou serveur : on refuse un créneau qui n'est pas ouvert ce jour
+        // (jour fermé, fermeture exceptionnelle ou créneau non proposé). Évite
+        // qu'un client contourne le formulaire pour réserver un jour fermé.
+        const openSlots = await getOpenSlotsForDate(validation.data.date);
+        if (!openSlots.includes(validation.data.slot)) {
+            response.status(400).json({
+                message: "Ce créneau n’est pas disponible à la réservation.",
+            });
             return;
         }
         const appointment = await createAppointment(validation.data);
