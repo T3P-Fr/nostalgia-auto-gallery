@@ -4528,30 +4528,36 @@ a.gallery-card__video {
     align-items: stretch;
 }
 
-/* Aperçu carré : largeur calculée depuis la hauteur étirée ; média plein cadre. */
+/* Aperçu carré : sa hauteur s'étire sur la modale, sa largeur en découle
+   (aspect-ratio 1/1). min-width:0 empêche le carré de grossir à la taille
+   intrinsèque de l'image. */
 .modal__preview {
     flex: 0 0 auto;
+    align-self: stretch;
     aspect-ratio: 1 / 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    min-width: 0;
+    position: relative;
     overflow: hidden;
     background: var(--bg);
 }
 
-.modal__preview img {
+/* Tout média de l'aperçu est positionné en absolu : il remplit le carré sans
+   influencer sa taille (sinon l'image en taille réelle ferait déborder la modale). */
+.modal__preview > * {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
+}
+
+.modal__preview img {
     object-fit: cover;
     display: block;
 }
 
-/* Dans l'aperçu carré, l'avant/après et la vidéo épousent le carré
-   (on neutralise leur ratio 16:9 par défaut). */
+/* Avant/après et vidéo : on neutralise leur ratio 16:9 pour épouser le carré. */
 .modal__preview .ba-slider,
 .modal__preview .gallery-card__video {
-    width: 100%;
-    height: 100%;
     aspect-ratio: auto;
 }
 
