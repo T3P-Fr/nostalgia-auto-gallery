@@ -168,6 +168,56 @@ export async function uploadFile(file) {
 }
 
 /**
+ * Téléverse un fichier en suivant la progression d'envoi (barre de chargement).
+ * Utilise XMLHttpRequest car fetch n'expose pas la progression d'upload.
+ * @param {File} file Fichier à téléverser.
+ * @param {(percent: number) => void} [onProgress] Rappel appelé avec le pourcentage (0–100).
+ * @returns {Promise<object>} L'objet fichier créé (contient notamment `id`).
+ */
+export function uploadFileWithProgress(file, onProgress) {
+    return new Promise((resolve, reject) => {
+        const request = new XMLHttpRequest();
+        request.open("POST", `${DIRECTUS_URL}/files`);
+        // Authentification par jeton (l'upload est protégé).
+        request.setRequestHeader("Authorization", `Bearer ${getAccessToken()}`);
+
+        // Événement de progression : on convertit octets envoyés / total en %.
+        request.upload.onprogress = (event) => {
+            if (event.lengthComputable && onProgress) {
+                onProgress(Math.round((event.loaded / event.total) * 100));
+            }
+        };
+
+        // Fin de l'envoi : succès (2xx) → objet fichier ; sinon message d'erreur.
+        request.onload = () => {
+            if (request.status >= 200 && request.status < 300) {
+                try {
+                    resolve(JSON.parse(request.responseText).data);
+                } catch (error) {
+                    reject(new Error("Réponse d’upload illisible."));
+                }
+            } else {
+                let message = "Échec de l’envoi du fichier.";
+                try {
+                    message = JSON.parse(request.responseText).errors?.[0]?.message || message;
+                } catch (error) {
+                    // On garde le message générique si le corps n'est pas du JSON.
+                }
+                reject(new Error(message));
+            }
+        };
+
+        // Erreur réseau bas niveau (connexion coupée…).
+        request.onerror = () => reject(new Error("Erreur réseau pendant l’envoi."));
+
+        // Corps multipart/form-data avec le champ "file" attendu par Directus.
+        const formData = new FormData();
+        formData.append("file", file);
+        request.send(formData);
+    });
+}
+
+/**
  * Construit l'URL d'affichage d'un fichier Directus, éventuellement redimensionné.
  * Le jeton d'accès est passé en paramètre d'URL car une balise <img> ne peut pas
  * porter d'en-tête Authorization.

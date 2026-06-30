@@ -4133,6 +4133,195 @@ main::after {
     font-size: 0.85rem;
 }
 
+/* Cartes déplaçables par glisser-déposer. */
+.gallery-card {
+    cursor: grab;
+}
+
+.gallery-card:active {
+    cursor: grabbing;
+}
+
+/* La vignette « vidéo » devient un lien cliquable. */
+a.gallery-card__video {
+    text-decoration: none;
+}
+
+/* --- Carte d'ajout (clic ou dépôt de 1 à 2 photos) --- */
+.gallery-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    padding: 16px;
+    border: 2px dashed var(--line);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.gallery-add:hover {
+    border-color: var(--acc);
+    background: color-mix(in oklch, var(--acc) 8%, transparent);
+}
+
+.gallery-add__hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    text-align: center;
+}
+
+.gallery-add__hint small {
+    font-size: 0.78rem;
+}
+
+/* Suivi de progression des téléversements (une ligne par fichier). */
+.gallery-add__uploads {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.upload-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 4px 8px;
+    font-size: 0.8rem;
+}
+
+.upload-row__name {
+    grid-column: 1 / -1;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.upload-row__bar {
+    grid-column: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--line);
+    overflow: hidden;
+}
+
+.upload-row__bar > div {
+    height: 100%;
+    background: var(--acc);
+    transition: width 0.2s;
+}
+
+.upload-row__pct {
+    grid-column: 2;
+    color: var(--muted);
+}
+
+/* --- Curseur avant/après en direct --- */
+.ba-slider {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    user-select: none;
+}
+
+.ba-slider__base,
+.ba-slider__overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Trait de séparation suivant la position du curseur. */
+.ba-slider__divider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    margin-left: -1px;
+    background: #fff;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+}
+
+.ba-slider__tag {
+    position: absolute;
+    bottom: 8px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: color-mix(in oklch, black 55%, transparent);
+    color: #fff;
+    font-size: 0.7rem;
+    pointer-events: none;
+}
+
+.ba-slider__tag--before {
+    left: 8px;
+}
+
+.ba-slider__tag--after {
+    right: 8px;
+}
+
+/* Curseur natif étendu à toute l'image (zone de glissement), rendu invisible. */
+.ba-slider__range {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: ew-resize;
+}
+
+/* --- Corbeille (purge manuelle) --- */
+.gallery-trash {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+}
+
+.gallery-trash__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.gallery-trash__head h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.gallery-trash__list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.trash-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: var(--surface);
+    color: var(--muted);
+}
+
 /* --- Responsive : menu latéral replié au-dessus du contenu sur petit écran. --- */
 @media (max-width: 720px) {
     .dashboard {
