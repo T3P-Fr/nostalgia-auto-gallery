@@ -4509,9 +4509,10 @@ a.gallery-card__video {
 }
 
 .modal {
-    /* Taille compacte qui tient dans la page (bornée à 780px de large). */
+    /* Largeur tenant dans la page, mais assez large pour loger le formulaire
+       à gauche + l'aperçu carré à droite. */
     width: 100%;
-    max-width: 780px;
+    max-width: min(95vw, 920px);
     max-height: 90vh;
     overflow: auto;
     border: 1px solid var(--line);
@@ -4530,14 +4531,10 @@ a.gallery-card__video {
     align-items: stretch;
 }
 
-/* Aperçu carré : sa hauteur s'étire sur la modale, sa largeur en découle
-   (aspect-ratio 1/1). min-width:0 empêche le carré de grossir à la taille
-   intrinsèque de l'image. */
+/* Aperçu carré : ses dimensions (width = height) sont fixées en JS à la hauteur
+   du formulaire. position:relative + overflow:hidden pour contenir le média. */
 .modal__preview {
     flex: 0 0 auto;
-    align-self: stretch;
-    aspect-ratio: 1 / 1;
-    min-width: 0;
     position: relative;
     overflow: hidden;
     background: var(--bg);
@@ -4622,13 +4619,16 @@ a.gallery-card__video {
         grid-template-columns: 1fr;
     }
 
-    /* Modale empilée : image carrée (pleine largeur) au-dessus du formulaire. */
+    /* Modale empilée : image carrée pleine largeur au-dessus du formulaire.
+       !important pour neutraliser la taille fixée en JS (réservée au desktop). */
     .modal__layout {
         flex-direction: column;
     }
 
     .modal__preview {
-        width: 100%;
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 1 / 1;
     }
 
     .dashboard-sidebar {

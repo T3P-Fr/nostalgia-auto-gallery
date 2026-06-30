@@ -91,6 +91,11 @@ export default function GallerySection() {
     const [overIndex, setOverIndex] = useState(null);
     // Input fichier caché de la carte d'ajout.
     const addInputRef = useRef(null);
+    // Référence du formulaire de la modale d'édition + taille mesurée de l'aperçu.
+    // L'aperçu est rendu carré exactement à la hauteur du formulaire (= hauteur
+    // utile de la pop-up), via mesure JS (l'approche CSS pure s'effondrait à 0).
+    const editFormRef = useRef(null);
+    const [previewSize, setPreviewSize] = useState(0);
 
     /**
      * Recharge la galerie et répartit les entrées entre visibles et corbeille.
@@ -111,6 +116,24 @@ export default function GallerySection() {
     useEffect(() => {
         loadItems();
     }, [loadItems]);
+
+    // Mesure la hauteur du formulaire d'édition pour dimensionner l'aperçu carré.
+    // Se met à jour si le contenu (et donc la hauteur) change (ResizeObserver).
+    useEffect(() => {
+        // Rien à mesurer tant que la modale d'édition est fermée.
+        if (editingId === null) {
+            return undefined;
+        }
+        const formElement = editFormRef.current;
+        if (!formElement) {
+            return undefined;
+        }
+        const measure = () => setPreviewSize(formElement.offsetHeight);
+        measure();
+        const observer = new ResizeObserver(measure);
+        observer.observe(formElement);
+        return () => observer.disconnect();
+    }, [editingId]);
 
     /* ----------------------------- Réordonnancement ----------------------------- */
 
@@ -627,11 +650,16 @@ export default function GallerySection() {
             {editingId !== null && editingItem && (
                 <Modal onClose={() => setEditingId(null)}>
                     <div className="modal__layout">
-                            {/* Rappel visuel de l'entrée en cours d'édition. */}
-                            <div className="modal__preview">{renderMedia(editingItem)}</div>
+                            {/* Rappel visuel carré, exactement à la hauteur du formulaire. */}
+                            <div
+                                className="modal__preview"
+                                style={previewSize ? { width: previewSize, height: previewSize } : undefined}
+                            >
+                                {renderMedia(editingItem)}
+                            </div>
 
-                            {/* Formulaire des métadonnées. */}
-                            <div className="modal__form">
+                            {/* Formulaire des métadonnées (sa hauteur dimensionne l'aperçu). */}
+                            <div className="modal__form" ref={editFormRef}>
                                 <h3>Modifier l’entrée</h3>
                                 <label className="dashboard-field" title="Titre affiché sous le média">
                                     <span>Titre</span>
