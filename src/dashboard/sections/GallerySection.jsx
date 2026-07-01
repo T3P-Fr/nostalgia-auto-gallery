@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Film, ImagePlus, Pencil, Play, RotateCcw, Trash2, Video } from "lucide-react";
+import { ArrowLeft, Film, GripVertical, ImagePlus, Pencil, Play, RotateCcw, Trash2, Video } from "lucide-react";
 import { apiFetch, assetUrl, uploadFileWithProgress } from "../directusClient.js";
 import BeforeAfterSlider from "../BeforeAfterSlider.jsx";
 import Modal from "../Modal.jsx";
 import ConfirmDialog from "../ConfirmDialog.jsx";
 import ErrorToast from "../ErrorToast.jsx";
+import useDragReorder from "../useDragReorder.js";
 
 // Champs récupérés/enregistrés pour une entrée de galerie.
 const GALLERY_FIELDS = [
@@ -86,17 +87,28 @@ export default function GallerySection() {
     const [videoOpen, setVideoOpen] = useState(false);
     const [videoForm, setVideoForm] = useState({ ...EMPTY_META, video_url: "" });
 
-    // Glisser-déposer personnalisé (pointer events) : id de la carte tirée (rendue
-    // vide à sa place) et position à l'écran du clone flottant qui suit le curseur.
-    const [draggingId, setDraggingId] = useState(null);
-    const [clonePos, setClonePos] = useState({ x: 0, y: 0 });
-    // Données transitoires du glissement (évitent les fermetures périmées).
-    const dragRef = useRef({ id: null, active: false, startX: 0, startY: 0, offsetX: 0, offsetY: 0, width: 0 });
-    // Réf vers la liste « active » à jour, lue à la fin du drag pour persister l'ordre.
+    // Réf vers la liste « active » à jour, lue au relâchement pour persister l'ordre.
     const activeRef = useRef(active);
     activeRef.current = active;
-    // Réf vers persistOrder, appelée depuis les écouteurs globaux de pointeur.
-    const persistOrderRef = useRef(null);
+
+    // Moteur de drag UNIFIÉ (le même hook que les Forfaits) : clone soulevé qui
+    // suit le curseur + fantôme au contour pointillé. Rien de spécifique ici.
+    const galleryDrag = useDragReorder({
+        scope: "gallery",
+        onReorder: (fromKey, overKey) =>
+            setActive((current) => {
+                const from = current.findIndex((entry) => String(entry.id) === fromKey);
+                const over = current.findIndex((entry) => String(entry.id) === overKey);
+                if (from < 0 || over < 0) {
+                    return current;
+                }
+                const next = [...current];
+                const [moved] = next.splice(from, 1);
+                next.splice(over, 0, moved);
+                return next;
+            }),
+        onDrop: () => persistOrder(activeRef.current),
+    });
     // Input fichier caché de la carte d'ajout.
     const addInputRef = useRef(null);
     // Référence du formulaire de la modale d'édition + taille mesurée de l'aperçu.
@@ -171,99 +183,6 @@ export default function GallerySection() {
             setFeedback(error.message || "Réordonnancement impossible.");
             await loadItems();
         }
-    }
-
-    // Garde une réf à jour vers persistOrder pour les écouteurs globaux de pointeur.
-    persistOrderRef.current = persistOrder;
-
-    /**
-     * Pendant le glissement : déplace le clone, et réordonne en plaçant la carte
-     * tirée avant la carte actuellement sous le curseur (tri vivant).
-     * Stable (useCallback []) pour pouvoir s'ajouter/retirer comme écouteur global.
-     * @param {PointerEvent} event Événement pointermove.
-     * @returns {void} Aucune valeur de retour.
-     */
-    const onPointerMove = useCallback((event) => {
-        const drag = dragRef.current;
-        if (!drag.id) {
-            return;
-        }
-        // Seuil de déclenchement : on n'amorce le drag qu'au-delà de 5px (sinon clic).
-        if (!drag.active) {
-            if (Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) < 5) {
-                return;
-            }
-            drag.active = true;
-            setDraggingId(drag.id);
-        }
-        // Le clone suit le curseur en conservant le point de saisie.
-        setClonePos({ x: event.clientX - drag.offsetX, y: event.clientY - drag.offsetY });
-
-        // Carte sous le curseur (le clone est pointer-events:none, donc ignoré).
-        const element = document.elementFromPoint(event.clientX, event.clientY);
-        const card = element && element.closest("[data-dnd-id]");
-        const targetId = card && card.getAttribute("data-dnd-id");
-        if (targetId && String(targetId) !== String(drag.id)) {
-            // Réordonne : retire la carte tirée puis la réinsère avant la cible.
-            setActive((current) => {
-                const fromIndex = current.findIndex((entry) => String(entry.id) === String(drag.id));
-                if (fromIndex === -1) {
-                    return current;
-                }
-                const next = [...current];
-                const [moved] = next.splice(fromIndex, 1);
-                const insertAt = next.findIndex((entry) => String(entry.id) === String(targetId));
-                if (insertAt === -1) {
-                    return current;
-                }
-                next.splice(insertAt, 0, moved);
-                return next;
-            });
-        }
-    }, []);
-
-    /**
-     * Fin du glissement : retire les écouteurs, persiste l'ordre et réinitialise.
-     * @returns {void} Aucune valeur de retour.
-     */
-    const onPointerUp = useCallback(() => {
-        window.removeEventListener("pointermove", onPointerMove);
-        window.removeEventListener("pointerup", onPointerUp);
-        const wasActive = dragRef.current.active;
-        dragRef.current = { id: null, active: false, startX: 0, startY: 0, offsetX: 0, offsetY: 0, width: 0 };
-        if (wasActive) {
-            setDraggingId(null);
-            if (persistOrderRef.current) {
-                persistOrderRef.current(activeRef.current);
-            }
-        }
-    }, [onPointerMove]);
-
-    /**
-     * Amorce un éventuel glissement de carte au pointeur (souris/tactile). Les
-     * éléments interactifs (boutons, liens, champs) gardent leur comportement.
-     * @param {React.PointerEvent} event Événement pointerdown.
-     * @param {object} item Entrée de galerie de la carte.
-     * @returns {void} Aucune valeur de retour.
-     */
-    function handleCardPointerDown(event, item) {
-        if (event.button !== 0 || event.target.closest("button, a, input, label, select, textarea")) {
-            return;
-        }
-        // Empêche la sélection de texte / le drag natif d'image pendant le glissement.
-        event.preventDefault();
-        const rect = event.currentTarget.getBoundingClientRect();
-        dragRef.current = {
-            id: item.id,
-            active: false,
-            startX: event.clientX,
-            startY: event.clientY,
-            offsetX: event.clientX - rect.left,
-            offsetY: event.clientY - rect.top,
-            width: rect.width,
-        };
-        window.addEventListener("pointermove", onPointerMove);
-        window.addEventListener("pointerup", onPointerUp);
     }
 
     /* -------------------------------- Ajout photo ------------------------------- */
@@ -617,12 +536,20 @@ export default function GallerySection() {
             <div className="gallery-grid">
                 {active.map((item) => (
                         <article
-                            className={`gallery-card deletable${item.id === draggingId ? " gallery-card--placeholder" : ""}`}
+                            className={`gallery-card deletable${galleryDrag.draggingKey === String(item.id) ? " is-dnd-ghost" : ""}`}
                             key={item.id}
-                            data-dnd-id={item.id}
-                            onPointerDown={(event) => handleCardPointerDown(event, item)}
-                            title="Glissez pour réordonner"
+                            data-dnd-scope="gallery"
+                            data-dnd-key={item.id}
                         >
+                        {/* Poignée de glissement, en haut à gauche DANS la carte (moteur unifié). */}
+                        <span
+                            className="gallery-card__grip drag-grip"
+                            onPointerDown={(event) => galleryDrag.startDrag(event, item.id)}
+                            title="Glisser pour réordonner"
+                            aria-label="Réordonner cette carte"
+                        >
+                            <GripVertical />
+                        </span>
                         {/* Aperçu 16:9 (mutualisé avec la modale d'édition). */}
                         <div className="gallery-card__image">{renderMedia(item)}</div>
                         <div className="gallery-card__body">
@@ -772,16 +699,16 @@ export default function GallerySection() {
 
             {/* Clone flottant suivant le curseur pendant le glissement : soulevé
                 (110 %, légère rotation, ombre portée), opacité pleine. */}
-            {draggingId && (() => {
+            {galleryDrag.draggingKey && (() => {
                 // Entrée tirée, retrouvée par id (la liste se réordonne en direct).
-                const cloneItem = active.find((entry) => String(entry.id) === String(draggingId));
+                const cloneItem = active.find((entry) => String(entry.id) === galleryDrag.draggingKey);
                 if (!cloneItem) {
                     return null;
                 }
                 return (
                     <div
                         className="drag-clone"
-                        style={{ left: clonePos.x, top: clonePos.y, width: dragRef.current.width }}
+                        style={galleryDrag.cloneStyle}
                         aria-hidden="true"
                     >
                         <article className="gallery-card">

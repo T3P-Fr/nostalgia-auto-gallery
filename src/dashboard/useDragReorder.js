@@ -22,6 +22,12 @@ export default function useDragReorder({ scope, onReorder, onDrop }) {
     const [draggingKey, setDraggingKey] = useState(null);
     // Position à l'écran du clone flottant qui suit le curseur.
     const [clonePos, setClonePos] = useState({ x: 0, y: 0 });
+    // Inclinaison (deg) du clone — physique de « sac tenu par la poignée » :
+    // il balance selon la vitesse horizontale, puis revient à la verticale.
+    const [tilt, setTilt] = useState(0);
+    // Dernière abscisse (pour calculer la vitesse) + minuterie de retour vertical.
+    const lastX = useRef(0);
+    const tiltTimer = useRef(null);
     // Données transitoires du glissement (évitent les fermetures périmées).
     const drag = useRef({ key: null, active: false, startX: 0, startY: 0, offsetX: 0, offsetY: 0, width: 0 });
     // Réfs vers les callbacks à jour (lues depuis les écouteurs globaux).
@@ -52,6 +58,18 @@ export default function useDragReorder({ scope, onReorder, onDrop }) {
             }
             setClonePos({ x: event.clientX - d.offsetX, y: event.clientY - d.offsetY });
 
+            // Physique du balancement : l'inclinaison suit la vitesse horizontale
+            // (le bas « traîne » derrière la poignée), bornée, puis on programme un
+            // retour à la verticale dès que le mouvement s'arrête.
+            const dx = event.clientX - lastX.current;
+            lastX.current = event.clientX;
+            const angle = Math.max(-22, Math.min(22, -dx * 0.9));
+            setTilt(angle);
+            if (tiltTimer.current) {
+                clearTimeout(tiltTimer.current);
+            }
+            tiltTimer.current = setTimeout(() => setTilt(0), 90);
+
             const element = document.elementFromPoint(event.clientX, event.clientY);
             const item = element && element.closest(`[data-dnd-scope="${scope}"]`);
             const overKey = item && item.getAttribute("data-dnd-key");
@@ -71,6 +89,10 @@ export default function useDragReorder({ scope, onReorder, onDrop }) {
         window.removeEventListener("pointerup", onUp);
         const wasActive = drag.current.active;
         drag.current = { key: null, active: false, startX: 0, startY: 0, offsetX: 0, offsetY: 0, width: 0 };
+        if (tiltTimer.current) {
+            clearTimeout(tiltTimer.current);
+        }
+        setTilt(0);
         if (wasActive) {
             setDraggingKey(null);
             onDropRef.current();
@@ -90,6 +112,8 @@ export default function useDragReorder({ scope, onReorder, onDrop }) {
                 return;
             }
             event.preventDefault();
+            lastX.current = event.clientX;
+            setTilt(0);
             // L'élément mesuré = l'ancêtre réordonnable (la carte / la pastille…).
             const item = event.currentTarget.closest(`[data-dnd-scope="${scope}"]`) || event.currentTarget;
             const rect = item.getBoundingClientRect();
@@ -108,5 +132,15 @@ export default function useDragReorder({ scope, onReorder, onDrop }) {
         [scope, onMove, onUp],
     );
 
-    return { draggingKey, clonePos, cloneWidth: drag.current.width, startDrag };
+    // Style prêt à poser sur le clone : position + largeur + PIVOT à la poignée
+    // (point de préhension) + inclinaison physique.
+    const cloneStyle = {
+        left: clonePos.x,
+        top: clonePos.y,
+        width: drag.current.width,
+        transformOrigin: `${drag.current.offsetX}px ${drag.current.offsetY}px`,
+        transform: `scale(1.06) rotate(${tilt}deg)`,
+    };
+
+    return { draggingKey, clonePos, cloneWidth: drag.current.width, cloneStyle, startDrag };
 }

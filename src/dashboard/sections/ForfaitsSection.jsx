@@ -49,19 +49,13 @@ const ICON_CHOICES = [
 ];
 const ICON_MAP = Object.fromEntries(ICON_CHOICES.map(({ key, Comp }) => [key, Comp]));
 
-/**
- * Renvoie une copie du tableau où l'élément en position `from` est déplacé
- * juste avant la position `to` (réordonnancement).
- * @param {Array} array Tableau source.
- * @param {number} from Index de départ.
- * @param {number} to Index d'arrivée.
- * @returns {Array} Nouveau tableau réordonné.
- */
-function reorderArray(array, from, to) {
-    const next = [...array];
-    const [moved] = next.splice(from, 1);
-    next.splice(to, 0, moved);
-    return next;
+// Compteur de clés stables pour les lignes de prestation (les prestations sont
+// de simples chaînes en base ; on leur associe une clé stable en mémoire pour
+// le rendu React et le glisser-déposer).
+let featKeyCounter = 0;
+function nextFeatKey() {
+    featKeyCounter += 1;
+    return `f${featKeyCounter}`;
 }
 
 /**
@@ -135,7 +129,16 @@ export default function ForfaitsSection() {
                 apiFetch(`/items/formula_groups?${GROUP_QUERY}`),
             ]);
             setLevels(levelData || []);
-            setGroups(groupData || []);
+            // On dote chaque ligne de prestation d'une clé stable (les prestations
+            // sont des chaînes en base → objets {key, text} en mémoire).
+            const withFeatureKeys = (groupData || []).map((group) => ({
+                ...group,
+                tiers: (group.tiers || []).map((tier) => ({
+                    ...tier,
+                    features: (tier.features || []).map((text) => ({ key: nextFeatKey(), text })),
+                })),
+            }));
+            setGroups(withFeatureKeys);
             setActiveKey((current) => current ?? (groupData || [])[0]?.key ?? null);
         } catch (error) {
             setFeedback(error.message || "Impossible de charger les forfaits.");
@@ -467,46 +470,33 @@ export default function ForfaitsSection() {
 
     /* ------------------------------- Prestations -------------------------------- */
 
-    function editFeatureLocal(tier, index, value) {
-        const features = [...(tier.features || [])];
-        features[index] = value;
+    // Prestations = objets {key, text} en mémoire ; en base = tableau de chaînes.
+    function featureTexts(tier) {
+        return (tier.features || []).map((feature) => feature.text);
+    }
+
+    function editFeatureLocal(tier, key, value) {
+        const features = (tier.features || []).map((feature) =>
+            feature.key === key ? { ...feature, text: value } : feature,
+        );
         patchTierLocal(tier.id, { features });
     }
 
     async function addFeature(tier) {
-        const features = [...(tier.features || []), ""];
+        const features = [...(tier.features || []), { key: nextFeatKey(), text: "" }];
         patchTierLocal(tier.id, { features });
         // La ligne ajoutée peut être vide : on ancre le feedback sur la liste.
-        await saveTier(tier.id, { features }, `tier-${tier.id}-features`);
+        await saveTier(tier.id, { features: features.map((f) => f.text) }, `tier-${tier.id}-features`);
     }
 
-    async function removeFeature(tier, index) {
-        const features = (tier.features || []).filter((_, position) => position !== index);
+    async function removeFeature(tier, key) {
+        const features = (tier.features || []).filter((feature) => feature.key !== key);
         patchTierLocal(tier.id, { features });
         // La ligne disparaît : on ancre le feedback sur la liste des prestations.
-        await saveTier(tier.id, { features }, `tier-${tier.id}-features`);
+        await saveTier(tier.id, { features: features.map((f) => f.text) }, `tier-${tier.id}-features`);
     }
 
     /* -------------------------- Glisser-déposer (ordre) ------------------------- */
-
-    /**
-     * Réordonne les prestations d'un forfait après un dépôt (drag & drop).
-     * @param {object} tier Forfait concerné.
-     * @param {number} toIndex Position de dépôt.
-     * @param {React.DragEvent} event Événement drop (porte l'index d'origine).
-     * @returns {Promise<void>} Aucune valeur de retour.
-     */
-    async function dropFeature(tier, toIndex, event) {
-        event.preventDefault();
-        const [tierId, fromIndex] = (event.dataTransfer.getData("text/plain") || "").split(":");
-        // On ignore les dépôts venant d'un autre forfait.
-        if (Number(tierId) !== tier.id || fromIndex === "" || Number(fromIndex) === toIndex) {
-            return;
-        }
-        const features = reorderArray(tier.features || [], Number(fromIndex), toIndex);
-        patchTierLocal(tier.id, { features });
-        await saveTier(tier.id, { features }, `tier-${tier.id}-features`);
-    }
 
     // Réfs vers l'ordre courant (lues au relâchement pour persister).
     const levelsRef = useRef(levels);
@@ -567,6 +557,38 @@ export default function ForfaitsSection() {
             } catch (error) {
                 setFeedback(error.message || "Réordonnancement impossible.");
                 await loadAll();
+            }
+        },
+    });
+
+    // Drag « façon Galerie » des LIGNES de prestation (dans un même forfait).
+    const featDragTierRef = useRef(null);
+    const featuresDrag = useDragReorder({
+        scope: "feat",
+        onReorder: (fromKey, overKey) =>
+            setGroups((current) =>
+                current.map((group) => ({
+                    ...group,
+                    tiers: (group.tiers || []).map((tier) => {
+                        const from = (tier.features || []).findIndex((f) => f.key === fromKey);
+                        const over = (tier.features || []).findIndex((f) => f.key === overKey);
+                        // Les deux lignes doivent appartenir au MÊME forfait.
+                        if (from < 0 || over < 0) {
+                            return tier;
+                        }
+                        featDragTierRef.current = tier.id;
+                        const next = [...tier.features];
+                        const [moved] = next.splice(from, 1);
+                        next.splice(over, 0, moved);
+                        return { ...tier, features: next };
+                    }),
+                })),
+            ),
+        onDrop: async () => {
+            const tierId = featDragTierRef.current;
+            const tier = groupsRef.current.flatMap((g) => g.tiers || []).find((t) => t.id === tierId);
+            if (tier) {
+                await saveTier(tierId, { features: tier.features.map((f) => f.text) }, `tier-${tierId}-features`);
             }
         },
     });
@@ -746,13 +768,26 @@ export default function ForfaitsSection() {
                                         <div className="forfait-dd">
                                             <button
                                                 type="button"
-                                                className="forfait-dd__trigger"
+                                                className={`forfait-dd__trigger${includesMenuFor === tier.id ? " is-open" : ""}`}
                                                 onClick={() => setIncludesMenuFor(includesMenuFor === tier.id ? null : tier.id)}
                                                 aria-expanded={includesMenuFor === tier.id}
                                                 title="Choisir la formule que celle-ci complète"
                                             >
-                                                <span>{tier.includes || "Aucune"}</span>
-                                                <ChevronDown />
+                                                {/* Le déclencheur reprend l'icône + la couleur de la formule choisie. */}
+                                                {(() => {
+                                                    const sel = levels.find((l) => l.name === tier.includes);
+                                                    if (!sel) {
+                                                        return <span>Aucune</span>;
+                                                    }
+                                                    const SelIcon = ICON_MAP[sel.icon] || Sparkles;
+                                                    return (
+                                                        <span className="forfait-dd__value" style={{ color: sel.color || DEFAULT_COLOR }}>
+                                                            <SelIcon />
+                                                            {sel.name}
+                                                        </span>
+                                                    );
+                                                })()}
+                                                <ChevronDown className="forfait-dd__caret" />
                                             </button>
                                             {includesMenuFor === tier.id && (
                                                 <div className="forfait-dd__menu" role="listbox">
@@ -765,24 +800,31 @@ export default function ForfaitsSection() {
                                                             setIncludesMenuFor(null);
                                                         }}
                                                     >
+                                                        <Check className="forfait-dd__check" style={{ visibility: !tier.includes ? "visible" : "hidden" }} />
                                                         Aucune
                                                     </button>
                                                     {levels
                                                         .filter((other) => other.id !== tier.level && other.name)
-                                                        .map((other) => (
-                                                            <button
-                                                                key={other.id}
-                                                                type="button"
-                                                                className={`forfait-dd__option${tier.includes === other.name ? " is-active" : ""}`}
-                                                                onClick={() => {
-                                                                    patchTierLocal(tier.id, { includes: other.name });
-                                                                    saveTier(tier.id, { includes: other.name }, `tier-${tier.id}-includes`);
-                                                                    setIncludesMenuFor(null);
-                                                                }}
-                                                            >
-                                                                {other.name}
-                                                            </button>
-                                                        ))}
+                                                        .map((other) => {
+                                                            const OtherIcon = ICON_MAP[other.icon] || Sparkles;
+                                                            return (
+                                                                <button
+                                                                    key={other.id}
+                                                                    type="button"
+                                                                    className={`forfait-dd__option${tier.includes === other.name ? " is-active" : ""}`}
+                                                                    style={{ color: other.color || DEFAULT_COLOR }}
+                                                                    onClick={() => {
+                                                                        patchTierLocal(tier.id, { includes: other.name });
+                                                                        saveTier(tier.id, { includes: other.name }, `tier-${tier.id}-includes`);
+                                                                        setIncludesMenuFor(null);
+                                                                    }}
+                                                                >
+                                                                    <Check className="forfait-dd__check" style={{ visibility: tier.includes === other.name ? "visible" : "hidden" }} />
+                                                                    <OtherIcon />
+                                                                    {other.name}
+                                                                </button>
+                                                            );
+                                                        })}
                                                 </div>
                                             )}
                                         </div>
@@ -790,18 +832,17 @@ export default function ForfaitsSection() {
 
                                     {/* Prestations. */}
                                     <ul className="forfait-features save-anchor">
-                                        {(tier.features || []).map((feature, index) => (
+                                        {(tier.features || []).map((feature) => (
                                             <li
-                                                className="forfait-feature deletable"
-                                                key={index}
-                                                onDragOver={(event) => event.preventDefault()}
-                                                onDrop={(event) => dropFeature(tier, index, event)}
+                                                className={`forfait-feature deletable${featuresDrag.draggingKey === feature.key ? " is-dnd-ghost" : ""}`}
+                                                key={feature.key}
+                                                data-dnd-scope="feat"
+                                                data-dnd-key={feature.key}
                                             >
-                                                {/* Poignée de glissement (réordonner la ligne). */}
+                                                {/* Poignée « façon Galerie » (clone flottant + fantôme). */}
                                                 <span
                                                     className="drag-grip"
-                                                    draggable
-                                                    onDragStart={(event) => event.dataTransfer.setData("text/plain", `${tier.id}:${index}`)}
+                                                    onPointerDown={(event) => featuresDrag.startDrag(event, feature.key)}
                                                     title="Glisser pour réordonner"
                                                     aria-label="Réordonner cette ligne"
                                                 >
@@ -809,21 +850,20 @@ export default function ForfaitsSection() {
                                                 </span>
                                                 <Check className="forfait-feature__check" />
                                                 <input
-                                                    value={feature}
+                                                    value={feature.text}
                                                     placeholder="Décrire la prestation…"
-                                                    onChange={(event) => editFeatureLocal(tier, index, event.target.value)}
-                                                    onBlur={() => saveTier(tier.id, { features: tier.features }, `tier-${tier.id}-feat-${index}`)}
+                                                    onChange={(event) => editFeatureLocal(tier, feature.key, event.target.value)}
+                                                    onBlur={() => saveTier(tier.id, { features: featureTexts(tier) }, `tier-${tier.id}-features`)}
                                                 />
                                                 <button
                                                     type="button"
                                                     className="delete-badge delete-badge--sm"
-                                                    onClick={() => removeFeature(tier, index)}
+                                                    onClick={() => removeFeature(tier, feature.key)}
                                                     aria-label="Supprimer cette ligne"
                                                     title="Supprimer cette prestation"
                                                 >
                                                     <Trash2 />
                                                 </button>
-                                                {savedFx(`tier-${tier.id}-feat-${index}`)}
                                             </li>
                                         ))}
                                         {/* Feedback d'ajout/suppression de ligne (la ligne
@@ -967,7 +1007,7 @@ export default function ForfaitsSection() {
                 return (
                     <div
                         className="drag-clone"
-                        style={{ left: levelsDrag.clonePos.x, top: levelsDrag.clonePos.y, width: levelsDrag.cloneWidth }}
+                        style={levelsDrag.cloneStyle}
                         aria-hidden="true"
                     >
                         <div className="level-chip" style={{ "--tier-color": level.color || DEFAULT_COLOR }}>
@@ -987,10 +1027,33 @@ export default function ForfaitsSection() {
                 return (
                     <div
                         className="drag-clone"
-                        style={{ left: familiesDrag.clonePos.x, top: familiesDrag.clonePos.y, width: familiesDrag.cloneWidth }}
+                        style={familiesDrag.cloneStyle}
                         aria-hidden="true"
                     >
                         <div className="forfait-tab is-active">{group.title}</div>
+                    </div>
+                );
+            })()}
+
+            {/* Clone flottant de la LIGNE de prestation tirée. */}
+            {featuresDrag.draggingKey && (() => {
+                const feature = (activeGroup?.tiers || [])
+                    .flatMap((t) => t.features || [])
+                    .find((f) => f.key === featuresDrag.draggingKey);
+                if (!feature) {
+                    return null;
+                }
+                return (
+                    <div
+                        className="drag-clone"
+                        style={featuresDrag.cloneStyle}
+                        aria-hidden="true"
+                    >
+                        <div className="forfait-feature forfait-feature--clone">
+                            <GripVertical className="drag-grip" />
+                            <Check className="forfait-feature__check" />
+                            <span>{feature.text || "…"}</span>
+                        </div>
                     </div>
                 );
             })()}
