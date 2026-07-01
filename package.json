@@ -9,6 +9,7 @@
         "dev:server": "node --watch server/index.cjs",
         "cms": "cd cms && node node_modules/directus/cli.js start",
         "build": "vite build",
+        "build:admin": "vite build --config vite.admin.config.js",
         "start": "node server/index.cjs",
         "test": "node --test"
     },
