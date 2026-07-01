@@ -1,0 +1,98 @@
+/* Slyk — IconPicker. Déclencheur (icône + chevron) + menu flottant en grille.
+   Thémable via les variables Zoé du contexte (repli fourni) :
+     --acc, --line, --bg, --surface, --muted, --radius-button */
+
+.slyk-iconpicker {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.slyk-iconpicker__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 5px 6px;
+    border: 1px solid var(--line, rgba(255, 255, 255, 0.12));
+    border-radius: var(--radius-button, 8px);
+    background: var(--bg, #000);
+    cursor: pointer;
+}
+
+.slyk-iconpicker__current {
+    width: 22px;
+    height: 22px;
+}
+
+.slyk-iconpicker__caret {
+    width: 14px;
+    height: 14px;
+    color: var(--muted, #9aa0a6);
+    transition: transform 0.18s ease;
+    transform: rotate(-90deg);
+}
+
+.slyk-iconpicker__trigger.is-open .slyk-iconpicker__caret {
+    transform: rotate(0deg);
+}
+
+.slyk-iconpicker__menu {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 4px);
+    left: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    padding: 6px;
+    border: 1px solid var(--line, rgba(255, 255, 255, 0.12));
+    border-radius: var(--radius-button, 8px);
+    background: var(--surface, #0b0d10);
+    box-shadow: 0 18px 40px -6px rgba(0, 0, 0, 0.9);
+    transform-origin: top;
+    animation: slykIconOpen 0.15s ease-out;
+}
+
+@keyframes slykIconOpen {
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scaleY(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scaleY(1);
+    }
+}
+
+.slyk-iconpicker__choice {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border: 1px solid var(--line, rgba(255, 255, 255, 0.12));
+    border-radius: var(--radius-button, 8px);
+    background: var(--bg, #000);
+    color: var(--muted, #9aa0a6);
+    cursor: pointer;
+}
+
+.slyk-iconpicker__choice svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Survol : on entoure (cohérent avec le Dropdown Slyk). */
+.slyk-iconpicker__choice:hover {
+    outline: 2px solid var(--acc, #e11d48);
+    outline-offset: -2px;
+}
+
+/* Icône active : pastille pleine en couleur d'accent (elle reste inerte au survol). */
+.slyk-iconpicker__choice.is-active {
+    background: var(--acc, #e11d48);
+    border-color: var(--acc, #e11d48);
+    color: #fff;
+}
+
+.slyk-iconpicker__choice.is-active:hover {
+    outline: none;
+}

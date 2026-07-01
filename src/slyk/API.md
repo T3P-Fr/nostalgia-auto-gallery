@@ -9,17 +9,22 @@
     *   [Examples][5]
 *   [ErrorToast][6]
     *   [Parameters][7]
-*   [Modal][8]
+*   [IconPicker][8]
     *   [Parameters][9]
-*   [onMove][10]
-    *   [Parameters][11]
-*   [onUp][12]
-*   [SlykDropdownOption][13]
-    *   [Properties][14]
-*   [startDrag][15]
-    *   [Parameters][16]
-*   [useDragReorder][17]
-    *   [Parameters][18]
+    *   [Examples][10]
+*   [Modal][11]
+    *   [Parameters][12]
+*   [onMove][13]
+    *   [Parameters][14]
+*   [onUp][15]
+*   [SlykDropdownOption][16]
+    *   [Properties][17]
+*   [SlykIconOption][18]
+    *   [Properties][19]
+*   [startDrag][20]
+    *   [Parameters][21]
+*   [useDragReorder][22]
+    *   [Parameters][23]
 
 ## ConfirmDialog
 
@@ -27,13 +32,13 @@ Boîte de confirmation réutilisable (remplace window\.confirm), bâtie sur Moda
 
 ### Parameters
 
-*   `props` **[object][19]** Propriétés du composant.
+*   `props` **[object][24]** Propriétés du composant.
 
-    *   `props.title` **[string][20]?** Titre de la confirmation. (optional, default `"Confirmer"`)
-    *   `props.message` **[string][20]** Message expliquant l'action à confirmer.
-    *   `props.confirmLabel` **[string][20]?** Libellé du bouton de validation. (optional, default `"Confirmer"`)
-    *   `props.cancelLabel` **[string][20]?** Libellé du bouton d'annulation. (optional, default `"Annuler"`)
-    *   `props.danger` **[boolean][21]?** Vrai pour une action destructive (bouton rouge). (optional, default `false`)
+    *   `props.title` **[string][25]?** Titre de la confirmation. (optional, default `"Confirmer"`)
+    *   `props.message` **[string][25]** Message expliquant l'action à confirmer.
+    *   `props.confirmLabel` **[string][25]?** Libellé du bouton de validation. (optional, default `"Confirmer"`)
+    *   `props.cancelLabel` **[string][25]?** Libellé du bouton d'annulation. (optional, default `"Annuler"`)
+    *   `props.danger` **[boolean][26]?** Vrai pour une action destructive (bouton rouge). (optional, default `false`)
     *   `props.onConfirm` &#x20;
     *   `props.onCancel` &#x20;
 
@@ -56,12 +61,12 @@ Thème via variables CSS du contexte : `--acc`, `--line`, `--bg`, `--surface`,
 
 ### Parameters
 
-*   `props` **[object][19]** Propriétés.
+*   `props` **[object][24]** Propriétés.
 
-    *   `props.options` **[Array][22]<[SlykDropdownOption][13]>** Les options proposées.
-    *   `props.value` **([string][20] | [number][23] | null)** Valeur courante (sélectionnée).
-    *   `props.placeholder` **[string][20]** Affiché quand rien n'est sélectionné. (optional, default `"—"`)
-    *   `props.ariaLabel` **[string][20]?** Libellé accessible du champ.
+    *   `props.options` **[Array][27]<[SlykDropdownOption][16]>** Les options proposées.
+    *   `props.value` **([string][25] | [number][28] | null)** Valeur courante (sélectionnée).
+    *   `props.placeholder` **[string][25]** Affiché quand rien n'est sélectionné. (optional, default `"—"`)
+    *   `props.ariaLabel` **[string][25]?** Libellé accessible du champ.
     *   `props.onChange` &#x20;
 
 ### Examples
@@ -89,12 +94,46 @@ dans toutes les sections du Dashboard pour signaler un échec.
 
 ### Parameters
 
-*   `props` **[object][19]** Propriétés.
+*   `props` **[object][24]** Propriétés.
 
-    *   `props.message` **[string][20]** Message d'erreur (rien n'est rendu si vide).
+    *   `props.message` **[string][25]** Message d'erreur (rien n'est rendu si vide).
     *   `props.onClose` &#x20;
 
 Returns **(JSX.Element | null)** Le toast, ou null s'il n'y a pas de message.
+
+## IconPicker
+
+Sélecteur d'icône Slyk : un déclencheur montrant l'icône courante (dans une
+couleur optionnelle) + un menu flottant en GRILLE de pastilles. Comportements
+communs à Slyk : fermeture au clic extérieur et à Échap, chevron animé,
+l'icône déjà active n'est pas re-cliquée inutilement. Agnostique du jeu
+d'icônes (on lui passe les composants).
+
+Thème via variables CSS du contexte (`--acc`, `--line`, `--bg`, `--surface`,
+`--radius-button`) avec des valeurs de repli.
+
+### Parameters
+
+*   `props` **[object][24]** Propriétés.
+
+    *   `props.options` **[Array][27]<[SlykIconOption][18]>** Palette d'icônes proposées.
+    *   `props.value` **[string][25]** Clé de l'icône sélectionnée.
+    *   `props.color` **[string][25]?** Couleur de l'icône du déclencheur.
+    *   `props.ariaLabel` **[string][25]** Libellé accessible. (optional, default `"Choisir une icône"`)
+    *   `props.onChange` &#x20;
+
+### Examples
+
+```javascript
+<IconPicker
+  value="star"
+  color="#e11d48"
+  onChange={setIcon}
+  options={[{ key: "star", icon: Star }, { key: "crown", icon: Crown }]}
+/>
+```
+
+Returns **JSX.Element** Le sélecteur d'icône.
 
 ## Modal
 
@@ -103,9 +142,9 @@ fond ou à la touche Échap. Le contenu est libre (formulaire, confirmation…).
 
 ### Parameters
 
-*   `props` **[object][19]** Propriétés du composant.
+*   `props` **[object][24]** Propriétés du composant.
 
-    *   `props.className` **[string][20]?** Classe additionnelle sur la boîte (.modal). (optional, default `""`)
+    *   `props.className` **[string][25]?** Classe additionnelle sur la boîte (.modal). (optional, default `""`)
     *   `props.children` **React.ReactNode** Contenu de la modale.
     *   `props.onClose` &#x20;
 
@@ -130,14 +169,23 @@ Returns **void** Aucune valeur de retour.
 
 ## SlykDropdownOption
 
-Type: [object][19]
+Type: [object][24]
 
 ### Properties
 
-*   `value` **([string][20] | [number][23] | null)** Valeur renvoyée à la sélection.
-*   `label` **[string][20]** Texte affiché.
+*   `value` **([string][25] | [number][28] | null)** Valeur renvoyée à la sélection.
+*   `label` **[string][25]** Texte affiché.
 *   `icon` **React.ComponentType?** Icône (composant, ex. lucide) devant le texte.
-*   `color` **[string][20]?** Couleur du texte + icône (ex. couleur d'un niveau).
+*   `color` **[string][25]?** Couleur du texte + icône (ex. couleur d'un niveau).
+
+## SlykIconOption
+
+Type: [object][24]
+
+### Properties
+
+*   `key` **[string][25]** Clé stable de l'icône (valeur stockée).
+*   `icon` **React.ComponentType** Composant icône à rendre (ex. lucide).
 
 ## startDrag
 
@@ -163,9 +211,9 @@ appelle `startDrag(event, cléStable)` sur son `onPointerDown`.
 
 ### Parameters
 
-*   `opts` **[object][19]** Options.
+*   `opts` **[object][24]** Options.
 
-    *   `opts.scope` **[string][20]** Namespace pour ne cibler que les bons éléments.
+    *   `opts.scope` **[string][25]** Namespace pour ne cibler que les bons éléments.
     *   `opts.onReorder` &#x20;
     *   `opts.onDrop` &#x20;
 
@@ -183,34 +231,44 @@ appelle `startDrag(event, cléStable)` sur son `onPointerDown`.
 
 [7]: #parameters-2
 
-[8]: #modal
+[8]: #iconpicker
 
 [9]: #parameters-3
 
-[10]: #onmove
+[10]: #examples-1
 
-[11]: #parameters-4
+[11]: #modal
 
-[12]: #onup
+[12]: #parameters-4
 
-[13]: #slykdropdownoption
+[13]: #onmove
 
-[14]: #properties
+[14]: #parameters-5
 
-[15]: #startdrag
+[15]: #onup
 
-[16]: #parameters-5
+[16]: #slykdropdownoption
 
-[17]: #usedragreorder
+[17]: #properties
 
-[18]: #parameters-6
+[18]: #slykiconoption
 
-[19]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[19]: #properties-1
 
-[20]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[20]: #startdrag
 
-[21]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[21]: #parameters-6
 
-[22]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[22]: #usedragreorder
 
-[23]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[23]: #parameters-7
+
+[24]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[25]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[26]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[27]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
+[28]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number

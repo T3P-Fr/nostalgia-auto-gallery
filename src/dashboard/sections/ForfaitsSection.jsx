@@ -3,7 +3,6 @@ import {
     Award,
     Car,
     Check,
-    ChevronDown,
     Crown,
     Diamond,
     Droplets,
@@ -22,6 +21,7 @@ import { apiFetch } from "../directusClient.js";
 import ConfirmDialog from "../../slyk/ConfirmDialog.jsx";
 import ErrorToast from "../../slyk/ErrorToast.jsx";
 import Dropdown from "../../slyk/Dropdown.jsx";
+import IconPicker from "../../slyk/IconPicker.jsx";
 import useDragReorder from "../../slyk/useDragReorder.js";
 
 // Couleur par défaut d'un niveau tant qu'aucune n'est choisie.
@@ -111,7 +111,6 @@ export default function ForfaitsSection() {
     const [feedback, setFeedback] = useState("");
     const [confirmState, setConfirmState] = useState(null);
     // Menus déroulants ouverts : icône (id de niveau) et « complète » (id de forfait).
-    const [iconMenuFor, setIconMenuFor] = useState(null);
     // Sélecteur « ajouter un niveau existant à cette famille » ouvert ?
     const [addPickerOpen, setAddPickerOpen] = useState(false);
     // Feedback de sauvegarde : quel élément vient d'être enregistré (clé) + un
@@ -194,49 +193,25 @@ export default function ForfaitsSection() {
      * IMPORTANT : c'est une fonction de rendu (pas un composant) pour que les
      * champs ne perdent pas le focus à chaque frappe.
      * @param {object} level Niveau à afficher/éditer.
-     * @param {object} opts Options : menuKey (unique par emplacement), withColor,
-     *   withDelete, onDelete.
+     * @param {object} opts Options : withColor, withDelete, onDelete.
      * @returns {JSX.Element} Les contrôles du niveau.
      */
-    function levelControls(level, { menuKey, withColor = false, withDelete = false, onDelete }) {
-        const IconComp = ICON_MAP[level.icon] || Sparkles;
+    function levelControls(level, { withColor = false, withDelete = false, onDelete }) {
         return (
             <>
-                {/* Icône : menu déroulant. */}
-                <div className="forfait-icon-dd save-anchor">
-                    <button
-                        type="button"
-                        className="forfait-icon-dd__trigger"
-                        onClick={() => setIconMenuFor(iconMenuFor === menuKey ? null : menuKey)}
-                        aria-label="Choisir une icône"
-                        aria-expanded={iconMenuFor === menuKey}
-                        title="Choisir une icône"
-                    >
-                        <IconComp className="forfait-card__icon" />
-                        <ChevronDown className="forfait-icon-dd__caret" />
-                    </button>
-                    {iconMenuFor === menuKey && (
-                        <div className="forfait-icon-dd__menu" role="listbox">
-                            {ICON_CHOICES.map(({ key, Comp }) => (
-                                <button
-                                    key={key}
-                                    type="button"
-                                    className={`forfait-icon-choice${level.icon === key ? " is-active" : ""}`}
-                                    onClick={() => {
-                                        patchLevelLocal(level.id, { icon: key });
-                                        saveLevel(level.id, { icon: key }, `level-${level.id}-icon`);
-                                        setIconMenuFor(null);
-                                    }}
-                                    aria-label={`Icône ${key}`}
-                                    title={key}
-                                >
-                                    <Comp />
-                                </button>
-                            ))}
-                        </div>
-                    )}
+                {/* Icône : sélecteur Slyk (self-managé). */}
+                <span className="save-anchor slyk-iconpicker-slot">
+                    <IconPicker
+                        value={level.icon}
+                        color={level.color || DEFAULT_COLOR}
+                        options={ICON_CHOICES.map(({ key, Comp }) => ({ key, icon: Comp }))}
+                        onChange={(key) => {
+                            patchLevelLocal(level.id, { icon: key });
+                            saveLevel(level.id, { icon: key }, `level-${level.id}-icon`);
+                        }}
+                    />
                     {savedFx(`level-${level.id}-icon`)}
-                </div>
+                </span>
 
                 {/* Nom du niveau (coloré). */}
                 <span className="save-anchor level-chip__name-wrap">
@@ -643,7 +618,6 @@ export default function ForfaitsSection() {
                                 <GripVertical />
                             </span>
                             {levelControls(level, {
-                                menuKey: `strip-${level.id}`,
                                 withColor: true,
                                 withDelete: true,
                                 onDelete: () => removeLevel(level),
@@ -716,7 +690,7 @@ export default function ForfaitsSection() {
                                         >
                                             <GripVertical />
                                         </span>
-                                        {levelControls(level, { menuKey: `card-${tier.id}` })}
+                                        {levelControls(level, {})}
                                     </div>
 
                                     {/* Prix. */}
