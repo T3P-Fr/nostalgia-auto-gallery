@@ -4,6 +4,7 @@ import { apiFetch, assetUrl, uploadFileWithProgress } from "../directusClient.js
 import BeforeAfterSlider from "../BeforeAfterSlider.jsx";
 import Modal from "../Modal.jsx";
 import ConfirmDialog from "../ConfirmDialog.jsx";
+import ErrorToast from "../ErrorToast.jsx";
 
 // Champs récupérés/enregistrés pour une entrée de galerie.
 const GALLERY_FIELDS = [
@@ -585,7 +586,7 @@ export default function GallerySection() {
                 </div>
             )}
 
-            {feedback && <p className="dashboard-feedback">{feedback}</p>}
+            <ErrorToast message={feedback} onClose={() => setFeedback("")} />
 
             {/* Formulaire d'ajout de vidéo (replié par défaut, vue Galerie seulement). */}
             {view === "gallery" && videoOpen && (

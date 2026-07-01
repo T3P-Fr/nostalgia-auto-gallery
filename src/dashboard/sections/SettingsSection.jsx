@@ -3,6 +3,7 @@ import { Eye, EyeOff, ImagePlus, Loader2, Plus, SlidersHorizontal, Trash2 } from
 import { apiFetch, assetUrl, uploadFile } from "../directusClient.js";
 import Modal from "../Modal.jsx";
 import ConfirmDialog from "../ConfirmDialog.jsx";
+import ErrorToast from "../ErrorToast.jsx";
 
 // Réglages SERVEUR partagés (singleton mail_config) : serveur + port seulement.
 // L'identifiant et le mot de passe sont propres à CHAQUE compte (voir mail_accounts).
@@ -190,7 +191,7 @@ export default function SettingsSection() {
                 </button>
             </div>
 
-            {feedback && <p className="dashboard-feedback">{feedback}</p>}
+            <ErrorToast message={feedback} onClose={() => setFeedback("")} />
 
             {/* Cartes courtes : avatar + nom (+ email discret). */}
             <div className="mail-cards">

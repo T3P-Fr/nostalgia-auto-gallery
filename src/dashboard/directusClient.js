@@ -133,7 +133,16 @@ export async function apiFetch(pathWithQuery, options = {}, isRetry = false) {
         headers["Content-Type"] = "application/json";
     }
 
-    const response = await fetch(`${DIRECTUS_URL}${pathWithQuery}`, { ...options, headers });
+    // On intercepte les échecs RÉSEAU (fetch qui rejette : « Failed to fetch »)
+    // pour afficher un message clair plutôt que l'erreur technique du navigateur.
+    let response;
+    try {
+        response = await fetch(`${DIRECTUS_URL}${pathWithQuery}`, { ...options, headers });
+    } catch (networkError) {
+        throw new Error(
+            "Impossible de joindre le serveur (connexion réseau ou modification refusée par l’hébergeur). Réessayez ; si ça persiste, prévenez l’administrateur.",
+        );
+    }
 
     // Jeton expiré : on tente UN rafraîchissement puis on rejoue l'appel.
     if (response.status === 401 && !isRetry) {

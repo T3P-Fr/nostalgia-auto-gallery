@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { apiFetch } from "../directusClient.js";
 import ConfirmDialog from "../ConfirmDialog.jsx";
+import ErrorToast from "../ErrorToast.jsx";
 import useDragReorder from "../useDragReorder.js";
 
 // Couleur par défaut d'un niveau tant qu'aucune n'est choisie.
@@ -596,7 +597,7 @@ export default function ForfaitsSection() {
                 </div>
             </div>
 
-            {feedback && <p className="dashboard-feedback">{feedback}</p>}
+            <ErrorToast message={feedback} onClose={() => setFeedback("")} />
 
             {/* ===================== Bande « Vos niveaux » ====================== */}
             <div className="level-strip">

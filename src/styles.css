@@ -5183,6 +5183,66 @@ a.gallery-card__video {
 /* ===== Feedback d'enregistrement (pendant vert de la corbeille rouge) =====
    Au succès d'une sauvegarde : bordure verte qui s'estompe + toast « Enregistré »
    qui monte en fondu au-dessus de l'élément. Réutilisable via .save-feedback. */
+/* Toast d'erreur rouge, PERSISTANT (fermé uniquement par la croix). */
+.error-toast {
+    position: fixed;
+    z-index: 2000;
+    right: 20px;
+    bottom: 20px;
+    max-width: min(440px, calc(100vw - 40px));
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 14px 14px 16px;
+    border: 1px solid #e11d48;
+    border-left: 4px solid #e11d48;
+    border-radius: var(--radius-card);
+    background: #fff1f2;
+    color: #9f1239;
+    box-shadow: 0 12px 30px rgba(159, 18, 57, 0.25);
+    font-weight: 600;
+}
+
+.error-toast__icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: #e11d48;
+    margin-top: 1px;
+}
+
+.error-toast__msg {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.9rem;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.error-toast__close {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    color: #9f1239;
+    cursor: pointer;
+}
+
+.error-toast__close:hover {
+    background: rgba(225, 29, 72, 0.15);
+}
+
+.error-toast__close svg {
+    width: 16px;
+    height: 16px;
+}
+
 /* Conteneur d'ancrage du feedback : c'est le PLUS PETIT élément modifié
    (champ), pas la carte, qui reçoit le pendant vert. */
 .save-anchor {

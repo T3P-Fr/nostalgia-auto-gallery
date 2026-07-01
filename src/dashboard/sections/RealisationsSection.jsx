@@ -3,6 +3,7 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import { apiFetch, assetUrl } from "../directusClient.js";
 import ImageDropField from "../ImageDropField.jsx";
 import ConfirmDialog from "../ConfirmDialog.jsx";
+import ErrorToast from "../ErrorToast.jsx";
 
 // Champs textes récupérés/enregistrés pour une réalisation. On liste explicitement
 // les champs demandés à Directus pour ne transférer que l'utile (et inclure les
@@ -220,7 +221,7 @@ export default function RealisationsSection() {
                 )}
             </div>
 
-            {feedback && <p className="dashboard-feedback">{feedback}</p>}
+            <ErrorToast message={feedback} onClose={() => setFeedback("")} />
 
             {/* Formulaire de création/édition (avec les deux zones avant/après). */}
             {editingId !== null && (
