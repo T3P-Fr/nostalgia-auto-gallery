@@ -616,7 +616,7 @@ export default function GallerySection() {
             <div className="gallery-grid">
                 {active.map((item) => (
                         <article
-                            className={`gallery-card${item.id === draggingId ? " gallery-card--placeholder" : ""}`}
+                            className={`gallery-card deletable${item.id === draggingId ? " gallery-card--placeholder" : ""}`}
                             key={item.id}
                             data-dnd-id={item.id}
                             onPointerDown={(event) => handleCardPointerDown(event, item)}
@@ -630,12 +630,13 @@ export default function GallerySection() {
                                 <strong>{item.title || "Sans titre"}</strong>
                                 <span>{[MEDIA_TYPE_LABELS[item.media_type || "image"], item.caption].filter(Boolean).join(" · ")}</span>
                             </div>
-                            {/* Petites icônes en bout de ligne du titre/sous-titre. */}
+                            {/* Modification à côté du titre. */}
                             <div className="gallery-card__actions">
                                 <button className="icon-button icon-button--sm" onClick={() => startEdit(item)} aria-label="Modifier" title="Modifier le titre, la légende et le texte alternatif"><Pencil /></button>
-                                <button className="icon-button icon-button--sm" onClick={() => trashItem(item)} aria-label="Mettre à la corbeille" title="Mettre à la corbeille (réversible)"><Trash2 /></button>
                             </div>
                         </div>
+                        {/* Mise à la corbeille (réversible) : corbeille douce en bas à droite. */}
+                        <button className="delete-badge delete-badge--soft delete-badge--corner" onClick={() => trashItem(item)} aria-label="Mettre à la corbeille" title="Mettre à la corbeille (réversible)"><Trash2 /></button>
                         </article>
                 ))}
 
@@ -686,7 +687,7 @@ export default function GallerySection() {
             {view === "trash" && (
                 <div className="gallery-grid">
                     {trash.map((item) => (
-                        <article className="gallery-card" key={item.id}>
+                        <article className="gallery-card deletable" key={item.id}>
                             <div className="gallery-card__image">{renderMedia(item)}</div>
                             <div className="gallery-card__body">
                                 <div className="gallery-card__text">
@@ -695,9 +696,10 @@ export default function GallerySection() {
                                 </div>
                                 <div className="gallery-card__actions">
                                     <button className="icon-button icon-button--sm" onClick={() => restoreItem(item)} aria-label="Restaurer" title="Restaurer dans la galerie"><RotateCcw /></button>
-                                    <button className="icon-button icon-button--sm" onClick={() => deletePermanently(item)} aria-label="Supprimer définitivement" title="Supprimer définitivement (irréversible)"><Trash2 /></button>
                                 </div>
                             </div>
+                            {/* Suppression définitive : corbeille rouge en bas à droite. */}
+                            <button className="delete-badge delete-badge--corner" onClick={() => deletePermanently(item)} aria-label="Supprimer définitivement" title="Supprimer définitivement (irréversible)"><Trash2 /></button>
                         </article>
                     ))}
                     {trash.length === 0 && (

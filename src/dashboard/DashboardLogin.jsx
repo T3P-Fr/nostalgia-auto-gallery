@@ -41,6 +41,8 @@ export default function DashboardLogin({ onAuthenticated }) {
     return (
         <div className="dashboard-login">
             <form className="dashboard-login__card" onSubmit={handleSubmit}>
+                {/* Logo officiel de la marque, centré en tête du formulaire. */}
+                <img src="/assets/logo.webp" alt="Nostalgia Auto Gallery" className="dashboard-login__logo" />
                 <span className="overline">Espace gérant</span>
                 <h1>Nostalgia Auto Gallery</h1>
                 <p className="dashboard-login__intro">

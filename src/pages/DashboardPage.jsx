@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { CalendarClock, Images, LayoutGrid, LogOut, Sparkles, Tag } from "lucide-react";
+import { CalendarClock, Images, LogOut, Settings, Sparkles, Tag } from "lucide-react";
 import { isAuthenticated, logout } from "../dashboard/directusClient.js";
 import DashboardLogin from "../dashboard/DashboardLogin.jsx";
 import RealisationsSection from "../dashboard/sections/RealisationsSection.jsx";
 import GallerySection from "../dashboard/sections/GallerySection.jsx";
+import ForfaitsSection from "../dashboard/sections/ForfaitsSection.jsx";
+import SettingsSection from "../dashboard/sections/SettingsSection.jsx";
 
 // Définition du menu latéral : une entrée par section gérable. `key` identifie la
 // section active ; `icon` est un composant lucide ; `available` indique si la
@@ -11,7 +13,7 @@ import GallerySection from "../dashboard/sections/GallerySection.jsx";
 const SECTIONS = [
     { key: "realisations", label: "Réalisations", icon: Sparkles, available: true },
     { key: "gallery", label: "Galerie", icon: Images, available: true },
-    { key: "forfaits", label: "Forfaits", icon: Tag, available: false },
+    { key: "forfaits", label: "Forfaits", icon: Tag, available: true },
     { key: "disponibilites", label: "Disponibilités", icon: CalendarClock, available: false },
 ];
 
@@ -49,7 +51,8 @@ export default function DashboardPage() {
             {/* Menu latéral : marque + navigation entre sections + déconnexion. */}
             <aside className="dashboard-sidebar">
                 <div className="dashboard-brand">
-                    <LayoutGrid className="dashboard-brand__mark" />
+                    {/* Logo officiel de la marque (même emblème que le site public). */}
+                    <img src="/assets/logo.webp" alt="Nostalgia Auto Gallery" className="dashboard-brand__logo" />
                     <div>
                         <strong>Nostalgia</strong>
                         <span>Espace gérant</span>
@@ -74,18 +77,45 @@ export default function DashboardPage() {
                     })}
                 </nav>
 
+                {/* Paramètres : engrenage en bas de la colonne (poussé vers le bas). */}
+                <button
+                    type="button"
+                    className={`dashboard-nav__item dashboard-nav__settings${activeSection === "parametres" ? " is-active" : ""}`}
+                    onClick={() => setActiveSection("parametres")}
+                    title="Paramètres (mail…)"
+                >
+                    <Settings /> Paramètres
+                </button>
+
                 <button type="button" className="dashboard-nav__logout" onClick={handleLogout} title="Fermer votre session et revenir à l’écran de connexion">
                     <LogOut /> Déconnexion
                 </button>
             </aside>
 
-            {/* Zone principale : la section choisie. */}
-            <main className="dashboard-main">
+            {/* Zone principale : la section choisie.
+                Entrée dans un champ = valider : on retire le focus du champ, ce qui
+                déclenche son enregistrement (onBlur). Comportement humain attendu.
+                (Ne s'applique pas aux zones de texte multiligne.) */}
+            <main
+                className="dashboard-main"
+                onKeyDown={(event) => {
+                    if (event.key === "Enter" && event.target.tagName === "INPUT") {
+                        event.preventDefault();
+                        event.target.blur();
+                    }
+                }}
+            >
                 {/* Section Réalisations (avant/après). */}
                 {activeSection === "realisations" && <RealisationsSection />}
 
                 {/* Section Galerie (photos mises en avant). */}
                 {activeSection === "gallery" && <GallerySection />}
+
+                {/* Section Forfaits (prix, durées, prestations, réductions). */}
+                {activeSection === "forfaits" && <ForfaitsSection />}
+
+                {/* Section Paramètres (mail…). */}
+                {activeSection === "parametres" && <SettingsSection />}
 
                 {/* Sections à venir : message d'attente pour les briques suivantes. */}
                 {currentSection && !currentSection.available && (

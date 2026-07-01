@@ -3758,6 +3758,23 @@ main::after {
     height: 28px;
 }
 
+/* Logo de la marque dans le menu latéral (emblème /assets/logo.webp). */
+.dashboard-brand__logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+/* Logo centré en tête de l'écran de connexion. */
+.dashboard-login__logo {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    align-self: center;
+    margin-bottom: 4px;
+}
+
 .dashboard-brand strong {
     display: block;
     line-height: 1.1;
@@ -3777,6 +3794,7 @@ main::after {
 }
 
 .dashboard-nav__item,
+.dashboard-nav__settings,
 .dashboard-nav__logout {
     display: flex;
     align-items: center;
@@ -3791,6 +3809,11 @@ main::after {
     text-align: left;
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
+}
+
+/* Paramètres : poussé en bas de la colonne (l'engrenage + la déconnexion). */
+.dashboard-nav__settings {
+    margin-top: auto;
 }
 
 .dashboard-nav__item svg,
@@ -3815,6 +3838,212 @@ main::after {
 
 .dashboard-nav__logout:hover {
     color: var(--txt);
+}
+
+/* --------------------------- Section Paramètres ---------------------------- */
+/* Cartes courtes des comptes (avatar + nom + email). */
+.mail-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+}
+
+.mail-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+}
+
+/* Avatar rond cliquable. */
+.mail-card__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: color-mix(in oklch, var(--acc) 12%, transparent);
+    color: var(--acc);
+    cursor: pointer;
+}
+
+.mail-card__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.mail-card__avatar svg {
+    width: 20px;
+    height: 20px;
+}
+
+.mail-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.mail-card__name {
+    width: 100%;
+    border: 1px solid transparent;
+    border-radius: var(--radius-button);
+    padding: 4px 6px;
+    background: none;
+    color: var(--txt);
+    font: inherit;
+    font-weight: 700;
+}
+
+.mail-card__email {
+    width: 100%;
+    border: 1px solid transparent;
+    border-radius: var(--radius-button);
+    padding: 3px 6px;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.85rem;
+    /* On veut voir l'adresse entière : elle défile dans le champ au focus. */
+    text-overflow: ellipsis;
+}
+
+.mail-card__name:focus,
+.mail-card__email:focus {
+    border-color: var(--line);
+    background: var(--bg);
+    outline: none;
+}
+
+/* Mot de passe dans la carte : pleine largeur, petit. */
+.mail-card__pass {
+    width: 100%;
+    margin-top: 2px;
+}
+
+.mail-card__pass input {
+    width: 100%;
+    padding: 3px 30px 3px 6px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-button);
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.85rem;
+}
+
+.mail-card__pass input:focus {
+    border-color: var(--line);
+    background: var(--bg);
+    outline: none;
+}
+
+/* Bouton clé (mot de passe de la boîte) — conservé, non utilisé actuellement. */
+.mail-card__key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: var(--bg);
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.mail-card__key:hover {
+    color: var(--acc);
+    border-color: var(--acc);
+}
+
+.mail-card__key svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Carte « Ajouter un compte » (pointillés). */
+.mail-card--add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 74px;
+    border: 2px dashed var(--line);
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.mail-card--add:hover {
+    border-color: var(--acc);
+    color: var(--acc);
+}
+
+.mail-card--add svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Modal des réglages techniques. */
+.modal--settings {
+    max-width: 560px;
+}
+
+.settings-card__intro {
+    margin: 0 0 16px;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+/* Champ mot de passe avec bouton afficher/masquer. */
+.password-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-field input {
+    flex: 1;
+    padding-right: 38px;
+}
+
+.password-field__toggle {
+    position: absolute;
+    right: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border: none;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.password-field__toggle svg {
+    width: 18px;
+    height: 18px;
 }
 
 .dashboard-main {
@@ -4705,4 +4934,770 @@ a.gallery-card__video {
     .realisation-card {
         grid-template-columns: 1fr;
     }
+}
+
+/* ============================ Section Forfaits ============================= */
+/* Pensée « grille de prix d'artisan » : onglets par famille, cartes de niveaux,
+   édition inline (prix, durée, prestations) et réductions combinées. */
+
+/* Onglets des familles (Intérieur / Extérieur / Révision). */
+.forfait-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+/* Poignée de glissement (réordonnancement) — commune aux listes. */
+.drag-grip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--muted);
+    cursor: grab;
+}
+
+.drag-grip:active {
+    cursor: grabbing;
+}
+
+.drag-grip svg {
+    width: 16px;
+    height: 16px;
+}
+
+.forfait-tab__grip {
+    margin-right: 4px;
+    opacity: 0.55;
+}
+
+.forfait-tab__grip svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Élément en cours de glissement : estompé à sa place (fantôme). */
+.is-dnd-ghost {
+    opacity: 0.35;
+}
+
+/* Clone d'un niveau / d'une famille pendant le glissement. */
+.drag-clone .level-chip {
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--tier-color, var(--line));
+    border-radius: var(--radius-button);
+    background: var(--surface);
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.drag-clone .forfait-tab {
+    white-space: nowrap;
+}
+
+.forfait-tab {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: var(--surface);
+    color: var(--txt);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.forfait-tab.is-active {
+    background: var(--acc);
+    border-color: var(--acc);
+    color: #fff;
+}
+
+/* Grille des cartes de niveaux (Platine / Premium / Deluxe). */
+.forfait-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.forfait-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    border: 1px solid var(--line);
+    /* Liseré supérieur à la couleur choisie du niveau. */
+    border-top: 3px solid var(--tier-color, var(--line));
+    border-radius: var(--radius-card);
+    background: var(--surface);
+}
+
+
+/* En-tête de carte : icône + nom éditable + suppression. */
+.forfait-card__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.forfait-card__icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    color: var(--tier-color, var(--acc));
+}
+
+.forfait-card__name-input {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 8px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-button);
+    background: var(--bg);
+    color: var(--txt);
+    font: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.forfait-card__name-input:focus {
+    border-color: var(--line);
+    outline: none;
+}
+
+/* Sélecteur de couleur du niveau : petite pastille carrée. */
+.forfait-card__color {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: none;
+    cursor: pointer;
+}
+
+/* Menu déroulant de choix d'icône : bouton d'aperçu + panneau flottant. */
+.forfait-icon-dd {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.forfait-icon-dd__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 5px 6px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: var(--bg);
+    cursor: pointer;
+}
+
+.forfait-icon-dd__caret {
+    width: 14px;
+    height: 14px;
+    color: var(--muted);
+}
+
+.forfait-icon-dd__menu {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 4px);
+    left: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    padding: 6px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: var(--surface);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.forfait-icon-choice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: var(--bg);
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.forfait-icon-choice svg {
+    width: 18px;
+    height: 18px;
+}
+
+.forfait-icon-choice.is-active {
+    background: var(--acc);
+    border-color: var(--acc);
+    color: #fff;
+}
+
+/* ===================== Convention de suppression (Dashboard) ==============
+   Bouton de suppression UNIQUE partout : corbeille ronde. Au survol, l'élément
+   supprimable (.deletable) qui le contient se borde de rouge. */
+.delete-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 31px;
+    height: 31px;
+    padding: 0;
+    flex-shrink: 0;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.delete-badge svg {
+    width: 17px;
+    height: 17px;
+}
+
+.delete-badge:hover {
+    border-color: #e11d48;
+    color: #e11d48;
+}
+
+/* Variante « douce » : action réversible (mise en corbeille) → survol accent,
+   pas de rouge, et pas d'encadré rouge de la cible. */
+.delete-badge--soft:hover {
+    border-color: var(--acc);
+    color: var(--acc);
+}
+
+/* ===== Feedback d'enregistrement (pendant vert de la corbeille rouge) =====
+   Au succès d'une sauvegarde : bordure verte qui s'estompe + toast « Enregistré »
+   qui monte en fondu au-dessus de l'élément. Réutilisable via .save-feedback. */
+/* Conteneur d'ancrage du feedback : c'est le PLUS PETIT élément modifié
+   (champ), pas la carte, qui reçoit le pendant vert. */
+.save-anchor {
+    position: relative;
+}
+
+span.save-anchor {
+    display: inline-flex;
+}
+
+.save-feedback {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 6;
+}
+
+.save-flash {
+    position: absolute;
+    inset: 0;
+    border: 2px solid #16a34a;
+    border-radius: inherit;
+    animation: saveFlash 1.2s ease-out forwards;
+}
+
+@keyframes saveFlash {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.save-toast {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translate(-50%, 0);
+    padding: 3px 12px;
+    border-radius: 999px;
+    background: #16a34a;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+    animation: saveRise 1.4s ease-out forwards;
+}
+
+@keyframes saveRise {
+    0% { opacity: 0; transform: translate(-50%, 4px); }
+    15% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -30px); }
+}
+
+/* Variante compacte (suppression d'une ligne / sous-élément). */
+.delete-badge--sm {
+    width: 24px;
+    height: 24px;
+}
+
+.delete-badge--sm svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Variante ancrée en bas à droite, légèrement débordante (cartes). */
+.delete-badge--corner {
+    position: absolute;
+    right: -8px;
+    bottom: -8px;
+}
+
+/* Les cartes Galerie ont overflow:hidden (coins arrondis de l'image) : on
+   place le badge à l'intérieur pour qu'il ne soit pas coupé. */
+.gallery-card .delete-badge--corner {
+    right: 8px;
+    bottom: 8px;
+}
+
+.deletable {
+    position: relative;
+}
+
+/* Contour rouge autour de l'élément qui sera supprimé, au survol de SON bouton.
+   Le combinateur enfant direct (`>`) est essentiel : survoler la corbeille d'une
+   LIGNE ne doit PAS allumer la carte parente qui la contient. */
+.deletable:has(> .delete-badge:not(.delete-badge--soft):hover) {
+    border-color: #e11d48;
+}
+
+/* Cas d'une ligne sans bordure propre (prestation) : on colore son champ. */
+.forfait-feature.deletable:has(> .delete-badge:hover) input {
+    border-color: #e11d48;
+}
+
+/* ---- Bande « Vos niveaux » (identité partagée : nom / icône / couleur) ---- */
+.level-strip {
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+}
+
+.level-strip__title {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+}
+
+.level-strip__items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: stretch;
+}
+
+/* Une pastille de niveau : icône + nom + couleur + suppression. */
+.level-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--tier-color, var(--line));
+    border-radius: var(--radius-button);
+    background: var(--surface);
+}
+
+.level-chip__name {
+    width: 130px;
+    padding: 4px 6px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-button);
+    background: var(--bg);
+    color: var(--txt);
+    font: inherit;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.level-chip__name:focus {
+    border-color: var(--line);
+    outline: none;
+}
+
+.level-chip__delete:hover {
+    color: #e11d48;
+}
+
+/* Bouton « + Ajouter un niveau » dans la bande. */
+.level-strip__add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px dashed var(--line);
+    border-radius: var(--radius-button);
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.level-strip__add:hover {
+    border-color: var(--acc);
+    color: var(--acc);
+}
+
+.level-strip__add svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* En-tête de carte en lecture seule (identité du niveau). */
+.forfait-card__head--readonly {
+    gap: 8px;
+}
+
+.forfait-card__name {
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+/* Dropdown personnalisé « Complète la formule ». */
+.forfait-dd {
+    position: relative;
+}
+
+.forfait-dd__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: var(--bg);
+    color: var(--txt);
+    font: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.forfait-dd__trigger svg {
+    width: 16px;
+    height: 16px;
+    color: var(--muted);
+}
+
+.forfait-dd__menu {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: var(--surface);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.forfait-dd__option {
+    padding: 7px 10px;
+    border: none;
+    border-radius: var(--radius-button);
+    background: none;
+    color: var(--txt);
+    font: inherit;
+    font-size: 0.9rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.forfait-dd__option:hover {
+    background: var(--bg);
+}
+
+.forfait-dd__option.is-active {
+    background: var(--acc);
+    color: #fff;
+}
+
+/* Prix : grand champ nombre suivi du symbole €. */
+.forfait-card__price {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.forfait-card__price input {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: var(--bg);
+    color: var(--txt);
+    font: inherit;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.forfait-card__euro {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.forfait-card__duration {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.forfait-card__duration input {
+    width: 56px;
+    padding: 6px 8px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: var(--bg);
+    color: var(--txt);
+    font: inherit;
+    text-align: center;
+}
+
+/* « ≈ » et unités (h / min) : décor fixe, non sélectionnable. */
+.forfait-card__approx,
+.forfait-card__unit {
+    color: var(--muted);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.forfait-card__approx {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+/* Choix « complète la formule » : libellé + menu déroulant. */
+.forfait-card__includes {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.82rem;
+    color: var(--muted);
+}
+
+.forfait-card__includes select {
+    padding: 6px 8px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: var(--bg);
+    color: var(--txt);
+    font: inherit;
+    font-size: 0.9rem;
+}
+
+/* Liste des prestations : une ligne = coche + champ texte + corbeille. */
+.forfait-features {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.forfait-feature {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.forfait-feature__check {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: var(--acc);
+}
+
+.forfait-feature input {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-button);
+    background: var(--bg);
+    color: var(--txt);
+    font: inherit;
+    font-size: 0.9rem;
+}
+
+.forfait-feature input:focus {
+    border-color: var(--line);
+    outline: none;
+}
+
+/* Bouton « + Ajouter une ligne », discret. */
+.forfait-add-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    padding: 6px 10px;
+    border: 1px dashed var(--line);
+    border-radius: var(--radius-button);
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.forfait-add-line svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Carte d'ajout d'un niveau : occupe une cellule de la grille, style « pointillé ». */
+.forfait-add-tier {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 160px;
+    padding: 20px;
+    border: 2px dashed var(--line);
+    border-radius: var(--radius-card);
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.forfait-add-tier:hover {
+    border-color: var(--acc);
+    color: var(--acc);
+}
+
+.forfait-add-tier svg {
+    width: 28px;
+    height: 28px;
+}
+
+/* Conteneur de la carte d'ajout (bouton OU menu de sélection). */
+.forfait-add-tier-card {
+    display: flex;
+}
+
+/* Menu « ajouter un niveau existant » : occupe la cellule, liste les niveaux. */
+.forfait-add-tier-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    padding: 12px;
+    border: 2px dashed var(--acc);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+}
+
+.forfait-add-tier-menu__title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 4px;
+}
+
+.forfait-add-tier-menu__option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: var(--bg);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.forfait-add-tier-menu__option svg {
+    width: 18px;
+    height: 18px;
+}
+
+.forfait-add-tier-menu__option:hover {
+    border-color: var(--acc);
+}
+
+.forfait-add-tier-menu__cancel {
+    margin-top: 4px;
+    padding: 6px;
+    border: none;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+/* Bloc des réductions combinées, sous les cartes. */
+.forfait-discounts {
+    margin-top: 20px;
+    padding: 16px 20px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+}
+
+.forfait-discounts__label {
+    margin: 0 0 12px;
+    font-weight: 600;
+}
+
+.forfait-discounts__fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.forfait-discount {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.forfait-discount > span {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.forfait-discount__input {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.forfait-discount__input input {
+    width: 70px;
+    padding: 6px 8px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-button);
+    background: var(--surface);
+    color: var(--txt);
+    font: inherit;
 }

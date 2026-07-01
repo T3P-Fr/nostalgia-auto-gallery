@@ -289,7 +289,7 @@ export default function RealisationsSection() {
             {/* Liste des réalisations existantes, avec aperçu avant/après. */}
             <div className="realisation-list">
                 {realisations.map((realisation) => (
-                    <article className="realisation-card" key={realisation.id}>
+                    <article className="realisation-card deletable" key={realisation.id}>
                         <div className="realisation-card__images">
                             {/* Vignettes avant/après côte à côte (placeholder si absente). */}
                             <div className="realisation-card__thumb">
@@ -311,8 +311,8 @@ export default function RealisationsSection() {
                         </div>
                         <div className="realisation-card__actions">
                             <button className="icon-button" onClick={() => startEdit(realisation)} aria-label="Modifier" title="Modifier cette réalisation"><Pencil /></button>
-                            <button className="icon-button" onClick={() => deleteRealisation(realisation)} aria-label="Supprimer" title="Supprimer définitivement cette réalisation"><Trash2 /></button>
                         </div>
+                        <button className="delete-badge delete-badge--corner" onClick={() => deleteRealisation(realisation)} aria-label="Supprimer" title="Supprimer définitivement cette réalisation"><Trash2 /></button>
                     </article>
                 ))}
                 {realisations.length === 0 && editingId === null && (
