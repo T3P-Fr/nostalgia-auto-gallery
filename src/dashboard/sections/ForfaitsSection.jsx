@@ -21,6 +21,7 @@ import {
 import { apiFetch } from "../directusClient.js";
 import ConfirmDialog from "../../slyk/ConfirmDialog.jsx";
 import ErrorToast from "../../slyk/ErrorToast.jsx";
+import Dropdown from "../../slyk/Dropdown.jsx";
 import useDragReorder from "../../slyk/useDragReorder.js";
 
 // Couleur par défaut d'un niveau tant qu'aucune n'est choisie.
@@ -111,7 +112,6 @@ export default function ForfaitsSection() {
     const [confirmState, setConfirmState] = useState(null);
     // Menus déroulants ouverts : icône (id de niveau) et « complète » (id de forfait).
     const [iconMenuFor, setIconMenuFor] = useState(null);
-    const [includesMenuFor, setIncludesMenuFor] = useState(null);
     // Sélecteur « ajouter un niveau existant à cette famille » ouvert ?
     const [addPickerOpen, setAddPickerOpen] = useState(false);
     // Feedback de sauvegarde : quel élément vient d'être enregistré (clé) + un
@@ -765,69 +765,28 @@ export default function ForfaitsSection() {
                                     <div className="forfait-card__includes save-anchor">
                                         <span className="forfait-card__includes-label">Complète la formule</span>
                                         {savedFx(`tier-${tier.id}-includes`)}
-                                        <div className="forfait-dd">
-                                            <button
-                                                type="button"
-                                                className={`forfait-dd__trigger${includesMenuFor === tier.id ? " is-open" : ""}`}
-                                                onClick={() => setIncludesMenuFor(includesMenuFor === tier.id ? null : tier.id)}
-                                                aria-expanded={includesMenuFor === tier.id}
-                                                title="Choisir la formule que celle-ci complète"
-                                            >
-                                                {/* Le déclencheur reprend l'icône + la couleur de la formule choisie. */}
-                                                {(() => {
-                                                    const sel = levels.find((l) => l.name === tier.includes);
-                                                    if (!sel) {
-                                                        return <span>Aucune</span>;
-                                                    }
-                                                    const SelIcon = ICON_MAP[sel.icon] || Sparkles;
-                                                    return (
-                                                        <span className="forfait-dd__value" style={{ color: sel.color || DEFAULT_COLOR }}>
-                                                            <SelIcon />
-                                                            {sel.name}
-                                                        </span>
-                                                    );
-                                                })()}
-                                                <ChevronDown className="forfait-dd__caret" />
-                                            </button>
-                                            {includesMenuFor === tier.id && (
-                                                <div className="forfait-dd__menu" role="listbox">
-                                                    <button
-                                                        type="button"
-                                                        className={`forfait-dd__option${!tier.includes ? " is-active" : ""}`}
-                                                        onClick={() => {
-                                                            patchTierLocal(tier.id, { includes: null });
-                                                            saveTier(tier.id, { includes: null }, `tier-${tier.id}-includes`);
-                                                            setIncludesMenuFor(null);
-                                                        }}
-                                                    >
-                                                        <Check className="forfait-dd__check" style={{ visibility: !tier.includes ? "visible" : "hidden" }} />
-                                                        Aucune
-                                                    </button>
-                                                    {levels
-                                                        .filter((other) => other.id !== tier.level && other.name)
-                                                        .map((other) => {
-                                                            const OtherIcon = ICON_MAP[other.icon] || Sparkles;
-                                                            return (
-                                                                <button
-                                                                    key={other.id}
-                                                                    type="button"
-                                                                    className={`forfait-dd__option${tier.includes === other.name ? " is-active" : ""}`}
-                                                                    style={{ color: other.color || DEFAULT_COLOR }}
-                                                                    onClick={() => {
-                                                                        patchTierLocal(tier.id, { includes: other.name });
-                                                                        saveTier(tier.id, { includes: other.name }, `tier-${tier.id}-includes`);
-                                                                        setIncludesMenuFor(null);
-                                                                    }}
-                                                                >
-                                                                    <Check className="forfait-dd__check" style={{ visibility: tier.includes === other.name ? "visible" : "hidden" }} />
-                                                                    <OtherIcon />
-                                                                    {other.name}
-                                                                </button>
-                                                            );
-                                                        })}
-                                                </div>
-                                            )}
-                                        </div>
+                                        {/* Dropdown Slyk (conventions intégrées). Options = « Aucune »
+                                            + les autres niveaux (icône + couleur), niveau courant exclu. */}
+                                        <Dropdown
+                                            value={tier.includes ?? null}
+                                            placeholder="Aucune"
+                                            ariaLabel="Choisir la formule que celle-ci complète"
+                                            onChange={(val) => {
+                                                patchTierLocal(tier.id, { includes: val });
+                                                saveTier(tier.id, { includes: val }, `tier-${tier.id}-includes`);
+                                            }}
+                                            options={[
+                                                { value: null, label: "Aucune" },
+                                                ...levels
+                                                    .filter((other) => other.id !== tier.level && other.name)
+                                                    .map((other) => ({
+                                                        value: other.name,
+                                                        label: other.name,
+                                                        icon: ICON_MAP[other.icon] || Sparkles,
+                                                        color: other.color || DEFAULT_COLOR,
+                                                    })),
+                                            ]}
+                                        />
                                     </div>
 
                                     {/* Prestations. */}

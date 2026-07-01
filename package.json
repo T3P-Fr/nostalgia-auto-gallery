@@ -10,6 +10,7 @@
         "cms": "cd cms && node node_modules/directus/cli.js start",
         "build": "vite build",
         "build:admin": "vite build --config vite.admin.config.js",
+        "docs:slyk": "documentation build src/slyk/*.js src/slyk/*.jsx -f md -o src/slyk/API.md --shallow --sort-order alpha",
         "start": "node server/index.cjs",
         "test": "node --test"
     },
@@ -26,6 +27,7 @@
     "devDependencies": {
         "@vitejs/plugin-react": "^4.5.2",
         "concurrently": "^9.1.2",
+        "documentation": "^14.0.3",
         "vite": "^6.3.5"
     }
 }
