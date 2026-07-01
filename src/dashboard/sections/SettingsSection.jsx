@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Eye, EyeOff, ImagePlus, Loader2, Plus, SlidersHorizontal, Trash2 } from "lucide-react";
 import { apiFetch, assetUrl, uploadFile } from "../directusClient.js";
-import Modal from "../Modal.jsx";
-import ConfirmDialog from "../ConfirmDialog.jsx";
-import ErrorToast from "../ErrorToast.jsx";
+import Modal from "../../slyk/Modal.jsx";
+import ConfirmDialog from "../../slyk/ConfirmDialog.jsx";
+import ErrorToast from "../../slyk/ErrorToast.jsx";
 
 // Réglages SERVEUR partagés (singleton mail_config) : serveur + port seulement.
 // L'identifiant et le mot de passe sont propres à CHAQUE compte (voir mail_accounts).

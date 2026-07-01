@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { apiFetch, assetUrl } from "../directusClient.js";
 import ImageDropField from "../ImageDropField.jsx";
-import ConfirmDialog from "../ConfirmDialog.jsx";
-import ErrorToast from "../ErrorToast.jsx";
+import ConfirmDialog from "../../slyk/ConfirmDialog.jsx";
+import ErrorToast from "../../slyk/ErrorToast.jsx";
 
 // Champs textes récupérés/enregistrés pour une réalisation. On liste explicitement
 // les champs demandés à Directus pour ne transférer que l'utile (et inclure les

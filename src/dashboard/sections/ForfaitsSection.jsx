@@ -19,9 +19,9 @@ import {
     Zap,
 } from "lucide-react";
 import { apiFetch } from "../directusClient.js";
-import ConfirmDialog from "../ConfirmDialog.jsx";
-import ErrorToast from "../ErrorToast.jsx";
-import useDragReorder from "../useDragReorder.js";
+import ConfirmDialog from "../../slyk/ConfirmDialog.jsx";
+import ErrorToast from "../../slyk/ErrorToast.jsx";
+import useDragReorder from "../../slyk/useDragReorder.js";
 
 // Couleur par défaut d'un niveau tant qu'aucune n'est choisie.
 const DEFAULT_COLOR = "#b91c1c";

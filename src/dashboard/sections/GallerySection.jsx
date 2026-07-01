@@ -2,10 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, Film, GripVertical, ImagePlus, Pencil, Play, RotateCcw, Trash2, Video } from "lucide-react";
 import { apiFetch, assetUrl, uploadFileWithProgress } from "../directusClient.js";
 import BeforeAfterSlider from "../BeforeAfterSlider.jsx";
-import Modal from "../Modal.jsx";
-import ConfirmDialog from "../ConfirmDialog.jsx";
-import ErrorToast from "../ErrorToast.jsx";
-import useDragReorder from "../useDragReorder.js";
+import Modal from "../../slyk/Modal.jsx";
+import ConfirmDialog from "../../slyk/ConfirmDialog.jsx";
+import ErrorToast from "../../slyk/ErrorToast.jsx";
+import useDragReorder from "../../slyk/useDragReorder.js";
 
 // Champs récupérés/enregistrés pour une entrée de galerie.
 const GALLERY_FIELDS = [
