@@ -1,0 +1,39 @@
+/* =============================================================================
+   ZOÉ — le thème de Slyk.
+   Slyk (le moteur d'interactions) ne connaît QUE ces variables. Zoé leur donne
+   des valeurs = l'apparence. Un client re-skin en surchargeant ces tokens, sans
+   toucher au comportement.
+
+   Ce fichier définit le THÈME PAR DÉFAUT (sombre neutre). Un client fournit le
+   sien (ex. Nostalgia) en redéfinissant les mêmes variables sur :root.
+   ============================================================================= */
+
+:root {
+    /* --- Couleurs --- */
+    --zoe-acc: #e11d48; /* accent : survols, focus, éléments actifs */
+    --zoe-ok: #16a34a; /* positif : coche de sélection, validation */
+    --zoe-bg: #000000; /* fond des champs / menus */
+    --zoe-surface: #0b0d10; /* surfaces surélevées (cartes, popovers) */
+    --zoe-txt: #ffffff; /* texte principal */
+    --zoe-muted: #9aa0a6; /* texte discret (chevrons, placeholders) */
+    --zoe-line: rgba(255, 255, 255, 0.12); /* bordures / séparateurs */
+
+    /* --- Formes --- */
+    --zoe-radius: 8px; /* rayon des coins */
+
+    /* =========================================================================
+       PONT ZOÉ → SLYK.
+       Slyk lit des variables neutres (--acc, --line, --bg…). On les branche ici
+       sur les tokens Zoé. Ainsi : changer un token Zoé re-skin tout Slyk.
+       (Un client peut aussi définir directement --acc, etc. — Zoé n'est qu'un
+       fournisseur de valeurs.)
+       ========================================================================= */
+    --acc: var(--zoe-acc);
+    --line: var(--zoe-line);
+    --bg: var(--zoe-bg);
+    --surface: var(--zoe-surface);
+    --txt: var(--zoe-txt);
+    --muted: var(--zoe-muted);
+    --slyk-ok: var(--zoe-ok);
+    --radius-button: var(--zoe-radius);
+}
