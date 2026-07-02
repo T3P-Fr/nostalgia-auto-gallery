@@ -3,11 +3,23 @@
     "site": {
         "phone": "06 36 37 22 10",
         "phoneHref": "tel:+33636372210",
-        "email": "jammesmeca.auto@gmail.com",
-        "emailHref": "mailto:jammesmeca.auto@gmail.com",
-        "social": "@nostalgia_auto_galery",
+        "emailUser": "contact",
+        "emailDomain": "nostalgiaauto.gallery",
+        "socials": [
+            {
+                "label": "Instagram",
+                "url": "https://www.instagram.com/nostalgiaauto.gallery/",
+                "icon": "Instagram"
+            },
+            {
+                "label": "Facebook",
+                "url": "https://www.facebook.com/nostalgiaauto.gallery",
+                "icon": "Facebook"
+            }
+        ],
         "location": "Parignargues · Gard (30)",
-        "siret": "SIRET 105 175 756 · Ouverture officielle · 6 juillet 2026",
+        "siret": "105 175 756 00011",
+        "address": "3 Rue du Silence, 30730 Parignargues",
         "footerTagline": "Le detailing automobile à domicile dans le Gard. Nettoyage, rénovation esthétique et protection, autour de Parignargues et Nîmes.",
         "copyright": "© 2026 Nostalgia Auto Gallery — Corentin Jammes. Tous droits réservés.",
         "legalLinks": [
@@ -30,19 +42,16 @@
         {
             "title": "Intérieur",
             "description": "Un habitacle propre, sain et agréable : aspiration, surfaces, vitres, sièges et vapeur selon le niveau choisi.",
-            "from": "dès 65 €",
             "icon": "Armchair"
         },
         {
             "title": "Extérieur",
             "description": "Une carrosserie qui retrouve son éclat : lavage manuel, jantes, décontamination et protection longue durée.",
-            "from": "dès 65 €",
             "icon": "CarFront"
         },
         {
             "title": "Complète",
             "description": "Intérieur et extérieur réunis dans une seule intervention : vous économisez sur le lavage et la révision de base est gratuite.",
-            "from": "dès 125 €",
             "icon": "Wrench"
         }
     ],
@@ -86,26 +95,6 @@
             "nissan-dusk2.jpg",
             "200SX",
             "finition extérieure"
-        ],
-        [
-            "https://picsum.photos/seed/nag-interior/800/600",
-            "Habitacle",
-            "shampoing des sièges · placeholder"
-        ],
-        [
-            "https://picsum.photos/seed/nag-wheel/800/600",
-            "Jantes",
-            "nettoyage & céramique · placeholder"
-        ],
-        [
-            "https://picsum.photos/seed/nag-foam/800/600",
-            "Prélavage mousse",
-            "lavage à la main · placeholder"
-        ],
-        [
-            "https://picsum.photos/seed/nag-detail/800/600",
-            "Finitions",
-            "détails & protection · placeholder"
         ]
     ],
     "interventionTowns": [
@@ -314,7 +303,6 @@
             ],
             "stats": [
                 {
-                    "value": "dès 65 €",
                     "label": "soin esthétique"
                 },
                 {
@@ -672,11 +660,11 @@
                 "blocks": [
                     {
                         "title": "Éditeur du site",
-                        "text": "Nostalgia Auto Gallery — Corentin Jammes. Parignargues (30730), Gard. SIRET à compléter (14 chiffres). Responsable de la publication : Corentin Jammes."
+                        "text": "Nostalgia Auto Gallery — Corentin Jammes. Adresse : {address}. SIRET : {siret}. Responsable de la publication : Corentin Jammes."
                     },
                     {
                         "title": "Contact",
-                        "text": "Téléphone : 06 36 37 22 10. Email : jammesmeca.auto@gmail.com."
+                        "text": "Téléphone : 06 36 37 22 10. Email : corentin@nostalgiaauto.gallery."
                     },
                     {
                         "title": "Hébergement",
@@ -700,7 +688,7 @@
                     },
                     {
                         "title": "Vos droits",
-                        "text": "Vous pouvez demander l’accès, la rectification ou la suppression de vos informations en écrivant à jammesmeca.auto@gmail.com."
+                        "text": "Vous pouvez demander l’accès, la rectification ou la suppression de vos informations en écrivant à corentin@nostalgiaauto.gallery."
                     }
                 ]
             },

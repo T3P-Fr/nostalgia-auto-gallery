@@ -1,5 +1,7 @@
+import { Mail, MapPin, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
-import { site } from "../data.js";
+import { icons, site } from "../data.js";
+import { useEmail } from "../utils/useEmail.js";
 import { Brand } from "./Brand.jsx";
 
 /**
@@ -10,14 +12,11 @@ import { Brand } from "./Brand.jsx";
  * @returns {JSX.Element} Le pied de page du site.
  */
 export function FooterPage() {
+    const email = useEmail();
+
     return (
         <footer className="site-footer bluredBackground--card">
             <div className="footer-grid container">
-                <div className="footer-about">
-                    <Brand footer />
-                    <p>{site.footerTagline}</p>
-                    <small>{site.siret}</small>
-                </div>
                 <div>
                     <h3>Navigation</h3>
                     <Link to="/">Accueil</Link>
@@ -29,10 +28,46 @@ export function FooterPage() {
                 </div>
                 <div>
                     <h3>Contact</h3>
-                    <a href={site.phoneHref}>{site.phone}</a>
-                    <a href={site.emailHref}>{site.email}</a>
-                    <span>{site.social}</span>
-                    <span>{site.location}</span>
+                    <a className="footer-social" href={site.phoneHref}>
+                        <Phone size={16} aria-hidden="true" />
+                        {site.phone}
+                    </a>
+                    {email ? (
+                        <a className="footer-social" href={email.href}>
+                            <Mail size={16} aria-hidden="true" />
+                            {email.address}
+                        </a>
+                    ) : (
+                        <span className="footer-social">
+                            <Mail size={16} aria-hidden="true" />
+                            Écrire un e-mail
+                        </span>
+                    )}
+                    {site.socials?.map((social) => {
+                        const Icon = icons[social.icon];
+                        return (
+                            <a
+                                key={social.label}
+                                className="footer-social"
+                                href={social.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {Icon ? <Icon size={16} aria-hidden="true" /> : null}
+                                {social.label}
+                            </a>
+                        );
+                    })}
+                    <span className="footer-social">
+                        <MapPin size={16} aria-hidden="true" />
+                        {site.location}
+                    </span>
+                </div>
+                <div className="footer-about">
+                    <Brand footer />
+                    <p>{site.footerTagline}</p>
+                    <small>{site.address}</small>
+                    <small>SIRET {site.siret}</small>
                 </div>
             </div>
             <div className="footer-bottom">{site.copyright}</div>

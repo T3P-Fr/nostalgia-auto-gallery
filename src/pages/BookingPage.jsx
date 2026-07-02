@@ -32,6 +32,7 @@ import {
     slotToMinutes,
     washCategories,
 } from "../utils/bookingHelpers.js";
+import {useEmail} from "../utils/useEmail.js";
 
 /*
  * Page de rendez-vous : contact, zone d'intervention et parcours complet de réservation.
@@ -51,6 +52,7 @@ export default function BookingPage() {
         pieces: false,
     });
     const [searchParams] = useSearchParams();
+    const email = useEmail();
     const [visibleMonth, setVisibleMonth] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState("");
     const [selectedSlot, setSelectedSlot] = useState("");
@@ -715,10 +717,17 @@ export default function BookingPage() {
                         <Phone />
                         <span><small>Téléphone</small>{site.phone}</span>
                     </a>
-                    <a href={site.emailHref}>
-                        <Mail />
-                        <span><small>Email</small>{site.email}</span>
-                    </a>
+                    {email ? (
+                        <a href={email.href}>
+                            <Mail />
+                            <span><small>Email</small>{email.address}</span>
+                        </a>
+                    ) : (
+                        <div>
+                            <Mail />
+                            <span><small>Email</small>Écrire un e-mail</span>
+                        </div>
+                    )}
                     <div>
                         <MapPin />
                         <span><small>Atelier mobile</small>{site.location}</span>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { FooterPage } from "./FooterPage.jsx";
 import { HeaderPage } from "./HeaderPage.jsx";
@@ -16,13 +16,6 @@ import { MainPage } from "./MainPage.jsx";
  */
 export default function Layout() {
     const location = useLocation();
-
-    // Avis « site en finalisation » : popup rouvert à CHAQUE page (changement de
-    // route), refermé par le bouton « COMPRIS ».
-    const [noticeOpen, setNoticeOpen] = useState(true);
-    useEffect(() => {
-        setNoticeOpen(true);
-    }, [location.pathname]);
 
     // Chaque changement de page repart du haut : React Router ne réinitialise pas
     // le défilement seul, et l'état du fond fixe (flou/zoom) en dépend.
@@ -99,27 +92,6 @@ export default function Layout() {
             <HeaderPage />
             <MainPage />
             <FooterPage />
-
-            {/* Popup d'avis (même modal que partout) : rouvert à chaque page. */}
-            {noticeOpen && (
-                <div className="slot-modal" role="dialog" aria-modal="true">
-                    <div className="slot-modal__box">
-                        <h3>Site en cours de finalisation</h3>
-                        <p>
-                            Ce site est en cours de finalisation. Pour les informations et
-                            les tarifs exacts, contactez Corentin au{" "}
-                            <a href="tel:+33636372210">06&nbsp;36&nbsp;37&nbsp;22&nbsp;10</a>.
-                        </p>
-                        <button
-                            className="button button--block"
-                            type="button"
-                            onClick={() => setNoticeOpen(false)}
-                        >
-                            COMPRIS
-                        </button>
-                    </div>
-                </div>
-            )}
         </>
     );
 }

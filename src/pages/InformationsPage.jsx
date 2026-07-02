@@ -1,12 +1,24 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { PageHero, SectionHeading } from "../components/Ui.jsx";
-import { pages } from "../data.js";
+import { pages, site } from "../data.js";
 
 // Contenu centralisé (cf. content.json → pages.informations + pages.legal).
 const { hero } = pages.informations;
 // Documents légaux, dans l'ordre d'insertion (mentions → confidentialité → conditions).
 const documents = Object.entries(pages.legal);
+
+/**
+ * Injecte les données d'identité (adresse, SIRET) issues de `site` dans un texte
+ * légal, via les marqueurs {address} / {siret}. Source unique : content.json → site.
+ * @param {string} text Texte pouvant contenir des marqueurs.
+ * @returns {string} Le texte avec les valeurs de `site` substituées.
+ */
+function fillIdentity(text) {
+    return text
+        .replaceAll("{address}", site.address)
+        .replaceAll("{siret}", site.siret);
+}
 
 /**
  * Page Informations : réunit mentions légales, confidentialité et conditions de
@@ -40,7 +52,7 @@ export default function InformationsPage() {
                         {doc.blocks.map((block) => (
                             <div className="legal-block" key={block.title}>
                                 <h3>{block.title}</h3>
-                                <p>{block.text}</p>
+                                <p>{fillIdentity(block.text)}</p>
                             </div>
                         ))}
                     </article>

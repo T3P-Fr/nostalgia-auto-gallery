@@ -1167,6 +1167,8 @@ main::after {
 
 /* Bouton-zoom enveloppant chaque photo de la grille. */
 .gallery-zoom {
+    position: absolute;
+    inset: 0;
     display: block;
     padding: 0;
     border: 0;
@@ -1177,6 +1179,33 @@ main::after {
 .gallery-zoom img {
     display: block;
     width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Œil révélé au survol (ou focus clavier) : voile sombre + icône centrée. */
+.gallery-zoom__eye {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(4, 8, 12, 0.42);
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    /* Laisse passer survol et clic vers le bouton en dessous. */
+    pointer-events: none;
+}
+
+.gallery-zoom:hover .gallery-zoom__eye,
+.gallery-zoom:focus-visible .gallery-zoom__eye {
+    opacity: 1;
+}
+
+.gallery-zoom__eye svg {
+    width: 38px;
+    height: 38px;
 }
 
 /* Modal natif plein écran (<dialog>) pour visualiser une photo agrandie. */
@@ -1199,6 +1228,18 @@ main::after {
     margin: 0;
 }
 
+/* Comparateur avant/après en plein écran : largeur bornée, gardant le ratio 16/9. */
+.image-modal__content--ba {
+    width: min(90vw, 1000px);
+}
+
+.image-modal__caption {
+    margin-top: 10px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+}
+
 .image-modal__content img {
     display: block;
     max-width: 92vw;
@@ -1214,26 +1255,36 @@ main::after {
     font-size: 14px;
 }
 
+/* Bouton fermer : cercle blanc / croix noire, qui vire au rouge / croix blanche
+   au survol (convention Slyk). Fixé au coin haut-droit de l'écran. */
 .image-modal__close {
-    position: absolute;
-    top: -52px;
-    right: 0;
+    position: fixed;
+    top: 20px;
+    right: 20px;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border: 1px solid rgba(255, 255, 255, 0.42);
-    border-radius: var(--radius-card);
-    background: color-mix(in oklch, var(--surface) 38%, transparent);
-    backdrop-filter: blur(10px);
-    color: #fff;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    color: #000;
     cursor: pointer;
-    font-weight: 700;
-    text-transform: uppercase;
+    transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.image-modal__close:hover,
+.image-modal__close:focus-visible {
+    background: var(--acc);
+    color: #fff;
+    transform: scale(1.06);
 }
 
 .image-modal__close svg {
-    width: 18px;
+    width: 22px;
+    height: 22px;
 }
 
 /* Page Informations : pleine largeur du site (le .container fixe déjà la largeur),
@@ -3382,15 +3433,31 @@ main::after {
 
 .footer-grid {
     display: grid;
-    grid-template-columns: 1.6fr 1fr 1fr;
+    /* Colonnes dimensionnées au contenu et réparties sur toute la largeur :
+       Navigation colle à gauche, Infos à droite, espaces vides réguliers. */
+    grid-template-columns: auto auto auto;
+    justify-content: space-between;
     gap: 56px;
-    padding-block: 60px 30px;
+    padding-block: 96px 48px;
+    padding-inline: 24px;
+}
+
+/* Le bloc « Infos » (marque, tagline, adresse, SIRET) : dernier, aligné à gauche,
+   largeur bornée pour ne pas étirer démesurément le paragraphe. */
+.footer-about {
+    text-align: left;
+    max-width: 360px;
+}
+
+/* Adresse et SIRET sur des lignes distinctes (deux <small> côte à côte sinon). */
+.footer-about small {
+    display: block;
 }
 
 .footer-about p,
 .footer-about small,
-.footer-grid>div:not(:first-child) a,
-.footer-grid>div:not(:first-child) span {
+.footer-grid>div:not(.footer-about) a,
+.footer-grid>div:not(.footer-about) span {
     color: var(--muted);
     font-size: 14px;
     line-height: 1.6;
@@ -3403,7 +3470,7 @@ main::after {
     text-transform: uppercase;
 }
 
-.footer-grid>div:not(:first-child) {
+.footer-grid>div:not(.footer-about) {
     display: flex;
     flex-direction: column;
     gap: 9px;
@@ -3411,6 +3478,13 @@ main::after {
 
 .footer-grid a {
     text-decoration: none;
+}
+
+/* Liens réseaux sociaux : icône + libellé alignés sur une même ligne. */
+.footer-social {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .footer-grid a:hover {
@@ -3556,6 +3630,8 @@ main::after {
 
     .footer-grid {
         grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        padding-inline: 32px;
     }
 
     .footer-about {
@@ -3570,9 +3646,14 @@ main::after {
 
 @media (max-width: 620px) {
 
-    /* Mode téléphone : on ne garde que l'emblème, le logo texte est masqué. */
+    /* Mode téléphone : on ne garde que l'emblème dans l'en-tête, le logo texte
+       y est masqué… mais on le conserve dans le footer (il y a la place). */
     .brand__words {
         display: none;
+    }
+
+    .site-footer .brand__words {
+        display: inline;
     }
 
     .hero {
@@ -3642,12 +3723,15 @@ main::after {
         border-bottom: 1px solid var(--line);
     }
 
+    /* Mobile : Navigation + Contact sur deux colonnes, Infos en pleine largeur. */
     .footer-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        padding-inline: 32px;
     }
 
     .footer-about {
-        grid-column: auto;
+        grid-column: 1 / -1;
     }
 }
 

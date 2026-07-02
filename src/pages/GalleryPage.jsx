@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { Eye, X } from "lucide-react";
 import { useRef, useState } from "react";
 import {
     BeforeAfterComparison,
@@ -30,38 +30,56 @@ function resolveImageSource(image) {
     return image.startsWith("http") ? image : `/assets/${image}`;
 }
 
+// Avant/après mis en avant (Hero) : l'intérieur de la Nissan. Il n'apparaît donc
+// PAS dans la liste (pour ne pas l'avoir en double).
+const heroSet =
+    beforeAfter.find((set) => set.label === "Intérieur") ?? beforeAfter[0];
+
+/*
+ * Liste de réalisations : avant/après (hors Hero) ET photos, mêmes vignettes.
+ * L'ordre viendra du serveur ; ici on concatène. Chaque vignette porte un type qui
+ * décide du plein écran : un comparateur (« ba ») ou une image simple (« photo »).
+ */
+const tiles = [
+    ...beforeAfter
+        .filter((set) => set !== heroSet)
+        .map((set) => ({
+            type: "ba",
+            key: `ba-${set.label}`,
+            thumb: set.after,
+            before: set.before,
+            after: set.after,
+            label: set.label,
+            caption: set.label,
+            subtitle: "avant / après",
+        })),
+    ...galleryItems.map(([image, title, subtitle]) => ({
+        type: "photo",
+        key: image,
+        thumb: resolveImageSource(image),
+        source: resolveImageSource(image),
+        caption: title,
+        subtitle,
+    })),
+];
+
 /**
- * Page Réalisations : avant/après sélectionnable, galerie zoomable (modal natif),
- * avis clients et note de transparence.
+ * Page Réalisations : une galerie unique. Chaque vignette révèle un œil au survol
+ * (curseur loupe) et s'ouvre en plein écran au clic — image ou comparateur.
  * @returns {JSX.Element} La page des réalisations.
  */
 export default function GalleryPage() {
-    // Exemple avant/après actuellement affiché dans le grand comparateur.
-    const [activeSet, setActiveSet] = useState(0);
-    // Photo affichée en plein écran dans le <dialog> (null = fermé).
-    const [zoomed, setZoomed] = useState(null);
-
-    const comparisonRef = useRef(null);
+    // Vignette affichée en plein écran dans le <dialog> (null = fermé).
+    const [viewer, setViewer] = useState(null);
     const dialogRef = useRef(null);
 
     /**
-     * Sélectionne un exemple avant/après et fait défiler vers le grand comparateur.
-     * @param {number} index Indice de l'exemple choisi.
+     * Ouvre une vignette en plein écran via le modal natif <dialog>.
+     * @param {object} tile Vignette à afficher (type « ba » ou « photo »).
      * @returns {void} Aucune valeur de retour.
      */
-    function showBeforeAfter(index) {
-        setActiveSet(index);
-        comparisonRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-
-    /**
-     * Ouvre une photo en plein écran via le modal natif <dialog>.
-     * @param {string} source URL de l'image à agrandir.
-     * @param {string} title Légende de l'image.
-     * @returns {void} Aucune valeur de retour.
-     */
-    function openZoom(source, title) {
-        setZoomed({ source, title });
+    function openViewer(tile) {
+        setViewer(tile);
         dialogRef.current?.showModal();
     }
 
@@ -69,11 +87,20 @@ export default function GalleryPage() {
      * Ferme le modal plein écran.
      * @returns {void} Aucune valeur de retour.
      */
-    function closeZoom() {
+    function closeViewer() {
         dialogRef.current?.close();
     }
 
-    const current = beforeAfter[activeSet];
+    /**
+     * Ferme le modal lorsqu'on clique en dehors du contenu (fond du <dialog>).
+     * @param {import("react").MouseEvent} event Évènement de clic sur le dialog.
+     * @returns {void} Aucune valeur de retour.
+     */
+    function handleDialogClick(event) {
+        if (event.target === dialogRef.current) {
+            closeViewer();
+        }
+    }
 
     return (
         <>
@@ -82,61 +109,35 @@ export default function GalleryPage() {
             <section className="container">
                 <SectionHeading {...heading} />
 
-                {/* Grand comparateur avant/après, piloté par l'exemple sélectionné. */}
-                <div ref={comparisonRef}>
-                    <BeforeAfterComparison
-                        before={current.before}
-                        after={current.after}
-                        label={current.label}
-                    />
-                </div>
+                {/* Hero : un seul avant/après mis en avant (l'intérieur de la Nissan). */}
+                <BeforeAfterComparison
+                    before={heroSet.before}
+                    after={heroSet.after}
+                    label={heroSet.label}
+                />
 
-                {/* Cartes d'exemples (même style que la galerie) : une seule image,
-                    surmontée des pills « Avant / Après ». Un clic défile vers le
-                    grand comparateur et y charge l'exemple choisi. */}
-                <div className="gallery-grid ba-grid">
-                    {beforeAfter.map((set, index) => (
-                        <button
-                            type="button"
-                            key={set.label}
-                            className={`ba-card${index === activeSet ? " is-active" : ""}`}
-                            onClick={() => showBeforeAfter(index)}
-                            aria-label={`Voir l’avant / après — ${set.label}`}
-                        >
-                            <img src={set.after} alt={`Avant / après — ${set.label}`} loading="lazy" />
-                            <span className="ba-card__pills">
-                                <span className="pill">Avant</span>
-                                <span className="pill">Après</span>
-                            </span>
-                            <span className="ba-card__caption">
-                                <strong>{set.label}</strong>
-                                <span>avant / après</span>
-                            </span>
-                        </button>
-                    ))}
-                </div>
-
-                {/* Galerie : chaque photo s'ouvre en plein écran au clic. */}
+                {/* Réalisations : photos et avant/après mélangés. Œil au survol
+                    (curseur loupe), clic = plein écran. */}
                 <div className="gallery-grid">
-                    {galleryItems.map(([image, title, subtitle]) => {
-                        const source = resolveImageSource(image);
-                        return (
-                            <figure key={image}>
-                                <button
-                                    type="button"
-                                    className="gallery-zoom"
-                                    onClick={() => openZoom(source, title)}
-                                    aria-label={`Agrandir : ${title}`}
-                                >
-                                    <img src={source} alt={title} loading="lazy" />
-                                </button>
-                                <figcaption>
-                                    <strong>{title}</strong>
-                                    <span>{subtitle}</span>
-                                </figcaption>
-                            </figure>
-                        );
-                    })}
+                    {tiles.map((tile) => (
+                        <figure key={tile.key}>
+                            <button
+                                type="button"
+                                className="gallery-zoom"
+                                onClick={() => openViewer(tile)}
+                                aria-label={`Voir en plein écran : ${tile.caption}`}
+                            >
+                                <img src={tile.thumb} alt={tile.caption} loading="lazy" />
+                                <span className="gallery-zoom__eye" aria-hidden="true">
+                                    <Eye />
+                                </span>
+                            </button>
+                            <figcaption>
+                                <strong>{tile.caption}</strong>
+                                <span>{tile.subtitle}</span>
+                            </figcaption>
+                        </figure>
+                    ))}
                 </div>
             </section>
 
@@ -177,17 +178,40 @@ export default function GalleryPage() {
                 </div>
             </section>
 
-            {/* Modal plein écran natif : visualisation d'une photo + bouton Fermer. */}
-            <dialog ref={dialogRef} className="image-modal" onClose={() => setZoomed(null)}>
-                {zoomed && (
+            {/* Modal plein écran natif : image OU comparateur. Fermeture au clic sur
+                le fond ou sur la croix (cercle en haut à droite). */}
+            <dialog
+                ref={dialogRef}
+                className="image-modal"
+                onClose={() => setViewer(null)}
+                onClick={handleDialogClick}
+            >
+                <button
+                    type="button"
+                    className="image-modal__close"
+                    onClick={closeViewer}
+                    aria-label="Fermer"
+                >
+                    <X />
+                </button>
+
+                {viewer?.type === "ba" && (
+                    <div className="image-modal__content image-modal__content--ba">
+                        <BeforeAfterComparison
+                            before={viewer.before}
+                            after={viewer.after}
+                            label={viewer.label}
+                        />
+                        <p className="image-modal__caption">{viewer.label} — avant / après</p>
+                    </div>
+                )}
+
+                {viewer?.type === "photo" && (
                     <figure className="image-modal__content">
-                        <img src={zoomed.source} alt={zoomed.title} />
-                        <figcaption>{zoomed.title}</figcaption>
+                        <img src={viewer.source} alt={viewer.caption} />
+                        <figcaption>{viewer.caption}</figcaption>
                     </figure>
                 )}
-                <button type="button" className="image-modal__close" onClick={closeZoom}>
-                    <X /> Fermer
-                </button>
             </dialog>
         </>
     );
