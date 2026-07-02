@@ -4,6 +4,7 @@ import { apiFetch, assetUrl, uploadFile } from "../directusClient.js";
 import Modal from "../../slyk/Modal.jsx";
 import ConfirmDialog from "../../slyk/ConfirmDialog.jsx";
 import ErrorToast from "../../slyk/ErrorToast.jsx";
+import SaveFeedback from "../../slyk/SaveFeedback.jsx";
 
 // Réglages SERVEUR partagés (singleton mail_config) : serveur + port seulement.
 // L'identifiant et le mot de passe sont propres à CHAQUE compte (voir mail_accounts).
@@ -97,19 +98,6 @@ export default function SettingsSection() {
         const timer = setTimeout(() => setSaved((current) => ({ key: null, nonce: current.nonce })), 1500);
         return () => clearTimeout(timer);
     }, [saved.key, saved.nonce]);
-
-    /** Feedback vert (bordure + toast) sur l'élément fraîchement enregistré. */
-    function savedFx(key) {
-        if (saved.key !== key) {
-            return null;
-        }
-        return (
-            <span className="save-feedback" key={saved.nonce} aria-hidden="true">
-                <span className="save-flash" />
-                <span className="save-toast">Enregistré</span>
-            </span>
-        );
-    }
 
     function markSaved(key) {
         setSaved((current) => ({ key, nonce: current.nonce + 1 }));
@@ -242,10 +230,10 @@ export default function SettingsSection() {
                                     {showId === account.id ? <EyeOff /> : <Eye />}
                                 </button>
                             </div>
-                            {savedFx(`acct-${account.id}-name`)}
-                            {savedFx(`acct-${account.id}-email`)}
-                            {savedFx(`acct-${account.id}-avatar`)}
-                            {savedFx(`acct-${account.id}-pass`)}
+                            <SaveFeedback key={saved.nonce} show={saved.key === `acct-${account.id}-name`} />
+                            <SaveFeedback key={saved.nonce} show={saved.key === `acct-${account.id}-email`} />
+                            <SaveFeedback key={saved.nonce} show={saved.key === `acct-${account.id}-avatar`} />
+                            <SaveFeedback key={saved.nonce} show={saved.key === `acct-${account.id}-pass`} />
                         </div>
                         <button
                             type="button"
@@ -285,7 +273,7 @@ export default function SettingsSection() {
                                     onChange={(event) => setConfig((c) => ({ ...c, [field.key]: event.target.value }))}
                                     onBlur={() => saveConfig(field.key)}
                                 />
-                                {savedFx(`cfg-${field.key}`)}
+                                <SaveFeedback key={saved.nonce} show={saved.key === `cfg-${field.key}`} />
                             </label>
                         ))}
                     </div>

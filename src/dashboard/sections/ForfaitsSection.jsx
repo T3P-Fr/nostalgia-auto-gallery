@@ -22,6 +22,7 @@ import ConfirmDialog from "../../slyk/ConfirmDialog.jsx";
 import ErrorToast from "../../slyk/ErrorToast.jsx";
 import Dropdown from "../../slyk/Dropdown.jsx";
 import IconPicker from "../../slyk/IconPicker.jsx";
+import SaveFeedback from "../../slyk/SaveFeedback.jsx";
 import useDragReorder from "../../slyk/useDragReorder.js";
 
 // Couleur par défaut d'un niveau tant qu'aucune n'est choisie.
@@ -168,24 +169,6 @@ export default function ForfaitsSection() {
     }, [saved.key, saved.nonce]);
 
     /**
-     * Rend le feedback vert (bordure + toast « Enregistré ») si `key` correspond
-     * à l'élément fraîchement enregistré. Remonté par `nonce` pour rejouer l'anim.
-     * @param {string} key Clé de l'élément.
-     * @returns {JSX.Element|null} Le feedback, ou null.
-     */
-    function savedFx(key) {
-        if (saved.key !== key) {
-            return null;
-        }
-        return (
-            <span className="save-feedback" key={saved.nonce} aria-hidden="true">
-                <span className="save-flash" />
-                <span className="save-toast">Enregistré</span>
-            </span>
-        );
-    }
-
-    /**
      * Rend l'identité d'un niveau (icône déroulante + nom coloré), éditable et
      * synchronisée partout où le niveau apparaît. Utilisé à la fois dans la bande
      * du haut et dans l'en-tête des cartes de forfait.
@@ -210,7 +193,7 @@ export default function ForfaitsSection() {
                             saveLevel(level.id, { icon: key }, `level-${level.id}-icon`);
                         }}
                     />
-                    {savedFx(`level-${level.id}-icon`)}
+                    <SaveFeedback key={saved.nonce} show={saved.key === `level-${level.id}-icon`} />
                 </span>
 
                 {/* Nom du niveau (coloré). */}
@@ -224,7 +207,7 @@ export default function ForfaitsSection() {
                         onChange={(event) => patchLevelLocal(level.id, { name: event.target.value })}
                         onBlur={() => saveLevel(level.id, { name: level.name }, `level-${level.id}-name`)}
                     />
-                    {savedFx(`level-${level.id}-name`)}
+                    <SaveFeedback key={saved.nonce} show={saved.key === `level-${level.id}-name`} />
                 </span>
 
                 {/* Couleur (optionnelle : uniquement dans la bande). */}
@@ -239,7 +222,7 @@ export default function ForfaitsSection() {
                             onChange={(event) => patchLevelLocal(level.id, { color: event.target.value })}
                             onBlur={() => saveLevel(level.id, { color: level.color || DEFAULT_COLOR }, `level-${level.id}-color`)}
                         />
-                        {savedFx(`level-${level.id}-color`)}
+                        <SaveFeedback key={saved.nonce} show={saved.key === `level-${level.id}-color`} />
                     </span>
                 )}
 
@@ -707,7 +690,7 @@ export default function ForfaitsSection() {
                                             onBlur={() => saveTier(tier.id, { price: tier.price }, `tier-${tier.id}-price`)}
                                         />
                                         <span className="forfait-card__euro">€</span>
-                                        {savedFx(`tier-${tier.id}-price`)}
+                                        <SaveFeedback key={saved.nonce} show={saved.key === `tier-${tier.id}-price`} />
                                     </label>
 
                                     {/* Durée : « ≈ » fixe + heures / minutes. */}
@@ -732,13 +715,13 @@ export default function ForfaitsSection() {
                                             onBlur={() => saveTier(tier.id, { duration: tier.duration }, `tier-${tier.id}-duration`)}
                                         />
                                         <span className="forfait-card__unit">min</span>
-                                        {savedFx(`tier-${tier.id}-duration`)}
+                                        <SaveFeedback key={saved.nonce} show={saved.key === `tier-${tier.id}-duration`} />
                                     </div>
 
                                     {/* « Complète » : dropdown personnalisé (niveau courant exclu). */}
                                     <div className="forfait-card__includes save-anchor">
                                         <span className="forfait-card__includes-label">Complète la formule</span>
-                                        {savedFx(`tier-${tier.id}-includes`)}
+                                        <SaveFeedback key={saved.nonce} show={saved.key === `tier-${tier.id}-includes`} />
                                         {/* Dropdown Slyk (conventions intégrées). Options = « Aucune »
                                             + les autres niveaux (icône + couleur), niveau courant exclu. */}
                                         <Dropdown
@@ -801,7 +784,7 @@ export default function ForfaitsSection() {
                                         ))}
                                         {/* Feedback d'ajout/suppression de ligne (la ligne
                                             elle-même ayant disparu). */}
-                                        {savedFx(`tier-${tier.id}-features`)}
+                                        <SaveFeedback key={saved.nonce} show={saved.key === `tier-${tier.id}-features`} />
                                     </ul>
 
                                     <button
@@ -903,7 +886,7 @@ export default function ForfaitsSection() {
                                             />
                                             <span>%</span>
                                         </div>
-                                        {savedFx(`discounts-${activeGroup.id}-${name}`)}
+                                        <SaveFeedback key={saved.nonce} show={saved.key === `discounts-${activeGroup.id}-${name}`} />
                                     </label>
                                 );
                             })}
