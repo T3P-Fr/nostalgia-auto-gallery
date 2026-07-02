@@ -82,11 +82,6 @@
             "carrosserie lustrée"
         ],
         [
-            "peugeot-rear.jpg",
-            "205",
-            "profil arrière"
-        ],
-        [
             "context.jpg",
             "À domicile",
             "intervention"
@@ -567,11 +562,6 @@
                     "label": "Carrosserie",
                     "before": "/assets/comparison--before.webp",
                     "after": "/assets/comparison--after.webp"
-                },
-                {
-                    "label": "Scène complète",
-                    "before": "/assets/AVANT_MEME_SCENE_MATIN_TRES_SALE_PHARES_FERMES.png",
-                    "after": "/assets/AVANT_APRES_JOUR_APRES_ULTRA_CLEAN.png"
                 },
                 {
                     "label": "Intérieur",

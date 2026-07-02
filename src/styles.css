@@ -1183,10 +1183,87 @@ main::after {
     object-fit: cover;
 }
 
+/* Miniature avant/après FIGÉE : moitié avant (gauche), moitié après (droite,
+   découpée à 50%) + pastilles dans les angles. L'interactivité (curseur) est
+   réservée au plein écran. */
+.ba-thumb {
+    position: absolute;
+    inset: 0;
+    display: block;
+}
+
+.ba-thumb__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ba-thumb__img--after {
+    clip-path: inset(0 0 0 50%);
+}
+
+/* Trait blanc vertical au centre (séparation avant/après). */
+.ba-thumb::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    z-index: 2;
+    width: 2px;
+    transform: translateX(-50%);
+    background: #fff;
+}
+
+/* Poignée ⇆ centrée, comme le grand comparateur mais réduite et décorative. */
+.ba-thumb::after {
+    content: "⇆";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    color: #0d0e10;
+    font-size: 9px;
+    transform: translate(-50%, -50%);
+}
+
+.ba-thumb__tag {
+    position: absolute;
+    top: 8px;
+    z-index: 2;
+    /* Ne pas voler le survol/clic destinés au bouton en dessous. */
+    pointer-events: none;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.ba-thumb__tag--before {
+    left: 8px;
+}
+
+.ba-thumb__tag--after {
+    right: 8px;
+}
+
 /* Œil révélé au survol (ou focus clavier) : voile sombre + icône centrée. */
 .gallery-zoom__eye {
     position: absolute;
     inset: 0;
+    z-index: 4;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1198,7 +1275,9 @@ main::after {
     pointer-events: none;
 }
 
-.gallery-zoom:hover .gallery-zoom__eye,
+/* Survol déclenché sur toute la vignette (image + légende), pas seulement le
+   bouton : la légende, posée par-dessus, volait sinon le :hover au bas de la carte. */
+.gallery-grid figure:hover .gallery-zoom__eye,
 .gallery-zoom:focus-visible .gallery-zoom__eye {
     opacity: 1;
 }
@@ -1456,6 +1535,8 @@ main::after {
     flex-direction: column;
     padding: 55px 16px 14px;
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.78));
+    /* La légende ne doit pas capter le survol/clic (l'œil + le zoom passent au bouton). */
+    pointer-events: none;
 }
 
 .gallery-grid figcaption span {

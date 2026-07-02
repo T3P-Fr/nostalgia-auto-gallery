@@ -127,7 +127,18 @@ export default function GalleryPage() {
                                 onClick={() => openViewer(tile)}
                                 aria-label={`Voir en plein écran : ${tile.caption}`}
                             >
-                                <img src={tile.thumb} alt={tile.caption} loading="lazy" />
+                                {tile.type === "ba" ? (
+                                    // Miniature figée : moitié avant / moitié après + pastilles
+                                    // dans les angles (comme le grand comparateur, mais statique).
+                                    <span className="ba-thumb">
+                                        <img className="ba-thumb__img" src={tile.before} alt="" loading="lazy" />
+                                        <img className="ba-thumb__img ba-thumb__img--after" src={tile.after} alt={tile.caption} loading="lazy" />
+                                        <span className="ba-thumb__tag ba-thumb__tag--before">Avant</span>
+                                        <span className="ba-thumb__tag ba-thumb__tag--after">Après</span>
+                                    </span>
+                                ) : (
+                                    <img src={tile.thumb} alt={tile.caption} loading="lazy" />
+                                )}
                                 <span className="gallery-zoom__eye" aria-hidden="true">
                                     <Eye />
                                 </span>
