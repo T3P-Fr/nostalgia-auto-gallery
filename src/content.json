@@ -62,11 +62,6 @@
             "S13 · coupé"
         ],
         [
-            "nissan-lights.jpg",
-            "200SX",
-            "rénovation des phares"
-        ],
-        [
             "engine.jpg",
             "Compartiment moteur",
             "dégraissage"
@@ -77,19 +72,19 @@
             "youngtimer"
         ],
         [
-            "peugeot-front.jpg",
-            "205 GTI",
-            "carrosserie lustrée"
+            "avant-apres--ford.webp",
+            "Intérieur Ford",
+            "avant / après"
         ],
         [
-            "context.jpg",
-            "À domicile",
-            "intervention"
+            "optique.webp",
+            "Optique",
+            "avant / après"
         ],
         [
-            "nissan-dusk2.jpg",
-            "200SX",
-            "finition extérieure"
+            "moteur.webp",
+            "Compartiment moteur",
+            "dégraissage"
         ]
     ],
     "interventionTowns": [
@@ -567,6 +562,11 @@
                     "label": "Intérieur",
                     "before": "/assets/Interieur--avant.webp",
                     "after": "/assets/Interieur--apres.webp"
+                },
+                {
+                    "label": "Dacia Stepway",
+                    "before": "/assets/Stepway-apres.webp",
+                    "after": "/assets/Stepway-avant.webp"
                 }
             ],
             "reviewsHeading": {
@@ -636,16 +636,16 @@
         "informations": {
             "hero": {
                 "image": "/assets/Corentin-Magnum.webp",
-                "eyebrow": "Informations",
+                "eyebrow": "informations & mentions légales",
                 "title": "informations &\nmentions *légales*.",
-                "description": "Éditeur, données personnelles et conditions de réservation du site Nostalgia Auto Gallery, réunis sur une seule page."
+                "description": ""
             }
         },
         "legal": {
             "mentions-legales": {
                 "label": "Mentions légales",
                 "eyebrow": "Informations légales",
-                "title": "mentions *légales*.",
+                "title": "Vos droits, en toute\n*transparence*",
                 "intro": "Conformément aux dispositions légales applicables, cette page présente les informations relatives à l’éditeur et à l’hébergement du site Nostalgia Auto Gallery.",
                 "blocks": [
                     {
@@ -658,7 +658,7 @@
                     },
                     {
                         "title": "Hébergement",
-                        "text": "Coordonnées de l’hébergeur à compléter (nom, adresse, téléphone) avant publication."
+                        "text": "Ce site est hébergé par o2switch, 222-224 boulevard Gustave Flaubert, 63000 Clermont-Ferrand, France. SIRET : 510 909 807 00032. Téléphone : 04 44 44 60 40."
                     }
                 ]
             },
